@@ -1,0 +1,14 @@
+# default english
+Shop:
+  Prefix: "<white>SHOP: <darkgreen>"
+  Unknown_Item: "What is <white><item></>?"
+  Bad_Parameter: "... Not Quite Right for that Command ..<br> -- <error>"
+Permission:
+  Denied: You don't Have Permission to do that!
+ShopList:
+  Head: "-------- Price-List Page: &f<page> &2of &f<pages> &2--------"
+  Listing: "&f[<item>&f]&2 <l> Buy: &f<buyprice>&2  Sell: &f<sellprice>"
+  Tail: 
+  Alias: "&f[<item>&f]&2 is also known as: &b<alias>"
+  Nolist: "&f[<item>&f] &2cannot be bought or sold."
+  Pricecheck: "Price check! &f[<item>&f]&2 Buy: &f<buyprice> &2Sell: &f<sellprice>"
