@@ -120,7 +120,7 @@ public class Messages {
 		}
 	}
 // </editor-fold>
-	
+
 	protected Messages(BetterShop3 plugin) {
 		this.plugin = plugin;
 		for (int i = 0; i < messageTypes.length; ++i) {
@@ -163,12 +163,7 @@ public class Messages {
 							s.set(k2, MISSING_STRING);
 							needSave = true;
 						}
-						messages[i][j] = convertColorChars(s.getString(k2));
-
-						String[] tags = ((MessageType) o[j]).getTags();
-						for (int l = 0; l < tags.length; ++l) {
-							messages[i][j] = messages[i][j].replace(tags[l], "{" + l + "}");
-						}
+						messages[i][j] = lastColorTag(convertColorChars(convertTags(s.getString(k2), (MessageType) o[j])));
 					}
 				} else {
 					plugin.getLogger().info("Error: Section '" + k + "' is missing from " + lang.getName());
@@ -192,17 +187,33 @@ public class Messages {
 			}
 		}
 	}
+	final static Character shortColors[] = new Character[]{'B', 'N', 'G', 'Q', 'R', 'P', 'U', 'd', 'D', 'b', 'g', 'q', 'r', 'p', 'y', 'w', '~', 'r'};
+	final static Character colors[] = new Character[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'k', 'r'};
+	final static String colorTags[] = new String[]{"<black>", "<darkblue>", "<darkgreen>", "<darkaqua>", "<darkred>", "<darkpurple>",
+		"<gold>", "<gray>", "<darkgray>", "<blue>", "<green>", "<aqua>", "<red>", "<lightpurple>", "<yellow>", "<white>", "<magic>", "<reset>"};
 
 	public static String convertColorChars(String str) {
+		if (str.contains("<")) {
+			for (int i = 0; i < colorTags.length; ++i) {
+				str = str.replace(colorTags[i], String.valueOf(ChatColor.COLOR_CHAR) + colors[i]);
+			}
+		}
 		StringBuilder s = new StringBuilder();
-		for (int i = 0; i < str.length() - 1; ++i) {
+		int i = 0;
+		for (; i < str.length() - 1; ++i) {
 			if (str.charAt(i) == '&') {
 				if (str.charAt(i + 1) == '&') {
 					s.append("&");
 					++i;
 					continue;
 				} else {
-					ChatColor c = ChatColor.getByChar(str.charAt(i + 1));
+					// test shorthand color tags
+					char ch = str.charAt(i + 1);
+					int chi = ArrayManip.indexOf(shortColors, (Character) ch);
+					if (chi != -1) {
+						ch = colors[chi];
+					}
+					ChatColor c = ChatColor.getByChar(ch);
 					if (c != null) {
 						s.append(c.toString());
 						++i;
@@ -212,7 +223,37 @@ public class Messages {
 			}
 			s.append(str.charAt(i));
 		}
+		if (i < str.length()) {
+			s.append(str.charAt(i));
+		}
 		return s.toString();
+	}
+
+	final static Character format[] = new Character[]{'l', 'm', 'o', 'n', 'r'};
+	final static String formatTags[] = new String[]{"<bold>", "<strike>", "<underline>", "<italic>", "<reset>"};	
+	final static String shortFormatTags[] = new String[]{"<b>", "<del>", "<u>", "<em>", "<r>"};
+
+	private static String convertTags(String msg, MessageType message) {
+		if (msg.contains("<")) {
+			//String[] tags = message.getTags();
+			for (int j = 0; j < message.getNumberOfTags(); ++j) {
+				msg = msg.replace(message.getTag(j), "{" + j + "}");
+			}
+			msg = msg.replace("<newline>", "\n").replace("<br>", "\n").replace("&\\", "\n");
+			// now for formatting tags
+			for(int i = 0; i < formatTags.length; ++i) {
+				msg = msg.replace(formatTags[i], String.valueOf(ChatColor.COLOR_CHAR) + format[i])
+						.replace(shortFormatTags[i], String.valueOf(ChatColor.COLOR_CHAR) + format[i]);
+			}
+		}
+		return msg;
+	}
+	
+	private static String lastColorTag(String msg) {
+		if(msg.contains("<endcolor>") || msg.contains("</>") || msg.contains("&/")) {
+			//TODO
+		}
+		return msg;
 	}
 
 	public void SendMessage(CommandSender player, Enum message) {
@@ -220,7 +261,7 @@ public class Messages {
 	}
 
 	public void SendMessage(CommandSender player, Enum message, Object... params) {
-		if(message == null) {
+		if (message == null) {
 			throw new IllegalArgumentException("Message cannot be null");
 		}
 		Class c = message.getDeclaringClass();

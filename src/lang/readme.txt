@@ -27,7 +27,7 @@ also, colors can use shorthand '&' tags or full tags as such:
 	<bold>			<b>		&l
 	<strike>		<del>	&m
 	<underline>		<u>		&n	(dosn't play well with multiline - put a blank line underneath to make easier to read)
-	<italic>		<em>	&n
+	<italic>		<em>	&o
 	<reset>			<r>		&r	(reset all formatting)
 	<newline>		<br>	&\	(begin a new line of text)
 	<endcolor>		</>		&/	(returns to last used color)

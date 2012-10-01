@@ -5,7 +5,7 @@ Shop:
   Bad_Parameter: "... Not Quite Right for that Command ..<br> -- <error>"
 Permission:
   Denied: You don't Have Permission to do that!
-ShopList:
+Shop_List:
   Head: "-------- Price-List Page: &f<page> &2of &f<pages> &2--------"
   Listing: "&f[<item>&f]&2 <l> Buy: &f<buyprice>&2  Sell: &f<sellprice>"
   Tail: 

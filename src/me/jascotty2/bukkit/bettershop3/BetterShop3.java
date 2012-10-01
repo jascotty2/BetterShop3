@@ -41,6 +41,8 @@ public class BetterShop3 extends JavaPlugin {
 		} catch (IOException e) {
 			// Failed to submit the stats :-(
 		}
+		messages.SendMessage(null, Messages.SHOP.BAD_PARAMETER, "Brick", "2", "1.5", "buck", "5", "2.00 bucks", "1.50 bucks", "50");
+		
 	}
 	
 	@Override
