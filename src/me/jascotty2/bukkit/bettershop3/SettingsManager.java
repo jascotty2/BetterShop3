@@ -18,10 +18,22 @@
  */
 package me.jascotty2.bukkit.bettershop3;
 
+import java.util.HashMap;
+
 public class SettingsManager {
 	
 	protected final BetterShop3 plugin;
 	public String locale = "en";
+	public double econ_internal_startAmount = 50;
+	// discount permissions groups
+	HashMap<String, Double> econ_discountGroups = new HashMap<String, Double>();
+	// if bank is to be used, what bank to use for global
+	public String econ_bankName = "",
+			econ_currency_s = "Dollar",
+			econ_currency_m = "Dollars",
+			econ_currency_minor_s = "Cent",
+			econ_currency_minor_m = "Cents";
+	public boolean econ_currency_multi = false;
 	
 	protected SettingsManager(BetterShop3 plugin) {
 		this.plugin = plugin;

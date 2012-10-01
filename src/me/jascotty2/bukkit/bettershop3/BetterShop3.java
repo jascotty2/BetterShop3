@@ -28,6 +28,7 @@ public class BetterShop3 extends JavaPlugin {
 	public final Messages messages = new Messages(this);
 	public final FileManager fileManager = new FileManager(this);
 	public final SettingsManager config = new SettingsManager(this);
+	public final PermissionsHandler permissions = new PermissionsHandler(this);
 	
 	@Override
 	public void onEnable() {
@@ -35,18 +36,18 @@ public class BetterShop3 extends JavaPlugin {
 		config.load();
 		messages.load(config.locale);
 		economy.enable();
+		permissions.enable();
 		try {
 			Metrics metrics = new Metrics(this);
 			metrics.start();
 		} catch (IOException e) {
 			// Failed to submit the stats :-(
 		}
-		messages.SendMessage(null, Messages.SHOP.UNKNOWN_ITEM, "Brick", "2", "1.5", "buck", "5", "2.00 bucks", "1.50 bucks", "50");
-		
 	}
 	
 	@Override
 	public void onDisable() {
+		economy.flushSave();
 	}
 
 }

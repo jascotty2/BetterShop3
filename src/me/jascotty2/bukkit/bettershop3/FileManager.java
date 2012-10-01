@@ -27,7 +27,7 @@ public class FileManager {
 	protected final BetterShop3 plugin;
 	public static final File pluginDir = new File("plugins", "BetterShop3");	
 	public static final File oldPluginDir = new File("plugins", "BetterShop");
-	public static File langDir = new File(pluginDir, "lang"); // final
+	public static final File langDir = new File(pluginDir, "lang");
 	
 	protected FileManager(BetterShop3 plugin) {
 		this.plugin = plugin;
@@ -37,7 +37,8 @@ public class FileManager {
 	protected void extractFiles() {
 		try {
 			// FileIO.OVERWRITE_CASE.IF_NEWER does not work if jar is symbolic link
-			FileIO.extractResource("lang/en.yml", langDir, BetterShop3.class);// , FileIO.OVERWRITE_CASE.IF_NEWER);
+			FileIO.extractResource("lang/en.yml", langDir, BetterShop3.class);// , FileIO.OVERWRITE_CASE.IF_NEWER);			
+			FileIO.extractResource("config.yml", pluginDir, BetterShop3.class);//, FileIO.OVERWRITE_CASE.NEVER);
 		} catch (Exception ex) {
 			plugin.getLogger().log(Level.SEVERE, "Failed to extract Config Files", ex);
 		}

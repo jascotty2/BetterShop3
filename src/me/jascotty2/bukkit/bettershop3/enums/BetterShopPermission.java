@@ -52,6 +52,10 @@ public enum BetterShopPermission {
 	 */
 	USER_CHEST("BetterShop.user.chest"),
 	/**
+	 * ability to create a player-shop
+	 */
+	USER_MAKESHOP("BetterShop.user.makeshop"),
+	/**
 	 * generic admin permissions
 	 */
 	ADMIN("BetterShop.admin"),
@@ -71,10 +75,6 @@ public enum BetterShopPermission {
 	 * show shop stats
 	 */
 	ADMIN_INFO("BetterShop.admin.info"),
-	/**
-	 * gives the ability to purchase 'illegal' items
-	 */
-	ADMIN_ILLEGAL("BetterShop.admin.illegal"),
 	/**
 	 * backing up and restoring the pricelist
 	 */

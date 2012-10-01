@@ -36,7 +36,7 @@ public class Messages {
 	protected final static Class messageTypes[] = new Class[]{
 		SHOP.class, PERMISSION.class, SHOP_LIST.class};
 	protected final String messages[][] = new String[messageTypes.length][];
-	protected final Enum[] ALLOW_NULL = new Enum[]{SHOP.PREFIX, 
+	protected final Enum[] ALLOW_NULL = new Enum[]{SHOP.PREFIX,
 		SHOP_LIST.HEADER, SHOP_LIST.FOOTER};
 
 	// <editor-fold defaultstate="collapsed" desc="Message Templates">
@@ -184,14 +184,14 @@ public class Messages {
 		}
 		// apply prefix and format reset tags
 		String pre = getMessage(SHOP.PREFIX);
-		if(pre.length() > 0) {
+		if (pre.length() > 0) {
 			for (int i = 0; i < messageTypes.length; ++i) {
 				Class c = messageTypes[i];
 				if (c.isEnum()) {
 					Object[] o = c.getEnumConstants();
 					for (int j = 0; j < o.length; ++j) {
-						if((Enum) o[j] != SHOP.PREFIX) {
-							messages[i][j] = lastColorTag(pre + messages[i][j]);
+						if ((Enum) o[j] != SHOP.PREFIX) {
+							messages[i][j] = lastFormatTag(pre + messages[i][j]);
 						}
 					}
 				}
@@ -211,7 +211,7 @@ public class Messages {
 	final static String colorTags[] = new String[]{"<black>", "<darkblue>", "<darkgreen>", "<darkaqua>", "<darkred>", "<darkpurple>",
 		"<gold>", "<gray>", "<darkgray>", "<blue>", "<green>", "<aqua>", "<red>", "<lightpurple>", "<yellow>", "<white>", "<magic>", "<reset>"};
 
-	public static String convertColorChars(String str) {
+	protected static String convertColorChars(String str) {
 		if (str.contains("<")) {
 			for (int i = 0; i < colorTags.length; ++i) {
 				str = str.replace(colorTags[i], String.valueOf(ChatColor.COLOR_CHAR) + colors[i]);
@@ -251,7 +251,7 @@ public class Messages {
 	final static String formatTags[] = new String[]{"<bold>", "<strike>", "<underline>", "<italic>", "<reset>"};
 	final static String shortFormatTags[] = new String[]{"<b>", "<del>", "<u>", "<em>", "<r>"};
 
-	private static String convertTags(String msg, MessageType message) {
+	protected static String convertTags(String msg, MessageType message) {
 		if (msg.contains("<")) {
 			msg = msg.replace("<endcolor>", "&/").replace("</>", "&/");
 		}
@@ -270,7 +270,7 @@ public class Messages {
 		return msg;
 	}
 
-	private static String lastColorTag(String str) {
+	protected static String lastFormatTag(String str) {
 		if (str.contains("&/")) {
 			ChatColor[] colorStack = new ChatColor[Str.count(str, ChatColor.COLOR_CHAR)];
 			int n = -1; // reset value
@@ -363,13 +363,13 @@ public class Messages {
 			System.out.println("message type not found");
 		}
 	}
-}
 
-interface MessageType {
+	protected static interface MessageType {
 
-	public int getNumberOfTags();
+		public int getNumberOfTags();
 
-	public String[] getTags();
+		public String[] getTags();
 
-	public String getTag(int i);
+		public String getTag(int i);
+	}
 }
