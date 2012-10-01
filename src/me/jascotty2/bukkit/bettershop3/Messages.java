@@ -36,6 +36,8 @@ public class Messages {
 	protected final static Class messageTypes[] = new Class[]{
 		SHOP.class, PERMISSION.class, SHOP_LIST.class};
 	protected final String messages[][] = new String[messageTypes.length][];
+	protected final Enum[] ALLOW_NULL = new Enum[]{SHOP.PREFIX, 
+		SHOP_LIST.HEADER, SHOP_LIST.FOOTER};
 
 	// <editor-fold defaultstate="collapsed" desc="Message Templates">
 	public static enum SHOP implements MessageType {
@@ -159,14 +161,16 @@ public class Messages {
 					for (int j = 0; j < o.length; ++j) {
 						String k2 = Str.titleCase(o[j].toString().replace('_', ' ')).replace(' ', '_');
 						if (!s.contains(k2)) {
-							plugin.getLogger().info(k + "." + k2 + " missing from " + lang.getName());
-							s.set(k2, MISSING_STRING);
-							needSave = true;
+							if (ArrayManip.indexOf(ALLOW_NULL, o[j]) == -1) {
+								plugin.getLogger().warning(k + "." + k2 + " missing from " + lang.getName());
+								s.set(k2, MISSING_STRING);
+								needSave = true;
+							}
 						}
-						messages[i][j] = lastColorTag(convertColorChars(convertTags(s.getString(k2), (MessageType) o[j])));
+						messages[i][j] = convertColorChars(convertTags(s.getString(k2, ""), (MessageType) o[j]));
 					}
 				} else {
-					plugin.getLogger().info("Error: Section '" + k + "' is missing from " + lang.getName());
+					plugin.getLogger().warning("Error: Section '" + k + "' is missing from " + lang.getName());
 					conf.createSection(k);
 					ConfigurationSection s = conf.getConfigurationSection(k);
 					int j = 0;
@@ -175,6 +179,21 @@ public class Messages {
 						messages[i][j++] = convertColorChars(MISSING_STRING);
 					}
 					needSave = true;
+				}
+			}
+		}
+		// apply prefix and format reset tags
+		String pre = getMessage(SHOP.PREFIX);
+		if(pre.length() > 0) {
+			for (int i = 0; i < messageTypes.length; ++i) {
+				Class c = messageTypes[i];
+				if (c.isEnum()) {
+					Object[] o = c.getEnumConstants();
+					for (int j = 0; j < o.length; ++j) {
+						if((Enum) o[j] != SHOP.PREFIX) {
+							messages[i][j] = lastColorTag(pre + messages[i][j]);
+						}
+					}
 				}
 			}
 		}
@@ -228,12 +247,14 @@ public class Messages {
 		}
 		return s.toString();
 	}
-
 	final static Character format[] = new Character[]{'l', 'm', 'o', 'n', 'r'};
-	final static String formatTags[] = new String[]{"<bold>", "<strike>", "<underline>", "<italic>", "<reset>"};	
+	final static String formatTags[] = new String[]{"<bold>", "<strike>", "<underline>", "<italic>", "<reset>"};
 	final static String shortFormatTags[] = new String[]{"<b>", "<del>", "<u>", "<em>", "<r>"};
 
 	private static String convertTags(String msg, MessageType message) {
+		if (msg.contains("<")) {
+			msg = msg.replace("<endcolor>", "&/").replace("</>", "&/");
+		}
 		if (msg.contains("<")) {
 			//String[] tags = message.getTags();
 			for (int j = 0; j < message.getNumberOfTags(); ++j) {
@@ -241,19 +262,78 @@ public class Messages {
 			}
 			msg = msg.replace("<newline>", "\n").replace("<br>", "\n").replace("&\\", "\n");
 			// now for formatting tags
-			for(int i = 0; i < formatTags.length; ++i) {
-				msg = msg.replace(formatTags[i], String.valueOf(ChatColor.COLOR_CHAR) + format[i])
-						.replace(shortFormatTags[i], String.valueOf(ChatColor.COLOR_CHAR) + format[i]);
+			for (int i = 0; i < formatTags.length; ++i) {
+				msg = msg.replace(formatTags[i], String.valueOf(ChatColor.COLOR_CHAR) + format[i]).
+						replace(shortFormatTags[i], String.valueOf(ChatColor.COLOR_CHAR) + format[i]);
 			}
 		}
 		return msg;
 	}
-	
-	private static String lastColorTag(String msg) {
-		if(msg.contains("<endcolor>") || msg.contains("</>") || msg.contains("&/")) {
-			//TODO
+
+	private static String lastColorTag(String str) {
+		if (str.contains("&/")) {
+			ChatColor[] colorStack = new ChatColor[Str.count(str, ChatColor.COLOR_CHAR)];
+			int n = -1; // reset value
+
+			StringBuilder s = new StringBuilder();
+			int i = 0;
+			for (; i < str.length() - 1; ++i) {
+				if (str.charAt(i) == '&' && str.charAt(i + 1) == '/') {
+					// last color
+					if (n >= 0) {
+						//s.append(String.valueOf(ChatColor.COLOR_CHAR)).append(colorStack[n--]);
+						ChatColor c = colorStack[n--];
+						if (c.isColor() && n > 0) {
+							s.append(colorStack[n].toString());
+						} else if (n == -1) {
+							// reset
+							s.append(ChatColor.RESET.toString());
+						} else {
+							// reset, 
+							s.append(ChatColor.RESET.toString());
+							// apply last formatting options and apply last color
+							boolean col = false;
+							for (int j = n; j >= 0; --j) {
+								if (colorStack[j].isFormat()) {
+									s.append(colorStack[j].toString());
+								} else if (!col && colorStack[j].isColor()) {
+									s.append(colorStack[j].toString());
+									col = true;
+								}
+							}
+						}
+					} else {
+						s.append(ChatColor.RESET.toString());
+					}
+					i += 2; // skip past '/'
+				} else if (str.charAt(i) == ChatColor.COLOR_CHAR
+						&& str.charAt(i + 1) != ChatColor.COLOR_CHAR) {
+					ChatColor c = ChatColor.getByChar(str.charAt(i + 1));
+					if (c != null) {
+						if (c == ChatColor.RESET) {
+							n = -1;
+						} else { // if(c.isColor()) {
+							colorStack[++n] = c;//str.charAt(i + 1);
+						}
+					}
+				}
+				s.append(str.charAt(i));
+			}
+			if (i < str.length()) {
+				s.append(str.charAt(i));
+			}
+			return s.toString();
 		}
-		return msg;
+		return str;
+	}
+
+	protected String getMessage(Enum message) {
+		Class c = message.getDeclaringClass();
+		int i = ArrayManip.indexOf(messageTypes, c);
+		if (i != -1) {
+			return messages[i][message.ordinal()];
+		}
+		return null;
 	}
 
 	public void SendMessage(CommandSender player, Enum message) {
@@ -264,14 +344,14 @@ public class Messages {
 		if (message == null) {
 			throw new IllegalArgumentException("Message cannot be null");
 		}
-		Class c = message.getDeclaringClass();
-		int i = ArrayManip.indexOf(messageTypes, c);
-		if (i != -1) {
-			String msg = messages[i][message.ordinal()];
+		String msg = getMessage(message);
+		if (msg != null) {
 			try {
 				msg = MessageFormat.format(msg, params);
 			} catch (Exception e) {
-				plugin.getLogger().severe("Error fomatting message for " + c.getSimpleName() + "." + message.getClass().getSimpleName() + ": " + e.getMessage());
+				plugin.getLogger().severe("Error fomatting message for "
+						+ message.getDeclaringClass().getSimpleName() + "." + message.getClass().getSimpleName()
+						+ ": " + e.getMessage());
 			}
 			//System.out.println(msg);
 			if (player == null) {

@@ -30,7 +30,8 @@ also, colors can use shorthand '&' tags or full tags as such:
 	<italic>		<em>	&o
 	<reset>			<r>		&r	(reset all formatting)
 	<newline>		<br>	&\	(begin a new line of text)
-	<endcolor>		</>		&/	(returns to last used color)
+	<endcolor>		</>		&/	(end tag - returns to last used format or color (can be nested))
+	&& is used if you want an '&' symbol, and don't want it to turn the next character into a color code
 ========= Extended Node Tags: =========
 
 Shop.Prefix:		what comes before each and EVERY BetterShop message. (Putting default colors here makes things easy)
