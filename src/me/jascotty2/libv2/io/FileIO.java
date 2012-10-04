@@ -30,131 +30,226 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
-/**
- * @author jacob
- */
 public class FileIO {
+
+	/**
+	 * this is a quote within a csv string <br /> covers “ ” (8220 - 8221)
+	 */
+	protected final static char nullQuo = (char) 65533;
+	//protected final static String nullQuo = String.valueOf((char) 226) + (char) 128 + String.valueOf((char) 156);
+	/**
+	 * recognized delimeters
+	 */
+	protected final static ArrayList<Character> delimeters = new ArrayList<Character>() {
+		{
+			// fields can be tab, comma, or semicolin -delimited
+			add('\t');
+			add(',');
+			add(';');
+		}
+	};
 
 	public static List<String[]> loadCSVFile(File toLoad) throws FileNotFoundException, IOException {
 		ArrayList<String[]> ret = new ArrayList<String[]>();
 		if (toLoad.exists() && toLoad.isFile() && toLoad.canRead()) {
-			FileReader fstream = null;
-			fstream = new FileReader(toLoad.getAbsolutePath());
+			char delim = getDelim(toLoad);
+			String line;
+			FileReader fstream = new FileReader(toLoad.getAbsolutePath());
 			BufferedReader in = new BufferedReader(fstream);
 			try {
-				int n = 0;
-				for (String line = null; (line = in.readLine()) != null && line.length() > 0; ++n) {
-					// if was edited in openoffice, will instead have semicolins..
-					ret.add(line.replace(";", ",").replace(",,", ", ,").split(","));
+				if (delim == 0) {
+					while ((line = in.readLine()) != null) {
+						ret.add(new String[]{line});
+					}
+				} else {
+					while ((line = in.readLine()) != null) {
+						if (line.contains("\"")) {
+							// need to parse the strings..
+							ArrayList<String> fields = new ArrayList<String>();
+							boolean inStr = false;
+							int start = 0;
+							char c;
+							for (int i = 0; i < line.length() && (c = line.charAt(i)) != 0; ++i) {
+								if (c == '"') {
+									inStr = !inStr;
+								} else if (!inStr && c == delim) {
+									String field = line.substring(start, i);
+									if (!field.isEmpty() && field.charAt(0) == '"') {
+										field = field.substring(1, field.length() - 1);
+									}
+									fields.add(field.replace("\"\"", "\"").replace(nullQuo, '"'));
+									start = i + 1;
+								}
+							}
+							if (start < line.length()) {
+								String field = line.substring(start, line.length());
+								if (!field.isEmpty() && field.charAt(0) == '"') {
+									field = field.substring(1);
+								}
+								// just in case is missing the terminating quote
+								if (!field.isEmpty() && field.charAt(field.length() - 1) == '"') {
+									field = field.substring(0, field.length() - 1);
+								}
+								fields.add(field.replace("\"\"", "\"").replace(nullQuo, '"'));
+							}
+							ret.add(fields.toArray(new String[0]));
+						} else {
+							// simple substitution :)
+							ret.add(line.replace(nullQuo, '"').split(String.valueOf(delim)));
+						}
+					}
 				}
 			} finally {
 				in.close();
+				fstream.close();
 			}
 		}
 		return ret;
+	}
+
+	private static char getDelim(File toLoad) throws IOException {
+		FileReader fstream = new FileReader(toLoad);
+		int inC;
+		char delim = 0;
+		try {
+			boolean inStr = false;
+			while ((inC = fstream.read()) != -1) {
+				if (((char) inC) == '"') {
+					inStr = !inStr;
+				} else if (!inStr && delimeters.contains((Character) (char) inC)) {
+					delim = (char) inC;
+					break;
+				}
+			}
+			fstream.close();
+		} catch (IOException e) {
+			fstream.close();
+			throw (e);
+		}
+		return delim;
 	}
 
 	public static List<String> loadFile(File toLoad) throws FileNotFoundException, IOException {
 		ArrayList<String> ret = new ArrayList<String>();
 		if (toLoad.exists() && toLoad.isFile() && toLoad.canRead()) {
-			FileReader fstream = null;
-			fstream = new FileReader(toLoad.getAbsolutePath());
+			FileReader fstream = new FileReader(toLoad.getAbsolutePath());
 			BufferedReader in = new BufferedReader(fstream);
 			try {
-				int n = 0;
-				for (String line = null; (line = in.readLine()) != null && line.length() > 0; ++n) {
+				String line;
+				while ((line = in.readLine()) != null) {
 					ret.add(line);
 				}
 			} finally {
 				in.close();
+				fstream.close();
 			}
 		}
 		return ret;
 	}
-
-	public static boolean saveFile(File toSave, String[] lines) throws IOException {
-		if (!toSave.exists() && !toSave.createNewFile()) {
-			return false;
-		}
-		if (toSave.canWrite()) {
-			FileWriter fstream = null;
-			fstream = new FileWriter(toSave.getAbsolutePath());
-			//System.out.println("writing to " + tosave.getAbsolutePath());
-			BufferedWriter out = new BufferedWriter(fstream);
-			for (String line : lines) {
-				out.write(line);
-				out.newLine();
-			}
-			out.flush();
-			out.close();
-			return true;
-		}
-		return false;
-	}
-
-	public static boolean saveFile(File toSave, ArrayList<String> lines) throws IOException {
+	
+	public static void saveFile(File toSave, String data) throws IOException {
 		if (!toSave.exists()) {
-			// TODO: first check if directory exists, then create the file
+			// first check if directory exists, then create the file
 			File dir = new File(toSave.getAbsolutePath().substring(0, toSave.getAbsolutePath().lastIndexOf(File.separatorChar)));
 			dir.mkdirs();
-			try {
-				if (!toSave.createNewFile()) {
-					return false;
-				}
-			} catch (Exception e) {
-				return false;
-			}
+			toSave.createNewFile();
 		}
-		if (toSave.canWrite()) {
-			FileWriter fstream = null;
-			fstream = new FileWriter(toSave.getAbsolutePath());
-			//System.out.println("writing to " + tosave.getAbsolutePath());
-			BufferedWriter out = new BufferedWriter(fstream);
-			for (String line : lines) {
-				out.write(line);
-				out.newLine();
-			}
-			out.flush();
-			out.close();
-			return true;
-		}
-		return false;
+		FileWriter fstream = new FileWriter(toSave.getAbsolutePath());
+		BufferedWriter out = new BufferedWriter(fstream);
+		out.write(data);
+		out.close();
+		fstream.close();
 	}
 
-	public static boolean saveCSVFile(File toSave, ArrayList<String[]> lines) throws IOException {
+	public static void saveFile(File toSave, String[] lines) throws IOException {
 		if (!toSave.exists()) {
-			// TODO: first check if directory exists, then create the file
+			// first check if directory exists, then create the file
 			File dir = new File(toSave.getAbsolutePath().substring(0, toSave.getAbsolutePath().lastIndexOf(File.separatorChar)));
 			dir.mkdirs();
-			try {
-				if (!toSave.createNewFile()) {
-					return false;
-				}
-			} catch (Exception e) {
-				return false;
+			toSave.createNewFile();
+		}
+		FileWriter fstream = new FileWriter(toSave.getAbsolutePath());
+		BufferedWriter out = new BufferedWriter(fstream);
+		for (int i = 0; i < lines.length; ++i) {
+			out.write(lines[i]);
+			if (i + 1 < lines.length) {
+				out.newLine();
 			}
 		}
-		if (toSave.canWrite()) {
-			FileWriter fstream = null;
-			fstream = new FileWriter(toSave.getAbsolutePath());
-			//System.out.println("writing to " + tosave.getAbsolutePath());
-			BufferedWriter out = new BufferedWriter(fstream);
-			for (String line[] : lines) {
-				for (int i = 0; i < line.length; ++i) {
-					out.write(line[i]);
-					if (i + 1 < line.length) {
-						out.write(",");
+		out.close();
+		fstream.close();
+	}
+
+	public static void saveFile(File toSave, ArrayList<String> lines) throws IOException {
+		if (!toSave.exists()) {
+			// first check if directory exists, then create the file
+			File dir = new File(toSave.getAbsolutePath().substring(0, toSave.getAbsolutePath().lastIndexOf(File.separatorChar)));
+			dir.mkdirs();
+			toSave.createNewFile();
+		}
+		FileWriter fstream = new FileWriter(toSave.getAbsolutePath());
+		BufferedWriter out = new BufferedWriter(fstream);
+
+		Iterator<String> toWrite = lines.iterator();
+		while (toWrite.hasNext()) {
+			out.write(toWrite.next());
+			if (toWrite.hasNext()) {
+				out.newLine();
+			}
+		}
+		out.close();
+		fstream.close();
+	}
+
+	public static void saveCSVFile(File toSave, ArrayList<String[]> lines) throws IOException {
+		if (!toSave.exists()) {
+			// first check if directory exists, then create the file
+			File dir = new File(toSave.getAbsolutePath().substring(0, toSave.getAbsolutePath().lastIndexOf(File.separatorChar)));
+			dir.mkdirs();
+			toSave.createNewFile();
+		}
+		FileWriter fstream = new FileWriter(toSave);
+		BufferedWriter out = new BufferedWriter(fstream);
+		Iterator<String[]> toWrite = lines.iterator();
+		String line[];
+		while (toWrite.hasNext()) {
+			if ((line = toWrite.next()) == null) {
+				continue;
+			}
+			for (int i = 0; i < line.length; ++i) {
+				boolean str = line[i].contains("\"");
+				if (!str) {
+					for (Character c : delimeters) {
+						if (line[i].contains(String.valueOf(c))) {
+							str = true;
+							break;
+						}
 					}
 				}
+				if (str) {
+					out.write("\"" + line[i].replace("\"", "\"\"") + "\"");
+				} else {
+					out.write(line[i].replace('"', nullQuo));
+				}
+				// slower:
+//				if (Pattern.matches(fpRegex, line[i])) { // (fpRegex as defined from Double documentation)
+//					out.write(line[i]);
+//				} else {
+//					out.write("\"" + line[i].replace("\"", "\"\"") + "\"");
+//				}
+				if (i + 1 < line.length) {
+					out.write(",");
+				}
+			}
+			if (toWrite.hasNext()) {
 				out.newLine();
 			}
-			out.flush();
-			out.close();
-			return true;
 		}
-		return false;
+		out.close();
+		fstream.close();
 	}
 
 	public static File getJarFile(Class jarClass) {
@@ -223,10 +318,10 @@ public class FileIO {
 		}
 		// check if the file exists and is newer than the JAR
 		File jarFile = getJarFile(jarClass);
-		if (writeTo.exists()){
-			if(overwrite == OVERWRITE_CASE.NEVER) {
+		if (writeTo.exists()) {
+			if (overwrite == OVERWRITE_CASE.NEVER) {
 				return;
-			} else if (overwrite == OVERWRITE_CASE.IF_NEWER 
+			} else if (overwrite == OVERWRITE_CASE.IF_NEWER
 					&& writeTo.lastModified() >= jarFile.lastModified()) {
 				return;
 			}
@@ -295,5 +390,4 @@ public class FileIO {
 			throw err;
 		}
 	}
-} // end class CSV
-
+}

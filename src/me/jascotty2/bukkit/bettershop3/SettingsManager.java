@@ -27,13 +27,12 @@ public class SettingsManager {
 	public double econ_internal_startAmount = 50;
 	// discount permissions groups
 	HashMap<String, Double> econ_discountGroups = new HashMap<String, Double>();
-	// if bank is to be used, what bank to use for global
-	public String econ_bankName = "",
+	public String econ_bankName = "", // if bank is to be used, what bank to use for global
 			econ_currency_s = "Dollar",
 			econ_currency_m = "Dollars",
 			econ_currency_minor_s = "Cent",
 			econ_currency_minor_m = "Cents";
-	public boolean econ_currency_multi = false;
+	public boolean econ_currency_multi = false; // if internal currency formatting should be seperated (eg. 2 Dollars 25 Cents)
 	
 	protected SettingsManager(BetterShop3 plugin) {
 		this.plugin = plugin;
