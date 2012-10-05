@@ -28,6 +28,7 @@ public class FileManager {
 	public static final File pluginDir = new File("plugins", "BetterShop3");	
 	public static final File oldPluginDir = new File("plugins", "BetterShop");
 	public static final File langDir = new File(pluginDir, "lang");
+	public static final File configFile = new File(pluginDir, "config.yml");
 	
 	protected FileManager(BetterShop3 plugin) {
 		this.plugin = plugin;

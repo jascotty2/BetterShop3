@@ -1,0 +1,9 @@
+Language: en
+
+Economy:
+  Bank Name: 
+  # these values are used for formatting if there is no ecomony plugin installed
+  Currency: "Dollar"
+  Currency Plural: "Dollars"
+  Currency Minor: "Cent"
+  Currency Minor Plural: "Cents"
