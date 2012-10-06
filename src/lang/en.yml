@@ -12,3 +12,577 @@ Shop_List:
   Alias: "&f[<item>&f]&2 is also known as: &b<alias>"
   Nolist: "&f[<item>&f] &2cannot be bought or sold."
   Pricecheck: "Price check! &f[<item>&f]&2 Buy: &f<buyprice> &2Sell: &f<sellprice>"
+Items:
+  0: Air
+  1: Stone, Smooth Stone
+  2: Grass
+  3: Dirt
+  4: Cobblestone, Cobble
+  5: Wood, plank
+  5_1: Spruce Wood, Pine Wood
+  5_1_sub: Spruce, Pine
+  5_2: Birch Wood
+  5_2_sub: Birch
+  5_3: Jungle  Wood
+  5_3_sub: Jungle
+  6: Sapling, Tree Sapling, Tree, Branch
+  6_1: Spruce Sapling, Spruce Tree
+  6_1_sub: Spruce
+  6_2: Birch Sapling, Birch Tree, Pinecone, Pine
+  6_2_sub: Birch, Pine
+  6_3: Jungle Tree Sapling, Jungle Tree
+  6_3_sub: Jungle
+  7: Bedrock, Adminium
+  8: Water Block
+  9: Stationary Water, Still Water Block
+  10: Lava Block
+  11: Stationary Lava, Still Lava Block
+  12: Sand
+  13: Gravel
+  14: Gold Ore, gore
+  15: Iron Ore, iore
+  16: Coal Ore, core
+  17: Log, trunk
+  17_1: Spruce Log, Pine Log, Redwood Log, Red Log
+  17_1_sub: Spruce, Pine, Redwood, Red
+  17_2: Birch Log, White Log
+  17_2_sub: Birch, White
+  17_3: Jungle Log
+  17_3_sub: Jungle
+  18: Leaves, Leaf, Leafs
+  18_1: Spruce Leaves, Pine Leaves
+  18_1_sub: Spruce, Pine
+  18_2: Birch Leaves, bleaves, bleaf
+  18_2_sub: Birch
+  18_3: Jungle Leaves
+  18_3_sub: Jungle
+  19: Sponge
+  20: Glass
+  21: Lapis Lazuli Ore, lapisore, lore
+  22: <blue>Lapis Lazuli Block, lapisblock, lblock
+  23: Dispenser
+  24: Sandstone, sstone
+  25: Note Block, Music Block, nblock, mblock
+  27: Powered Rail, boosterrail, boosttrack, boostrack, poweredrail, poweredtrack
+  28: Detector Rail, detectorail
+  29: Sticky Piston, spiston, slimepiston
+  30: Web, Spiderweb, Cobweb
+  31: Dead Fern
+  31_1: Tall Grass
+  31_2: Fern
+  32: Dead Shrub
+  33: Piston
+  35: <white>White Wool, White Cloth, Wool, Cloth
+  35_0_sub: white, w
+  35_1: <orange>Orange Wool, Orange Cloth
+  35_1_sub: orange, o
+  35_2: <darkpurple>Magenta Wool, Magenta Cloth
+  35_2_sub: magenta, m
+  35_3: <aqua>Light Blue Wool, Light Blue Cloth, lbluewool, lbluecloth
+  35_3_sub: lightblue, lblue, lb
+  35_4: <yellow>Yellow Wool, Yellow Cloth
+  35_4_sub: yellow, y
+  35_5: <green>Light Green Wool, Light Green Cloth, Lime Green Wool, Lime Green Cloth, Lime Wool, Lime Cloth
+  35_5_sub: lightgreen, lgreen, lg
+  35_6: <lightpurple>Pink Wool, Pink Cloth
+  35_6_sub: pink, pn
+  35_7: <darkgray>Dark Gray Wool, Dark Grey Wool, Gray Wool, Grey Wool, Dark Gray Cloth, Dark Grey Cloth, Gray Cloth, Grey Cloth
+  35_7_sub: darkgray, dgray, darkgrey, dgrey, dg
+  35_8: <gray>Light Gray Wool, Light Grey Wool, Light Gray Cloth, Light Grey Cloth
+  35_8_sub: lightgray, lgray, lightgrey, lgrey lg
+  35_9: <aqua>Cyan Wool, Teal Wool, Cyan Cloth, Teal Cloth
+  35_9_sub: cyan, teal, c, t
+  35_10: Purple Wool, Purple Cloth
+  35_10_sub: purple, pu
+  35_11: <blue>Blue Wool, Blue Cloth
+  35_11_sub: blue, blu
+  35_12: <darkgray>Brown Wool, Brown Cloth
+  35_12_sub: brown, br
+  35_13: <darkgreen>Dark Green Wool, Dark Green Cloth, Green Wool, Green Cloth
+  35_13_sub: darkgreen, dgreen, dgr
+  35_14: <red>Red Wool, Red Cloth
+  35_14_sub: red, r
+  35_15: <black>Black Wool, Black Cloth
+  35_15_sub: black
+  37: <yellow>Dandelion, Yellow Flower, yflower, flower, flowers, dandelion
+  38: <red>Rose, Red Rose, redflower, rflower
+  39: Brown Mushroom, brownmush, bmushroom, bmush, mushroom
+  40: Red Mushroom, redmush, rmushroom, rmush
+  41: Gold Block, gblock
+  42: Iron Block, iblock
+  43: Double Step, dstep, doubleslab, dslab
+  43_1: Sandstone Double Step, sanddoublestep, sdoublestep, sstonedoublestep, sanddoubleslab, sdslab, sdstep
+  43_1_sub: sandstone, sand
+  43_2: Wood Double Step, wdoublestep, wooddoubleslab, wdstep, wdslab
+  43_2_sub: wood
+  43_3: Cobblestone Double Step, cstonedoublestep, cdoublestep, cobbledoublestoneslab, cobbledoubleslab, cdstep, cdslab
+  44: Step, slab, halfstep
+  44_1: Sandstone Step, Sand Step, sstep, sstonestep, sandslab
+  44_1_sub: sand, sandstone
+  44_2: Wood Step, wstep, woodslab
+  44_2_sub: wood
+  44_3: Cobblestone Step, cstonestep, cstep, cobblestoneslab, cobbleslab
+  44_3_sub: cobble
+  45: Brick Block, bblock
+  46: TNT, Dynamite, Dynomite
+  47: Bookshelf, Book Block
+  48: Moss Stone, Mossy Cobblestone, Mossy Cobble, Moss Cobble, mcobble, mosstone
+  49: Obsidian, obsi, obby
+  50: Torch
+  51: Fire
+  52: Monster Spawner, Mob Spawner, spawner, pigspawner
+  53: Wooden Stairs, Wood Stairs, wstairs
+  54: Chest
+  56: Diamond Ore, dore
+  57: Diamond Block, dblock
+  58: Crafting Table, Workbench, wbench, workb
+  60: Farmland
+  61: Furnace
+  62: Burning Furnace, bfurnace
+  63: Sign Post
+  64: Wooden Door Half, Wood Door Half, wdoorhalf
+  65: Ladder
+  66: Rails, Minecart Track, Minecart Rail, Track, Rail
+  67: Cobblestone Stairs, Stone Stairs, sstairs, Cobble Stairs, cstairs
+  68: Wall Sign
+  69: Lever
+  70: Stone Pressure Plate, Stone Plate, splate
+  71: Iron Door Half, idoorhalf
+  72: Wooden Pressure Plate, Wooden Plate, Wood Plate, wplate
+  73: Redstone Ore, redore
+  76: Redstone Torch, Red Torch, RS Torch, rtorch
+  77: Stone Button, sbutton, Button
+  78: Snow Covering, Snow Cover
+  79: Ice
+  80: SnowBlock, sblock
+  81: Cactus
+  82: Clay Block, cblock
+  84: Jukebox, jbox
+  85: Fence
+  86: Pumpkin
+  87: Netherrack, Netherack, Nether Stone, nstone, Hellstone, hstone, Blood Stone
+  88: Soulsand, Slowsand, ssand
+  89: Glowstone, Lightstone, lstone
+  90: Portal
+  91: Jack O'Lantern, Pumpkin Lantern, Glowing Pumpkin, Light Pumpkin
+  95: Locked Chest
+  96: Trapdoor, tdoor
+  97: Silverfish Stone, Monster Stone, Monster Block
+  97_1: Cobblestone Monster Block, Cobble Monster Block
+  97_1_sub: cobble
+  97_2: Stone Brick Monster Block
+  97_2_sub: stonebrick
+  98: Stone Brick
+  98_1: Mossy Stone Brick
+  98_1_sub: mossy, moss
+  98_2: Cracked Stone Brick
+  98_2_sub: cracked
+  98_3: Chiseled Stone Brick
+  98_3_sub: chiseled
+  99: Huge Brown Mushroom
+  100: Huge Red Mushroom
+  101: Iron Bars
+  102: Glass Pane
+  103: Melon
+  104: Pumpkin Stem Block
+  105: Melon Stem Block
+  106: Vines
+  107: Fence Gate, gate
+  108: Brick Stair
+  109: Stone Brick Stair
+  110: Mycelium, Mushroom Grass
+  111: Lilly Pad, Lilly
+  112: Nether Brick
+  113: Nether Brick Fence, Nether Fence
+  114: Nether Brick Stairs, Nether Stairs
+  115: Nether Wart, N Wart, Wart
+  116: Enchantment Table, Enchanting Table, etable
+  118: Cauldron
+  120: End Portal Frame
+  121: End Stone
+  122: Dragon Egg
+  123: Redstone Lamp
+  125: Wooden Double Slab
+  126: Wooden Slab
+  127: Cocoa Pod
+  128: Sandstone Stairs, Sand Stairs
+  129: Emerald Ore, eore
+  130: Ender Chest, eChest
+  131: Tripwire Hook
+  133: Emerald Block
+  134: Spruce Wood Stairs
+  135: Birch Wood Stairs
+  136: Jungle Wood Stairs
+  137: Command Block
+  138: Beacon
+  139: Cobblestone Wall
+  140: Flower Pot
+  143: Wooden Button
+  144: Skeleton Head, Head
+  144_0_sub: Skeleton
+  144_1: Wither Skeleton Head
+  144_1_sub: Wither Skeleton
+  144_2: Zombie Head
+  144_2_sub: Zombie
+  144_3: Human Head
+  144_3_sub: Human
+  144_4: Creeper Head
+  144_4_sub: Creeper
+  # items
+  256: Iron Shovel, Iron Spade, iShovel, iSpade
+  257: Iron Pickaxe, Iron Pick, iPickaxe, iPick
+  258: Iron Axe, iAxe
+  259: Flint And Steel, Lighter
+  260: Apple
+  261: Bow
+  262: Arrow
+  263: Coal
+  263_1: Charcoal, ccoal
+  264: Diamond
+  265: Iron Ingot, Iron Bar, Iron, iingot, ibar
+  266: Gold Ingot, Gold Bar, Gold, gingot, gbar
+  267: Iron Sword, iSword
+  268: Wooden Sword, Wood Sword, wSword
+  269: Wooden Shovel, Wooden Spade, Wood Shovel, Wood Spade, wShovel, wSpade
+  270: Wooden Pickaxe, Wooden Pick, Wood Pickaxe, Wood Pick, wPickaxe, wPick
+  271: Wooden Axe, Wood Axe, wAxe
+  272: Stone Sword, sSword
+  273: Stone Shovel, Stone Spade, sShovel, sSpade
+  274: Stone Pickaxe, Stone Pick, sPickaxe, sPick
+  275: Stone Axe, sAxe
+  276: Diamond Sword, dSword
+  277: Diamond Shovel, Diamond Spade, dShovel, dSpade
+  278: Diamond Pickaxe, Diamond Pick, dPickaxe, dPick
+  279: Diamond Axe, dAxe
+  280: Stick
+  281: Bowl
+  282: Mushroom Soup, Mushroom Stew, Soup, Stew
+  283: Gold Sword, gSword
+  284: Gold Shovel, Gold Spade, gShovel, gSpade
+  285: Gold Pickaxe, Gold Pick, gPickaxe, gPick
+  286: Gold Axe, gAxe
+  287: String, Rope, Tripwire
+  288: Feather
+  289: Gunpowder, Sulpher
+  290: Wooden Hoe, Wood Hoe, wHoe
+  291: Stone Hoe, sHoe
+  292: Iron Hoe, iHoe
+  293: Diamond Hoe, dHoe
+  294: Gold Hoe, gHoe
+  295: Seeds
+  296: Wheat
+  297: Bread
+  298: Leather Helmet, Leather Helm, Leather Hat, lHelmet, lHelm, lHat
+  299: Leather Chestplate, Leather Shirt, lChestplate, lShirt
+  300: Leather Leggings, Leather Pants, lLeggings, lPants
+  301: Leather Boots, Leather Shoes, lBoots, lShoes
+  302: Chainmail Helmet, Chainmail Helm, Chainmail Hat, Chain Helmet, Chain Hat, cHelmet, cHat
+  303: Chainmail Chestplate, Chainmail Shirt, Chain Chestplate, Chain Shirt, cChestplate, cShirt
+  304: Chainmail Leggings, Chainmail Pants, Chain Leggings, Chain Pants, cLeggings, cPants
+  305: Chainmail Boots, Chainmail Shoes, Chain Boots, Chain Shoes, cBoots, cShoes
+  306: Iron Helmet, Iron Helm, Iron Hat, iHelmet, iHelm, iHat
+  307: Iron Chestplate, Iron Shirt, iChestplate, iShirt
+  308: Iron Leggings, Iron Pants, iLeggings, iPants
+  309: Iron Boots, Iron Shoes, iBoots, iShoes
+  310: Diamond Helmet, Diamond Helm, Diamond Hat, dHelmet, dHelm, dHat
+  311: Diamond Chestplate, Diamond Shirt, dChestplate, dShirt
+  312: Diamond Leggings, Diamond Pants, dLeggings, dPants
+  313: Diamond Boots, Diamond Shoes, dBoots, dShoes
+  314: Gold Helmet, Gold Helm, Gold Hat, gHelmet, gHelm, gHat
+  315: Gold Chestplate, Gold Shirt, gChestplate, gShirt
+  316: Gold Leggings, Gold Pants, gLeggings, gPants
+  317: Gold Boots, Gold Shoes, gBoots, gShoes
+  318: Flint,
+  319: Raw Porkchop, Raw Pork, Pork, Pork Chop
+  320: Cooked Porkchop, Grilled Pork, Cooked Pork, Bacon
+  321: Painting, Picture
+  322: Golden Apple, Gold Apple, gApple
+  322_1: Enchanted Golden Apple, Enchanted Gold Apple, Enchanted Apple, egApple
+  323: Sign
+  324: Wooden Door, Wood Door, wDoor
+  325: Bucket
+  326: Water Bucket, wBucket
+  327: Lava Bucket, lBucket
+  328: Minecart, Cart
+  329: Saddle
+  330: Iron Door, iDoor
+  331: Redstone, Redstone Dust, Red Dust, rDust, rStone
+  332: Snowball, sb
+  333: Boat
+  334: Leather, Cowhide
+  335: Milk Bucket, mBucket
+  336: Clay Brick, Brick
+  337: Clay Balls, Clay Ball, Clay
+  338: Sugar Cane, Reed
+  339: Paper, Papyrus
+  340: Book
+  341: Slimeball, sBall
+  342: Storage Minecart, Chest Minecart, Storage Cart, Chest Cart, sMinecart, cMinecart, sCart, cCart
+  343: Powered Minecart, Furnace Minecart, Powered Cart, Furnace Cart, pMinecart, fMinecart, pCart, fCart
+  344: Egg
+  345: Compass
+  346: Fishing Rod, Rod
+  347: Clock, Watch,
+  348: Glowstone Dust, Lightstone Dust, lsDust, gsDust
+  349: Raw Fish, Fish
+  350: Cooked Fish, cFish
+  351: <black>Ink Sac, Black Dye, Dye
+  351_0_sub: black
+  351_1: <red>Red Dye
+  351_1_sub: red
+  
+    item351sub2:
+        name: Green Dye
+        aliases:
+        sub: green
+        color: green
+    item351sub3:
+        name: Cocoa Bean
+        aliases: browndye, cocoa, coco, cocobean
+        sub: brown
+        color: gray
+    item351sub4:
+        name: Lapis Lazuli
+        aliases: bluedye, lapislazul, lapis
+        sub: blue
+        color: blue
+    item351sub5:
+        name: Purple Dye
+        aliases:
+        sub: purple
+        color: magenta
+    item351sub6:
+        name: Cyan Dye
+        aliases: tealdye
+        sub: cyan, teal
+        color: cyan, teal
+    item351sub7:
+        name: Light Gray Dye
+        aliases: lightgreydye
+        sub: lightgrey, lightgray
+        color: light gray
+    item351sub8:
+        name: Gray Dye
+        aliases: greydye
+        sub: grey, gray
+        color: gray
+    item351sub9:
+        name: Pink Dye
+        aliases:
+        sub: pink
+        color: pink
+    item351sub10:
+        name: Lime Dye
+        aliases: lightgreendye
+        sub: lime, limegreen
+        color: lime
+    item351sub11:
+        name: Yellow Dye
+        aliases:
+        sub: yellow
+        color: yellow
+    item351sub12:
+        name: Light Blue Dye
+        aliases:
+        sub: lightblue
+        color: sky blue
+    item351sub13:
+        name: Magenta Dye
+        aliases:
+        sub: magenta
+        color: magenta
+    item351sub14:
+        name: Orange Dye
+        aliases:
+        sub: orange
+        color: orange
+    item351sub15:
+        name: Bone Meal
+        aliases: whitedye
+        sub: white
+        color: white
+  352: Bone
+  353: Sugar
+  354: Cake
+  355: Bed, Cot
+  356: Redstone Repeater, Repeater, Diode
+  357: Cookie
+  358: Map
+  359: Shears
+  360: Melon Slice
+  361: Pumpkin Seeds
+  362: Melon Seeds
+  363: Raw Beef, Beef, Cow Meat
+  364: Steak, Cooked Beef
+  365: Raw Chicken, Chicken
+  366: Cooked Chicken
+  367: Rotten Flesh, Flesh, Zombie Meat
+  368: Ender Pearl, epearl
+  369: Blaze Rod
+  370: Ghast Tear
+  371: Gold Nugget
+  372: Nether Wart
+  374: Glass Bottle
+  375: Spider Eye
+  376: Fermented Spider Eye
+  377: Blaze Powder
+  378: Magma Cream
+  379: Brewing Stand
+  380: Cauldron
+  381: Eye of Ender
+  382: Glistering Melon
+        aliases: 
+    item383sub50:
+        name: Creeper Egg
+        aliases: 
+    item383sub51:
+        name: Skeleton Egg
+        aliases: 
+    item383sub52:
+        name: Spider Egg
+        aliases: 
+    item383sub53:
+        name: Giant Egg
+        aliases: 
+    item383sub54:
+        name: Zombie Egg
+        aliases: 
+    item383sub55:
+        name: Slime Egg
+        aliases: 
+    item383sub56:
+        name: Ghast Egg
+        aliases: 
+    item383sub57:
+        name: PigZombie Egg
+        aliases: 
+    item383sub58:
+        name: Enderman Egg
+        aliases: 
+    item383sub59:
+        name: CaveSpider Egg
+        aliases: 
+    item383sub60:
+        name: Silverfish Egg
+        aliases: 
+    item383sub61:
+        name: Blaze Egg
+        aliases: 
+    item383sub62:
+        name: LavaSlime Egg
+        aliases: 
+    item383sub63:
+        name: EnderDragon Egg
+        aliases: 
+    item383sub90:
+        name: Pig Egg
+        aliases: 
+    item383sub91:
+        name: Sheep Egg
+        aliases: 
+    item383sub92:
+        name: Cow Egg
+        aliases: 
+    item383sub93:
+        name: Chicken Egg
+        aliases: 
+    item383sub94:
+        name: Wolf Egg
+        aliases: 
+    item383sub95:
+        name: MushroomCow Egg
+        aliases: 
+    item383sub96:
+        name: SnowMan Egg
+        aliases: 
+    item383sub97:
+        name: Villager Egg
+        aliases: 
+    item383sub98:
+        name: Ocelot Egg
+        aliases: categg
+  384: Bottle o' Enchanting, Bottle of Enchanting, Experience Bottle, Experience, Exp Bottle
+  385: Fire Charge, Fireball
+  2256: <gold>13 Disk, Gold Record, Gold Disk
+  2257: <darkgreen>Cat Disc, Green Record, Green Disk
+  2258: <red>Blocks Disc, Orange Record, Orange Disk
+  2259: <red>Chirp Disc, Red Record, Red Disk
+  2260: Far Disc, Lime Record, Lime Disk
+  2261: <blue>Mall Disc, Blue Record, Blue Disk
+  2262: <darkpurple>Mellohi Disc, Purple Record, Purple Disk, pRecord, pDisk
+  2263: <black>Stal Disc, Black Record, Black Disk
+  2264: <white>Strad Disc, White Record, White Disk
+  2265: <green>Ward Disc
+  2266: <black>11 Disc, Broken Record, Broken Disk
+  
+        
+#entities :)
+# can't add more than what i have, or you'll get a chicken
+#   note: if adding to the csv, add 4000 to the entity number
+entities:
+    entity0:
+        name: Chicken
+        aliases: 
+    entity1:
+        name: Cow 
+        aliases: 
+    entity2:
+        name: Creeper
+        aliases: 
+    entity3:
+        name: Ghast
+        aliases: 
+    entity4:
+        name: Giant
+        aliases: giantzombie
+    entity5:
+        name: Monster
+        aliases: human, slave, bodyguard, dummy
+    entity6:
+        name: Pig
+        aliases: 
+    entity7:
+        name: PigZombie
+        aliases: 
+    entity8:
+        name: Sheep
+        aliases: 
+    entity9:
+        name: Skeleton
+        aliases: 
+    entity10:
+        name: Slime
+        aliases: 
+    entity11:
+        name: Spider
+        aliases: 
+    entity12:
+        name: Squid
+        aliases: 
+    entity13:
+        name: Zombie
+        aliases: 
+    entity14:
+        name: Wolf
+        aliases: dog
+    entity15:
+        name: Cave Spider
+        aliases: cspider
+    entity16:
+        name: Enderman
+        aliases: endermen
+    entity17:
+        name: Silverfish
+        aliases: sliverfish, stonefish
+    entity18:
+        name: Ender Dragon
+        aliases: 
+    entity19:
+        name: Villager
+        aliases:
+    entity20:
+        name: Blaze
+        aliases:
+    entity21:
+        name: Mushroom Cow
+        aliases: mooshroom
