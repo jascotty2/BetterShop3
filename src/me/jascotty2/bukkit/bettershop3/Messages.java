@@ -133,7 +133,7 @@ public class Messages {
 		}
 	}
 
-	public void load(String locale) {
+	public void load(String locale, ItemLookupTable itemDB) {
 		File lang = new File(FileManager.langDir, locale + ".yml");
 		if (!lang.exists()) {
 			if (!locale.equals("en")) {
@@ -196,6 +196,9 @@ public class Messages {
 					}
 				}
 			}
+		}
+		if(itemDB != null) {
+			itemDB.load(conf);
 		}
 		if (needSave) {
 			try {

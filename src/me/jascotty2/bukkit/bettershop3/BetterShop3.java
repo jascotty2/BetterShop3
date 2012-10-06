@@ -29,12 +29,13 @@ public class BetterShop3 extends JavaPlugin {
 	public final FileManager fileManager = new FileManager(this);
 	public final SettingsManager config = new SettingsManager(this);
 	public final PermissionsHandler permissions = new PermissionsHandler(this);
+	public final ItemLookupTable itemDB = new ItemLookupTable(this);
 	
 	@Override
 	public void onEnable() {
 		fileManager.extractFiles();
 		config.load();
-		messages.load(config.locale);
+		messages.load(config.locale, itemDB);
 		economy.enable();
 		permissions.enable();
 		try {
