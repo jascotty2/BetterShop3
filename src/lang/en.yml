@@ -62,15 +62,19 @@ Items:
   22: <blue>Lapis Lazuli Block, lapisblock, lblock
   23: Dispenser
   24: Sandstone, sstone
+  24_1: Chiseled Sandstone
+  24_1_sub: Chiseled
+  24_2: Smooth Sandstone
+  24_2_sub: Smooth
   25: Note Block, Music Block, nblock, mblock
   27: Powered Rail, boosterrail, boosttrack, boostrack, poweredrail, poweredtrack
   28: Detector Rail, detectorail
   29: Sticky Piston, spiston, slimepiston
   30: Web, Spiderweb, Cobweb
-  31: Dead Fern
+  31: Dead Shrub
   31_1: Tall Grass
   31_2: Fern
-  32: Dead Shrub
+  32: Dead Bush
   33: Piston
   35: <white>White Wool, White Cloth, Wool, Cloth
   35_0_sub: white, w
@@ -86,7 +90,7 @@ Items:
   35_5_sub: lightgreen, lgreen, lg
   35_6: <lightpurple>Pink Wool, Pink Cloth
   35_6_sub: pink, pn
-  35_7: <darkgray>Dark Gray Wool, Dark Grey Wool, Gray Wool, Grey Wool, Dark Gray Cloth, Dark Grey Cloth, Gray Cloth, Grey Cloth
+  35_7: <darkgray>Gray Wool, Dark Gray Wool, Grey Wool, Dark Grey Wool, Gray Cloth, Dark Gray Cloth, Grey Cloth, Dark Grey Cloth
   35_7_sub: darkgray, dgray, darkgrey, dgrey, dg
   35_8: <gray>Light Gray Wool, Light Grey Wool, Light Gray Cloth, Light Grey Cloth
   35_8_sub: lightgray, lgray, lightgrey, lgrey lg
@@ -98,7 +102,7 @@ Items:
   35_11_sub: blue, blu
   35_12: <darkgray>Brown Wool, Brown Cloth
   35_12_sub: brown, br
-  35_13: <darkgreen>Dark Green Wool, Dark Green Cloth, Green Wool, Green Cloth
+  35_13: <darkgreen>Green Wool, Green Cloth, Dark Green Wool, Dark Green Cloth
   35_13_sub: darkgreen, dgreen, dgr
   35_14: <red>Red Wool, Red Cloth
   35_14_sub: red, r

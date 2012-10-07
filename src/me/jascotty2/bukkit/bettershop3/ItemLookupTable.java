@@ -20,6 +20,8 @@ package me.jascotty2.bukkit.bettershop3;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import me.jascotty2.bukkit.bettershop3.enums.ExtendedMaterials;
+import me.jascotty2.libv2.util.Str;
 import org.bukkit.Material;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -27,11 +29,13 @@ import org.bukkit.configuration.file.YamlConfiguration;
 public class ItemLookupTable {
 	
 	final BetterShop3 plugin;
-	// items that require data to define
-	final static int[] useData = new int[]{
-		5, 6, 17, 18, 24, 31, 35, 43, 44, 
-		78, 97, 98, 99, 100, 125, 126,
-		263, 351, 373, 383, 397};
+	// do NOT add these id's to the table
+	//		(must be in order)
+	final static int[] invalidItems = new int[]{
+		0, 26, 34, 36, 55, 59, 62, 63, 68, 75, 90,
+		92, 93, 94, 104, 105, 115, 117, 118, 119,
+		132, 140, 141, 142, 144
+	};
 	// what item ids' data resemble max damage value
 	// (must be in ascending order)
 	final static int[] tools = new int[]{
@@ -51,9 +55,24 @@ public class ItemLookupTable {
 	public ItemLookupTable(BetterShop3 plugin) {
 		this.plugin = plugin;
 		// initialize item list
+		int ignore_i = 0, extended_i = 0;
 		for(Material m : Material.values()) {
-			
+			if(m.getId() == invalidItems[ignore_i]) {
+				++ignore_i;
+			} else if(m.getId() == ExtendedMaterials.idList[extended_i]) {
+				for(ExtendedMaterials m2 : ExtendedMaterials.values()) {
+					if(m2.getId() == m.getId()) {
+						addEntry(m2.getId(), m2.getData(), Str.titleCase(m2.name().replace('_', ' ')));
+					}
+				}
+			} else {
+				addEntry(m.getId(), 0, Str.titleCase(m.name().replace('_', ' ')));
+			}
 		}
+	}
+	
+	protected final void addEntry(int id, int data, String value) {
+		
 	}
 	
 	public void load(YamlConfiguration conf) {
@@ -63,14 +82,5 @@ public class ItemLookupTable {
 		}
 		MemorySection itemNames = (MemorySection) conf.get("Items");
 		
-	}
-	
-	public static boolean usesData(int id) {
-		for (int i = 0; i < useData.length; i++) {
-			if(id == useData[i]) {
-				return true;
-			}
-		}
-		return false;
 	}
 }
