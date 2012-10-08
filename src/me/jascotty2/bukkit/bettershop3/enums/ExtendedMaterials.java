@@ -23,7 +23,7 @@ public enum ExtendedMaterials {
 	OAK_WOOD(5, 0),
 	SPRUCE_WOOD(5, 1),
 	BIRCH_WOOD(5, 2),
-	JUNGLE_WOOD(5, 2),
+	JUNGLE_WOOD(5, 3),
 	OAK_SAPLING(6, 0),
 	SPRUCE_SAPLING(6, 1),
 	BIRCH_SAPLING(6, 2),
@@ -114,6 +114,7 @@ public enum ExtendedMaterials {
 	MAGENTA_DYE(351, 13),
 	ORANGE_DYE(351, 14),
 	BONE_MEAL(351, 15),
+	// potions technically require data, but too many values to type out by hand
 	POTION(373, 0),
 	CREEPER_SPAWN_EGG(383, 50),
 	SKELETON_SPAWN_EGG(383, 51),

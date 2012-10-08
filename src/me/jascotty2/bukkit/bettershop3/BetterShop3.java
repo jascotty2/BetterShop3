@@ -19,6 +19,10 @@
 package me.jascotty2.bukkit.bettershop3;
 
 import java.io.IOException;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.mcstats.Metrics;
 
@@ -30,7 +34,7 @@ public class BetterShop3 extends JavaPlugin {
 	public final SettingsManager config = new SettingsManager(this);
 	public final PermissionsHandler permissions = new PermissionsHandler(this);
 	public final ItemLookupTable itemDB = new ItemLookupTable(this);
-	
+
 	@Override
 	public void onEnable() {
 		fileManager.extractFiles();
@@ -44,11 +48,28 @@ public class BetterShop3 extends JavaPlugin {
 		} catch (IOException e) {
 			// Failed to submit the stats :-(
 		}
+		System.out.println("testing database:");
+//		System.out.println("search for '5': " + itemDB.getItem("5"));
+//		System.out.println("search for 'log': " + itemDB.getItem("log"));
+		System.out.println("search for 'Pine Wood': " + itemDB.getItem("Pine Wood"));
+		//System.out.println("search for 'woop:plue': " + itemDB.getItem("woop:plue"));
+		
 	}
-	
+
 	@Override
 	public void onDisable() {
 		economy.flushSave();
 	}
 
-}
+	@Override
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+		if(sender instanceof Player) {
+			System.out.println(((Player)sender).getName());
+			for(ItemStack i : ((Player) sender).getInventory().getContents()) {
+				System.out.println(i == null ? "null" : i.toString() + " - " + i.getDurability());
+				//sender.sendMessage(i == null ? "null" : i.toString());
+			}
+		}
+		return true;
+	}
+	}

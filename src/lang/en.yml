@@ -19,6 +19,7 @@ Items:
   3: Dirt
   4: Cobblestone, Cobble
   5: Wood, plank
+  5_0_sub: Oak
   5_1: Spruce Wood, Pine Wood
   5_1_sub: Spruce, Pine
   5_2: Birch Wood
@@ -43,6 +44,7 @@ Items:
   15: Iron Ore, iore
   16: Coal Ore, core
   17: Log, trunk
+  17_0_sub: Oak
   17_1: Spruce Log, Pine Log, Redwood Log, Red Log
   17_1_sub: Spruce, Pine, Redwood, Red
   17_2: Birch Log, White Log
@@ -383,6 +385,7 @@ Items:
   370: Ghast Tear
   371: Gold Nugget
   372: Nether Wart
+  373: Water Bottle, Potion
   374: Glass Bottle
   375: Spider Eye
   376: Fermented Spider Eye
@@ -433,6 +436,77 @@ Items:
   2264: <white>Strad Disc, White Record, White Disk
   2265: <green>Ward Disc
   2266: <black>11 Disc, Broken Record, Broken Disk
+Potions: 
+  Extra_Time: Extended <name>
+  Splash_Potion: Splash Potion
+  Potion_Name: Potion
+  0: Mundane Potion
+  1: Potion of Regeneration
+  2: Potion of Swiftness
+  3: Potion of Fire Resistance
+  4: Potion of Poison
+  5: Potion of Healing
+  6: Clear Potion
+  7: Clear Potion
+  8: Potion of Weakness
+  9: Potion of Strength
+  10: Potion of Slowness
+  11: Diffuse Potion
+  12: Potion of Harming
+  13: Artless Potion
+  14: Thin Potion
+  15: Thin Potion
+  # tier 1.5 ..
+  16: Awkward Potion
+  17: Potion of Regeneration
+  18: Potion of Swiftness
+  19: Potion of Fire Resistance
+  20: Potion of Poison
+  21: Potion of Healing
+  22: Bungling Potion
+  23: Bungling Potion
+  24: Potion of Weakness
+  25: Potion of Strength
+  26: Potion of Slowness
+  27: Smooth Potion
+  28: Potion of Harming
+  29: Suave Potion
+  30: Debonair Potion
+  31: Debonair Potion
+  # tier 2 names
+  32: Thick Potion
+  33: Potion of Regeneration II
+  34: Potion of Swiftness II
+  35: Potion of Fire Resistance
+  36: Potion of Poison II
+  37: Potion of Healing II
+  38: Charming Potion
+  39: Charming Potion
+  40: Potion of Weakness
+  41: Potion of Strength II
+  42: Potion of Slowness
+  43: Refined Potion
+  44: Potion of Harming II
+  45: Cordial Potion
+  46: Sparkling Potion
+  47: Sparkling Potion
+  # tier 2.5..
+  48: Potent Potion
+  49: Potion of Regeneration II
+  50: Potion of Swiftness II
+  51: Potion of Fire Resistance
+  52: Potion of Poison II
+  53: Potion of Healing II
+  54: Rank Potion
+  55: Rank Potion
+  56: Potion of Weakness
+  57: Potion of Strength II
+  58: Potion of Slowness
+  59: Acrid Potion
+  60: Potion of Harming II
+  61: Gross Potion
+  62: Stinky Potion
+  63: Stinky Potion
 # possible future use?
 Entities:
   50: Creeper
