@@ -177,4 +177,13 @@ public enum ExtendedMaterials {
 		}
 		return false;
 	}
+	
+	public static boolean validData(int id, int data) {
+		for(ExtendedMaterials m : values()) {
+			if(m.id == id && m.data == data) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

@@ -334,77 +334,34 @@ Items:
   351_0_sub: black
   351_1: <red>Red Dye
   351_1_sub: red
-  
-    item351sub2:
-        name: Green Dye
-        aliases:
-        sub: green
-        color: green
-    item351sub3:
-        name: Cocoa Bean
-        aliases: browndye, cocoa, coco, cocobean
-        sub: brown
-        color: gray
-    item351sub4:
-        name: Lapis Lazuli
-        aliases: bluedye, lapislazul, lapis
-        sub: blue
-        color: blue
-    item351sub5:
-        name: Purple Dye
-        aliases:
-        sub: purple
-        color: magenta
-    item351sub6:
-        name: Cyan Dye
-        aliases: tealdye
-        sub: cyan, teal
-        color: cyan, teal
-    item351sub7:
-        name: Light Gray Dye
-        aliases: lightgreydye
-        sub: lightgrey, lightgray
-        color: light gray
-    item351sub8:
-        name: Gray Dye
-        aliases: greydye
-        sub: grey, gray
-        color: gray
-    item351sub9:
-        name: Pink Dye
-        aliases:
-        sub: pink
-        color: pink
-    item351sub10:
-        name: Lime Dye
-        aliases: lightgreendye
-        sub: lime, limegreen
-        color: lime
-    item351sub11:
-        name: Yellow Dye
-        aliases:
-        sub: yellow
-        color: yellow
-    item351sub12:
-        name: Light Blue Dye
-        aliases:
-        sub: lightblue
-        color: sky blue
-    item351sub13:
-        name: Magenta Dye
-        aliases:
-        sub: magenta
-        color: magenta
-    item351sub14:
-        name: Orange Dye
-        aliases:
-        sub: orange
-        color: orange
-    item351sub15:
-        name: Bone Meal
-        aliases: whitedye
-        sub: white
-        color: white
+  351_2: <darkgreen>Green Dye
+  351_2_sub: green
+  351_3: <darkgray>Cocoa Bean, Brown Dye, Cocoa, Coco, Coco Bean
+  351_3_sub: brown
+  351_4: <blue>Lapis Lazuli, Blue Dye, Lapis Lazul, Lapis
+  351_4_sub: brown
+  351_5: <darkpurple>Purple Dye
+  351_5_sub: purple
+  351_6: <aqua>Cyan Dye, Teal Dye
+  351_6_sub: cyan, teal
+  351_7: <gray>Light Gray Dye, Light Grey Dye
+  351_7_sub: lightgrey, lightgray
+  351_8: <darkgray>Gray Dye, Grey Dye
+  351_8_sub: grey, gray
+  351_9: Pink Dye
+  351_9_sub: pink
+  351_10: <green>Lime Dye, Light Green Dye
+  351_10_sub: lime, limegreen
+  351_11: <yellow>Yellow Dye
+  351_11_sub: yellow
+  351_12: <darkaqua>Light Blue Dye, Light Blue
+  351_12_sub: light blue
+  351_13:  <darkpurple>Magenta Dye, Magenta
+  351_13_sub: magenta
+  351_14: <red>Orange Dye, Orange
+  351_14_sub: orange
+  351_15: Bone Meal, White Dye
+  351_15_sub: white
   352: Bone
   353: Sugar
   354: Cake
@@ -435,76 +392,34 @@ Items:
   380: Cauldron
   381: Eye of Ender
   382: Glistering Melon
-        aliases: 
-    item383sub50:
-        name: Creeper Egg
-        aliases: 
-    item383sub51:
-        name: Skeleton Egg
-        aliases: 
-    item383sub52:
-        name: Spider Egg
-        aliases: 
-    item383sub53:
-        name: Giant Egg
-        aliases: 
-    item383sub54:
-        name: Zombie Egg
-        aliases: 
-    item383sub55:
-        name: Slime Egg
-        aliases: 
-    item383sub56:
-        name: Ghast Egg
-        aliases: 
-    item383sub57:
-        name: PigZombie Egg
-        aliases: 
-    item383sub58:
-        name: Enderman Egg
-        aliases: 
-    item383sub59:
-        name: CaveSpider Egg
-        aliases: 
-    item383sub60:
-        name: Silverfish Egg
-        aliases: 
-    item383sub61:
-        name: Blaze Egg
-        aliases: 
-    item383sub62:
-        name: LavaSlime Egg
-        aliases: 
-    item383sub63:
-        name: EnderDragon Egg
-        aliases: 
-    item383sub90:
-        name: Pig Egg
-        aliases: 
-    item383sub91:
-        name: Sheep Egg
-        aliases: 
-    item383sub92:
-        name: Cow Egg
-        aliases: 
-    item383sub93:
-        name: Chicken Egg
-        aliases: 
-    item383sub94:
-        name: Wolf Egg
-        aliases: 
-    item383sub95:
-        name: MushroomCow Egg
-        aliases: 
-    item383sub96:
-        name: SnowMan Egg
-        aliases: 
-    item383sub97:
-        name: Villager Egg
-        aliases: 
-    item383sub98:
-        name: Ocelot Egg
-        aliases: categg
+  383_50: Creeper Egg
+  383_51: Skeleton Egg
+  383_52: Spider Egg
+  383_53: Giant Egg
+  383_54: Zombie Egg
+  383_55: Slime Egg
+  383_56: Ghast Egg
+  383_57: PigZombie Egg
+  383_58: Enderman Egg
+  383_59: CaveSpider Egg
+  383_60: Silverfish Egg
+  383_61: Blaze Egg
+  383_62: LavaSlime Egg
+  383_63: EnderDragon Egg
+  383_64: Wither Skeleton Egg, Wither Egg
+  383_65: Bat Egg
+  383_66: Witch Egg
+  383_90: Pig Egg
+  383_91: Sheep Egg
+  383_92: Cow Egg
+  383_93: Chicken Egg
+  383_94: Squid Egg
+  383_95: Wolf Egg
+  383_96: Mushroom Cow Egg
+  383_97: Snow Golem, SnowMan Egg
+  383_98: Ocelot Egg, Cat Egg
+  383_99: Iron Golem Egg, Villager Golem Egg
+  383_120: Villager Egg
   384: Bottle o' Enchanting, Bottle of Enchanting, Experience Bottle, Experience, Exp Bottle
   385: Fire Charge, Fireball
   2256: <gold>13 Disk, Gold Record, Gold Disk
@@ -518,75 +433,36 @@ Items:
   2264: <white>Strad Disc, White Record, White Disk
   2265: <green>Ward Disc
   2266: <black>11 Disc, Broken Record, Broken Disk
+# possible future use?
+Entities:
+  50: Creeper
+  51: Skeleton
+  52: Spider
+  53: Giant
+  54: Zombie
+  55: Slime
+  56: Ghast
+  57: Zombie Pigman, Pig Zombie
+  58: Enderman
+  59: Cave Spider
+  60: Silverfish
+  61: Blaze
+  62: Magma Cube, Lava Slime
+  63: Ender Dragon
+  64: Wither Skeleton, Wither
+  65: Bat
+  66: Witch
   
-        
-#entities :)
-# can't add more than what i have, or you'll get a chicken
-#   note: if adding to the csv, add 4000 to the entity number
-entities:
-    entity0:
-        name: Chicken
-        aliases: 
-    entity1:
-        name: Cow 
-        aliases: 
-    entity2:
-        name: Creeper
-        aliases: 
-    entity3:
-        name: Ghast
-        aliases: 
-    entity4:
-        name: Giant
-        aliases: giantzombie
-    entity5:
-        name: Monster
-        aliases: human, slave, bodyguard, dummy
-    entity6:
-        name: Pig
-        aliases: 
-    entity7:
-        name: PigZombie
-        aliases: 
-    entity8:
-        name: Sheep
-        aliases: 
-    entity9:
-        name: Skeleton
-        aliases: 
-    entity10:
-        name: Slime
-        aliases: 
-    entity11:
-        name: Spider
-        aliases: 
-    entity12:
-        name: Squid
-        aliases: 
-    entity13:
-        name: Zombie
-        aliases: 
-    entity14:
-        name: Wolf
-        aliases: dog
-    entity15:
-        name: Cave Spider
-        aliases: cspider
-    entity16:
-        name: Enderman
-        aliases: endermen
-    entity17:
-        name: Silverfish
-        aliases: sliverfish, stonefish
-    entity18:
-        name: Ender Dragon
-        aliases: 
-    entity19:
-        name: Villager
-        aliases:
-    entity20:
-        name: Blaze
-        aliases:
-    entity21:
-        name: Mushroom Cow
-        aliases: mooshroom
+  90: Pig
+  91: Sheep
+  92: Cow
+  93: Chicken
+  94: Squid
+  95: Wolf, Dog
+  96: Mooshroom, Mushroom Cow
+  97: Snow Golem, Snow Man
+  98: Ocelot, Ozelot, Cat
+  99: Iron Golem, Villager Golem
+  
+  120: Villager
+  

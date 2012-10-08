@@ -21,13 +21,14 @@ package me.jascotty2.bukkit.bettershop3;
 import java.util.ArrayList;
 import java.util.HashMap;
 import me.jascotty2.bukkit.bettershop3.enums.ExtendedMaterials;
+import me.jascotty2.libv2.io.CheckInput;
 import me.jascotty2.libv2.util.Str;
 import org.bukkit.Material;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 public class ItemLookupTable {
-	
+
 	final BetterShop3 plugin;
 	// do NOT add these id's to the table
 	//		(must be in order)
@@ -48,20 +49,24 @@ public class ItemLookupTable {
 	// items (other than tools) that aren't good to stack
 	final static int[] unsafeStack = new int[]{
 		282, 325, 326, 327, 335};
-	// first 16 bits == id, last 16 bits == data
+	// first 15 bits == id, last 16 bits == data
 	final protected HashMap<Integer, ArrayList<String>> itemNames = new HashMap<Integer, ArrayList<String>>();
 	final protected HashMap<String, Integer> items = new HashMap<String, Integer>();
-
+	/**
+	 * when comparing strings for typos, the 'distance' between the strings to compare as equal
+	 */
+	public int MAX_LEVENSHTEIN_DIST = 2;
+	
 	public ItemLookupTable(BetterShop3 plugin) {
 		this.plugin = plugin;
 		// initialize item list
 		int ignore_i = 0, extended_i = 0;
-		for(Material m : Material.values()) {
-			if(m.getId() == invalidItems[ignore_i]) {
+		for (Material m : Material.values()) {
+			if (m.getId() == invalidItems[ignore_i]) {
 				++ignore_i;
-			} else if(m.getId() == ExtendedMaterials.idList[extended_i]) {
-				for(ExtendedMaterials m2 : ExtendedMaterials.values()) {
-					if(m2.getId() == m.getId()) {
+			} else if (m.getId() == ExtendedMaterials.idList[extended_i]) {
+				for (ExtendedMaterials m2 : ExtendedMaterials.values()) {
+					if (m2.getId() == m.getId()) {
 						addEntry(m2.getId(), m2.getData(), Str.titleCase(m2.name().replace('_', ' ')));
 					}
 				}
@@ -70,17 +75,71 @@ public class ItemLookupTable {
 			}
 		}
 	}
-	
+
 	protected final void addEntry(int id, int data, String value) {
-		
+		id = (id << 16) + data;
+		if (!itemNames.containsKey(id)) {
+			itemNames.put(id, new ArrayList<String>());
+		}
+		itemNames.get(id).add(value);
+		items.put(value, id);
 	}
-	
+
+	public ItemValue getItem(String search) {
+		if (CheckInput.IsInt(search)) {
+			int id = CheckInput.GetInt(search, -1);
+			if((id & 2147418112) == 0 && id > 0 && itemNames.containsKey(id << 16)) {
+				return new ItemValue(id, 0);
+			}
+		} else if (search.contains(":")) {
+			if(Str.count(search, ":") == 1) {
+				String idStr = search.substring(0, search.indexOf(':'));
+				ItemValue find = getItem(idStr);
+				
+				if(find != null) {
+					if(ExtendedMaterials.usesData(find.id)) {
+						String datStr = search.substring(search.indexOf(':') + 1);
+						if (CheckInput.IsInt(datStr)) {
+							int dat = CheckInput.GetInt(search, -1);
+							if((dat & 2147418112) == 0 && dat > 0 && ExtendedMaterials.validData(find.id, dat)) {
+								find.data = dat;
+								return find;
+							}
+						} else {
+							// look up using sub table (eg. wool:black)
+						}
+					}
+				}
+			}
+		} else {
+			
+		}
+		return null;
+	}
+			
 	public void load(YamlConfiguration conf) {
 		// sanity check
-		if(conf == null || !(conf.get("Items") instanceof MemorySection) ) {
+		if (conf == null || !(conf.get("Items") instanceof MemorySection)) {
 			return;
 		}
 		MemorySection itemNames = (MemorySection) conf.get("Items");
-		
+
+	}
+
+	public static class ItemValue {
+
+		public int id, data;
+
+		ItemValue() {
+		}
+
+		public ItemValue(int id) {
+			this.id = id;
+		}
+
+		public ItemValue(int id, int data) {
+			this.id = id;
+			this.data = data;
+		}
 	}
 }
