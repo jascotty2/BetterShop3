@@ -131,14 +131,13 @@ public class ItemLookupTable {
 	protected static String potion_splash = DEFAULT_SPLASH_POTION;
 	protected static String potion_Name = DEFAULT_POTION;
 	/**
-	 * when comparing strings for typos, the 'distance' between the strings to compare as equal
+	 * when comparing strings for typos, the 'distance' between the strings to
+	 * compare as equal
 	 */
 	public int MAX_LEVENSHTEIN_DIST = 2;
 
 	public ItemLookupTable(BetterShop3 plugin) {
 		this.plugin = plugin;
-
-		//loadDefaults();
 	}
 
 	private void loadDefaults() {
@@ -203,10 +202,13 @@ public class ItemLookupTable {
 
 	protected final void setItem(int id, int data, String value) {
 		ArrayList<String> orig = itemNames.get((id << 16) + data);
+		String colored = Messages.convertColorChars(value);
+		if (colored.contains(String.valueOf(ChatColor.COLOR_CHAR))) {
+			itemColors.put((id << 16) + data,
+					ChatColor.getByChar(colored.charAt(colored.indexOf(ChatColor.COLOR_CHAR) + 1)));
+			value = ChatColor.stripColor(colored);
+		}
 		if (orig == null) {
-			if(id == 5) {
-				System.out.println(id + ":" + data + " - no known set? " + ((id << 16) + data));
-			}
 			addEntries(id, data, value);
 		} else {
 			LinkedList<String> names = new LinkedList<String>(orig);
@@ -216,9 +218,6 @@ public class ItemLookupTable {
 			}
 			if (value.contains(",")) {
 				String v, values[] = value.split(",");
-				if(id == 5) {
-					System.out.println("Setting " + id + ":" + data + " ('" + value + "' = " + values.length + ") " + Str.concatStr(values, ";"));
-				}
 				boolean firstIn = false;
 				for (int i = 0; i < values.length; ++i) {
 					if ((v = values[i].trim()).length() > 0) {
@@ -259,9 +258,6 @@ public class ItemLookupTable {
 							}
 							// as well to the global index
 							items.put(valKey, id);
-							if(id == 5) {
-								System.out.println("adding " + v + " to 5:" + data);
-							}
 						}
 					}
 				}
@@ -290,9 +286,10 @@ public class ItemLookupTable {
 			// and tier 2 starts at bit 5, so not sure where that's going..
 			if (id != 373) {
 				//plugin.getLogger().info(
-				System.out.println(String.format(
-						"Notice: Name \"%s\" for item %d:%d conficts with an existing entry: ignoring",
-						value, id, data));
+				ItemValue val = getItem(keyValue);
+				plugin.getLogger().info(String.format(
+						"Notice: Name \"%s\" for item %d:%d conficts with an existing entry: %d:%d (ignoring)",
+						keyValue, id, data, val == null ? -1 : val.id, val == null ? -1 : val.data));
 			}
 			return;
 		}
@@ -315,7 +312,7 @@ public class ItemLookupTable {
 				// only slightly more efficient than calling the funtion
 				if (map.containsKey(v)) {
 					plugin.getLogger().info(String.format(
-							"Notice: Sub-Name \"%s\" for item %d:%d conficts with an existing entry: ignoring",
+							"Notice: Sub-Name \"%s\" for item %d:%d conficts with an existing entry (" + map.get(v) + ") : ignoring",
 							v, id, data));
 				} else {
 					map.put(v, data);
@@ -345,6 +342,7 @@ public class ItemLookupTable {
 			return;
 		}
 		MemorySection itemNameSection = (MemorySection) conf.get("Items");
+		System.out.println(Str.concatStr(itemNameSection.getKeys(false), ", "));
 		int ignore_i = 0, extended_i = 0;
 		for (Material m : Material.values()) {
 			if (m.getId() == invalidItems[ignore_i]) {
@@ -358,7 +356,8 @@ public class ItemLookupTable {
 					++extended_i;
 					for (ExtendedMaterials m2 : ExtendedMaterials.values()) {
 						if (m2.getId() == m.getId()) {
-							String idDatStr = idStr + "_" + m2.getData();
+							String idDatStr = idStr + "-" + m2.getData();
+
 							if (itemNameSection.contains(idDatStr)) {
 								setItem(m.getId(), m2.getData(), itemNameSection.getString(idDatStr));
 							}
@@ -479,9 +478,43 @@ public class ItemLookupTable {
 				return new ItemValue(items.get(close) >> 16, items.get(close) & 65535);
 			}
 		}
-		System.out.println("no result for '" + search + "'");
-		System.out.println("all values: " + Str.concatStr(items.keySet(), ", "));
 		return null;
+	}
+
+	public String getItemName(int id) {
+		return itemNames.containsKey(id << 16) ? itemNames.get(id << 16).get(0) : null;
+	}
+
+	public String getItemName(int id, int data) {
+		return itemNames.containsKey((id << 16) + data) ? itemNames.get((id << 16) + data).get(0) : null;
+	}
+
+	public String getColoredItemName(int id) {
+		if (itemNames.containsKey(id << 16)) {
+			if (itemColors.containsKey(id << 16)) {
+				return itemColors.get(id << 16) + itemNames.get(id << 16).get(0);
+			}
+			return itemNames.get(id << 16).get(0);
+		}
+		return null;
+	}
+
+	public String getColoredItemName(int id, int data) {
+		if (itemNames.containsKey((id << 16) + data)) {
+			if (itemColors.containsKey((id << 16) + data)) {
+				return itemColors.get((id << 16) + data) + itemNames.get((id << 16) + data).get(0);
+			}
+			return itemNames.get((id << 16) + data).get(0);
+		}
+		return null;
+	}
+
+	public ArrayList<String> getItemNames(int id) {
+		return itemNames.containsKey(id << 16) ? (ArrayList<String>) itemNames.get(id << 16).clone() : null;
+	}
+
+	public ArrayList<String> getItemNames(int id, int data) {
+		return itemNames.containsKey((id << 16) + data) ? (ArrayList<String>) itemNames.get((id << 16) + data).clone() : null;
 	}
 
 	public static class ItemValue {

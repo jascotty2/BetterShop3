@@ -48,11 +48,6 @@ public class BetterShop3 extends JavaPlugin {
 		} catch (IOException e) {
 			// Failed to submit the stats :-(
 		}
-		System.out.println("testing database:");
-//		System.out.println("search for '5': " + itemDB.getItem("5"));
-//		System.out.println("search for 'log': " + itemDB.getItem("log"));
-		System.out.println("search for 'Pine Wood': " + itemDB.getItem("Pine Wood"));
-		//System.out.println("search for 'woop:plue': " + itemDB.getItem("woop:plue"));
 		
 	}
 

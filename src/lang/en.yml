@@ -19,20 +19,20 @@ Items:
   3: Dirt
   4: Cobblestone, Cobble
   5: Wood, plank
-  5_0_sub: Oak
-  5_1: Spruce Wood, Pine Wood
-  5_1_sub: Spruce, Pine
-  5_2: Birch Wood
-  5_2_sub: Birch
-  5_3: Jungle  Wood
-  5_3_sub: Jungle
+  5-0_sub: Oak
+  5-1: Spruce Wood, Pine Wood
+  5-1_sub: Spruce, Pine
+  5-2: Birch Wood
+  5-2_sub: Birch
+  5-3: Jungle Wood
+  5-3_sub: Jungle
   6: Sapling, Tree Sapling, Tree, Branch
-  6_1: Spruce Sapling, Spruce Tree
-  6_1_sub: Spruce
-  6_2: Birch Sapling, Birch Tree, Pinecone, Pine
-  6_2_sub: Birch, Pine
-  6_3: Jungle Tree Sapling, Jungle Tree
-  6_3_sub: Jungle
+  6-1: Spruce Sapling, Spruce Tree
+  6-1_sub: Spruce
+  6-2: Birch Sapling, Birch Tree, Pinecone, Pine
+  6-2_sub: Birch, Pine
+  6-3: Jungle Tree Sapling, Jungle Tree
+  6-3_sub: Jungle
   7: Bedrock, Adminium
   8: Water Block
   9: Stationary Water, Still Water Block
@@ -44,72 +44,72 @@ Items:
   15: Iron Ore, iore
   16: Coal Ore, core
   17: Log, trunk
-  17_0_sub: Oak
-  17_1: Spruce Log, Pine Log, Redwood Log, Red Log
-  17_1_sub: Spruce, Pine, Redwood, Red
-  17_2: Birch Log, White Log
-  17_2_sub: Birch, White
-  17_3: Jungle Log
-  17_3_sub: Jungle
+  17-0_sub: Oak
+  17-1: Spruce Log, Pine Log, Redwood Log, Red Log
+  17-1_sub: Spruce, Pine, Redwood, Red
+  17-2: Birch Log, White Log
+  17-2_sub: Birch, White
+  17-3: Jungle Log
+  17-3_sub: Jungle
   18: Leaves, Leaf, Leafs
-  18_1: Spruce Leaves, Pine Leaves
-  18_1_sub: Spruce, Pine
-  18_2: Birch Leaves, bleaves, bleaf
-  18_2_sub: Birch
-  18_3: Jungle Leaves
-  18_3_sub: Jungle
+  18-1: Spruce Leaves, Pine Leaves
+  18-1_sub: Spruce, Pine
+  18-2: Birch Leaves, bleaves, bleaf
+  18-2_sub: Birch
+  18-3: Jungle Leaves
+  18-3_sub: Jungle
   19: Sponge
   20: Glass
   21: Lapis Lazuli Ore, lapisore, lore
   22: <blue>Lapis Lazuli Block, lapisblock, lblock
   23: Dispenser
   24: Sandstone, sstone
-  24_1: Chiseled Sandstone
-  24_1_sub: Chiseled
-  24_2: Smooth Sandstone
-  24_2_sub: Smooth
+  24-1: Chiseled Sandstone
+  24-1_sub: Chiseled
+  24-2: Smooth Sandstone
+  24-2_sub: Smooth
   25: Note Block, Music Block, nblock, mblock
   27: Powered Rail, boosterrail, boosttrack, boostrack, poweredrail, poweredtrack
   28: Detector Rail, detectorail
   29: Sticky Piston, spiston, slimepiston
   30: Web, Spiderweb, Cobweb
   31: Dead Shrub
-  31_1: Tall Grass
-  31_2: Fern
+  31-1: Tall Grass
+  31-2: Fern
   32: Dead Bush
   33: Piston
   35: <white>White Wool, White Cloth, Wool, Cloth
-  35_0_sub: white, w
-  35_1: <orange>Orange Wool, Orange Cloth
-  35_1_sub: orange, o
-  35_2: <darkpurple>Magenta Wool, Magenta Cloth
-  35_2_sub: magenta, m
-  35_3: <aqua>Light Blue Wool, Light Blue Cloth, lbluewool, lbluecloth
-  35_3_sub: lightblue, lblue, lb
-  35_4: <yellow>Yellow Wool, Yellow Cloth
-  35_4_sub: yellow, y
-  35_5: <green>Light Green Wool, Light Green Cloth, Lime Green Wool, Lime Green Cloth, Lime Wool, Lime Cloth
-  35_5_sub: lightgreen, lgreen, lg
-  35_6: <lightpurple>Pink Wool, Pink Cloth
-  35_6_sub: pink, pn
-  35_7: <darkgray>Gray Wool, Dark Gray Wool, Grey Wool, Dark Grey Wool, Gray Cloth, Dark Gray Cloth, Grey Cloth, Dark Grey Cloth
-  35_7_sub: darkgray, dgray, darkgrey, dgrey, dg
-  35_8: <gray>Light Gray Wool, Light Grey Wool, Light Gray Cloth, Light Grey Cloth
-  35_8_sub: lightgray, lgray, lightgrey, lgrey lg
-  35_9: <aqua>Cyan Wool, Teal Wool, Cyan Cloth, Teal Cloth
-  35_9_sub: cyan, teal, c, t
-  35_10: Purple Wool, Purple Cloth
-  35_10_sub: purple, pu
-  35_11: <blue>Blue Wool, Blue Cloth
-  35_11_sub: blue, blu
-  35_12: <darkgray>Brown Wool, Brown Cloth
-  35_12_sub: brown, br
-  35_13: <darkgreen>Green Wool, Green Cloth, Dark Green Wool, Dark Green Cloth
-  35_13_sub: darkgreen, dgreen, dgr
-  35_14: <red>Red Wool, Red Cloth
-  35_14_sub: red, r
-  35_15: <black>Black Wool, Black Cloth
-  35_15_sub: black
+  35-0_sub: white, w
+  35-1: <orange>Orange Wool, Orange Cloth
+  35-1_sub: orange, o
+  35-2: <darkpurple>Magenta Wool, Magenta Cloth
+  35-2_sub: magenta, m
+  35-3: <aqua>Light Blue Wool, Light Blue Cloth, lbluewool, lbluecloth
+  35-3_sub: lightblue, lblue, lb
+  35-4: <yellow>Yellow Wool, Yellow Cloth
+  35-4_sub: yellow, y
+  35-5: <green>Light Green Wool, Light Green Cloth, Lime Green Wool, Lime Green Cloth, Lime Wool, Lime Cloth
+  35-5_sub: lightgreen, lgreen, lg
+  35-6: <lightpurple>Pink Wool, Pink Cloth
+  35-6_sub: pink, pn
+  35-7: <darkgray>Gray Wool, Dark Gray Wool, Grey Wool, Dark Grey Wool, Gray Cloth, Dark Gray Cloth, Grey Cloth, Dark Grey Cloth
+  35-7_sub: darkgray, dgray, darkgrey, dgrey, dg
+  35-8: <gray>Light Gray Wool, Light Grey Wool, Light Gray Cloth, Light Grey Cloth
+  35-8_sub: lightgray, lgray, lightgrey, lgrey lg
+  35-9: <aqua>Cyan Wool, Teal Wool, Cyan Cloth, Teal Cloth
+  35-9_sub: cyan, teal, c, t
+  35-10: Purple Wool, Purple Cloth
+  35-10_sub: purple, pu
+  35-11: <blue>Blue Wool, Blue Cloth
+  35-11_sub: blue, blu
+  35-12: <darkgray>Brown Wool, Brown Cloth
+  35-12_sub: brown, br
+  35-13: <darkgreen>Green Wool, Green Cloth, Dark Green Wool, Dark Green Cloth
+  35-13_sub: darkgreen, dgreen, dgr
+  35-14: <red>Red Wool, Red Cloth
+  35-14_sub: red, r
+  35-15: <black>Black Wool, Black Cloth
+  35-15_sub: black
   37: <yellow>Dandelion, Yellow Flower, yflower, flower, flowers, dandelion
   38: <red>Rose, Red Rose, redflower, rflower
   39: Brown Mushroom, brownmush, bmushroom, bmush, mushroom
@@ -117,18 +117,18 @@ Items:
   41: Gold Block, gblock
   42: Iron Block, iblock
   43: Double Step, dstep, doubleslab, dslab
-  43_1: Sandstone Double Step, sanddoublestep, sdoublestep, sstonedoublestep, sanddoubleslab, sdslab, sdstep
-  43_1_sub: sandstone, sand
-  43_2: Wood Double Step, wdoublestep, wooddoubleslab, wdstep, wdslab
-  43_2_sub: wood
-  43_3: Cobblestone Double Step, cstonedoublestep, cdoublestep, cobbledoublestoneslab, cobbledoubleslab, cdstep, cdslab
+  43-1: Sandstone Double Step, sanddoublestep, sdoublestep, sstonedoublestep, sanddoubleslab, sdslab, sdstep
+  43-1_sub: sandstone, sand
+  43-2: Wood Double Slab, wdslab
+  43-2_sub: wood
+  43-3: Cobblestone Double Step, cstonedoublestep, cdoublestep, cobbledoublestoneslab, cobbledoubleslab, cdstep, cdslab
   44: Step, slab, halfstep
-  44_1: Sandstone Step, Sand Step, sstep, sstonestep, sandslab
-  44_1_sub: sand, sandstone
-  44_2: Wood Step, wstep, woodslab
-  44_2_sub: wood
-  44_3: Cobblestone Step, cstonestep, cstep, cobblestoneslab, cobbleslab
-  44_3_sub: cobble
+  44-1: Sandstone Step, Sand Step, sstep, sstonestep, sandslab
+  44-1_sub: sand, sandstone
+  44-2: Wood Slab, wslab
+  44-2_sub: wood
+  44-3: Cobblestone Step, cstonestep, cstep, cobblestoneslab, cobbleslab
+  44-3_sub: cobble
   45: Brick Block, bblock
   46: TNT, Dynamite, Dynomite
   47: Bookshelf, Book Block
@@ -174,17 +174,17 @@ Items:
   95: Locked Chest
   96: Trapdoor, tdoor
   97: Silverfish Stone, Monster Stone, Monster Block
-  97_1: Cobblestone Monster Block, Cobble Monster Block
-  97_1_sub: cobble
-  97_2: Stone Brick Monster Block
-  97_2_sub: stonebrick
+  97-1: Cobblestone Monster Block, Cobble Monster Block
+  97-1_sub: cobble
+  97-2: Stone Brick Monster Block
+  97-2_sub: stonebrick
   98: Stone Brick
-  98_1: Mossy Stone Brick
-  98_1_sub: mossy, moss
-  98_2: Cracked Stone Brick
-  98_2_sub: cracked
-  98_3: Chiseled Stone Brick
-  98_3_sub: chiseled
+  98-1: Mossy Stone Brick
+  98-1_sub: mossy, moss
+  98-2: Cracked Stone Brick
+  98-2_sub: cracked
+  98-3: Chiseled Stone Brick
+  98-3_sub: chiseled
   99: Huge Brown Mushroom
   100: Huge Red Mushroom
   101: Iron Bars
@@ -225,15 +225,15 @@ Items:
   140: Flower Pot
   143: Wooden Button
   144: Skeleton Head, Head
-  144_0_sub: Skeleton
-  144_1: Wither Skeleton Head
-  144_1_sub: Wither Skeleton
-  144_2: Zombie Head
-  144_2_sub: Zombie
-  144_3: Human Head
-  144_3_sub: Human
-  144_4: Creeper Head
-  144_4_sub: Creeper
+  144-0_sub: Skeleton
+  144-1: Wither Skeleton Head
+  144-1_sub: Wither Skeleton
+  144-2: Zombie Head
+  144-2_sub: Zombie
+  144-3: Human Head
+  144-3_sub: Human
+  144-4: Creeper Head
+  144-4_sub: Creeper
   # items
   256: Iron Shovel, Iron Spade, iShovel, iSpade
   257: Iron Pickaxe, Iron Pick, iPickaxe, iPick
@@ -243,7 +243,7 @@ Items:
   261: Bow
   262: Arrow
   263: Coal
-  263_1: Charcoal, ccoal
+  263-1: Charcoal, ccoal
   264: Diamond
   265: Iron Ingot, Iron Bar, Iron, iingot, ibar
   266: Gold Ingot, Gold Bar, Gold, gingot, gbar
@@ -303,7 +303,7 @@ Items:
   320: Cooked Porkchop, Grilled Pork, Cooked Pork, Bacon
   321: Painting, Picture
   322: Golden Apple, Gold Apple, gApple
-  322_1: Enchanted Golden Apple, Enchanted Gold Apple, Enchanted Apple, egApple
+  322-1: Enchanted Golden Apple, Enchanted Gold Apple, Enchanted Apple, egApple
   323: Sign
   324: Wooden Door, Wood Door, wDoor
   325: Bucket
@@ -333,37 +333,37 @@ Items:
   349: Raw Fish, Fish
   350: Cooked Fish, cFish
   351: <black>Ink Sac, Black Dye, Dye
-  351_0_sub: black
-  351_1: <red>Red Dye
-  351_1_sub: red
-  351_2: <darkgreen>Green Dye
-  351_2_sub: green
-  351_3: <darkgray>Cocoa Bean, Brown Dye, Cocoa, Coco, Coco Bean
-  351_3_sub: brown
-  351_4: <blue>Lapis Lazuli, Blue Dye, Lapis Lazul, Lapis
-  351_4_sub: brown
-  351_5: <darkpurple>Purple Dye
-  351_5_sub: purple
-  351_6: <aqua>Cyan Dye, Teal Dye
-  351_6_sub: cyan, teal
-  351_7: <gray>Light Gray Dye, Light Grey Dye
-  351_7_sub: lightgrey, lightgray
-  351_8: <darkgray>Gray Dye, Grey Dye
-  351_8_sub: grey, gray
-  351_9: Pink Dye
-  351_9_sub: pink
-  351_10: <green>Lime Dye, Light Green Dye
-  351_10_sub: lime, limegreen
-  351_11: <yellow>Yellow Dye
-  351_11_sub: yellow
-  351_12: <darkaqua>Light Blue Dye, Light Blue
-  351_12_sub: light blue
-  351_13:  <darkpurple>Magenta Dye, Magenta
-  351_13_sub: magenta
-  351_14: <red>Orange Dye, Orange
-  351_14_sub: orange
-  351_15: Bone Meal, White Dye
-  351_15_sub: white
+  351-0_sub: black
+  351-1: <red>Red Dye
+  351-1_sub: red
+  351-2: <darkgreen>Green Dye
+  351-2_sub: green
+  351-3: <darkgray>Cocoa Bean, Brown Dye, Cocoa, Coco, Coco Bean
+  351-3_sub: brown
+  351-4: <blue>Lapis Lazuli, Blue Dye, Lapis Lazul, Lapis
+  351-4_sub: brown
+  351-5: <darkpurple>Purple Dye
+  351-5_sub: purple
+  351-6: <aqua>Cyan Dye, Teal Dye
+  351-6_sub: cyan, teal
+  351-7: <gray>Light Gray Dye, Light Grey Dye
+  351-7_sub: lightgrey, lightgray
+  351-8: <darkgray>Gray Dye, Grey Dye
+  351-8_sub: grey, gray
+  351-9: Pink Dye
+  351-9_sub: pink
+  351-10: <green>Lime Dye, Light Green Dye
+  351-10_sub: lime, limegreen
+  351-11: <yellow>Yellow Dye
+  351-11_sub: yellow
+  351-12: <darkaqua>Light Blue Dye, Light Blue
+  351-12_sub: light blue
+  351-13:  <darkpurple>Magenta Dye, Magenta
+  351-13_sub: magenta
+  351-14: <red>Orange Dye, Orange
+  351-14_sub: orange
+  351-15: Bone Meal, White Dye
+  351-15_sub: white
   352: Bone
   353: Sugar
   354: Cake
@@ -395,34 +395,34 @@ Items:
   380: Cauldron
   381: Eye of Ender
   382: Glistering Melon
-  383_50: Creeper Egg
-  383_51: Skeleton Egg
-  383_52: Spider Egg
-  383_53: Giant Egg
-  383_54: Zombie Egg
-  383_55: Slime Egg
-  383_56: Ghast Egg
-  383_57: PigZombie Egg
-  383_58: Enderman Egg
-  383_59: CaveSpider Egg
-  383_60: Silverfish Egg
-  383_61: Blaze Egg
-  383_62: LavaSlime Egg
-  383_63: EnderDragon Egg
-  383_64: Wither Skeleton Egg, Wither Egg
-  383_65: Bat Egg
-  383_66: Witch Egg
-  383_90: Pig Egg
-  383_91: Sheep Egg
-  383_92: Cow Egg
-  383_93: Chicken Egg
-  383_94: Squid Egg
-  383_95: Wolf Egg
-  383_96: Mushroom Cow Egg
-  383_97: Snow Golem, SnowMan Egg
-  383_98: Ocelot Egg, Cat Egg
-  383_99: Iron Golem Egg, Villager Golem Egg
-  383_120: Villager Egg
+  383-50: Creeper Egg
+  383-51: Skeleton Egg
+  383-52: Spider Egg
+  383-53: Giant Egg
+  383-54: Zombie Egg
+  383-55: Slime Egg
+  383-56: Ghast Egg
+  383-57: PigZombie Egg
+  383-58: Enderman Egg
+  383-59: CaveSpider Egg
+  383-60: Silverfish Egg
+  383-61: Blaze Egg
+  383-62: LavaSlime Egg
+  383-63: EnderDragon Egg
+  383-64: Wither Skeleton Egg, Wither Egg
+  383-65: Bat Egg
+  383-66: Witch Egg
+  383-90: Pig Egg
+  383-91: Sheep Egg
+  383-92: Cow Egg
+  383-93: Chicken Egg
+  383-94: Squid Egg
+  383-95: Wolf Egg
+  383-96: Mushroom Cow Egg
+  383-97: Snow Golem, SnowMan Egg
+  383-98: Ocelot Egg, Cat Egg
+  383-99: Iron Golem Egg, Villager Golem Egg
+  383-120: Villager Egg
   384: Bottle o' Enchanting, Bottle of Enchanting, Experience Bottle, Experience, Exp Bottle
   385: Fire Charge, Fireball
   2256: <gold>13 Disk, Gold Record, Gold Disk
@@ -437,9 +437,9 @@ Items:
   2265: <green>Ward Disc
   2266: <black>11 Disc, Broken Record, Broken Disk
 Potions: 
-  Extra_Time: Extended <name>
-  Splash_Potion: Splash Potion
-  Potion_Name: Potion
+  Extra-Time: Extended <name>
+  Splash-Potion: Splash Potion
+  Potion-Name: Potion
   0: Mundane Potion
   1: Potion of Regeneration
   2: Potion of Swiftness
