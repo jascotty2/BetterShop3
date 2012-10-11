@@ -161,17 +161,28 @@ public class ItemLookupTable {
 				++ignore_i;
 			} else if (m == Material.POTION) {
 				addEntry(m.getId(), 0, DEFAULT_WATER_BOTTLE);
-				for (int splash = 0; splash <= 1; ++splash) {
-					for (int extra = 0; extra <= 1; ++extra) {
-						for (int i = 0; i < 64; ++i) {
-							addEntry(m.getId(), i + (extra << 6) + (splash << 14),
-									extra == 1
-									? (splash == 1 ? String.format(DEFAULT_LONG_FORMAT, DEFAULT_POTION_NAMES[i].replace(DEFAULT_POTION, DEFAULT_SPLASH_POTION))
-									: String.format(DEFAULT_LONG_FORMAT, DEFAULT_POTION_NAMES[i]))
-									: (splash == 1 ? DEFAULT_POTION_NAMES[i].replace(DEFAULT_POTION, DEFAULT_SPLASH_POTION)
-									: DEFAULT_POTION_NAMES[i]));
-						}
-					}
+				// saving this routine in case i later decide to make the index ordered..
+				// for now, though, the alternative is easier to read
+//				for (int splash = 0; splash <= 1; ++splash) {
+//					for (int extra = 0; extra <= 1; ++extra) {
+//						for (int d = 0; d < 64; ++d) {
+//							addEntry(m.getId(), d + (extra << 6) + (splash << 14),
+//									extra == 1
+//									? (splash == 1 ? String.format(DEFAULT_LONG_FORMAT, DEFAULT_POTION_NAMES[d].replace(DEFAULT_POTION, DEFAULT_SPLASH_POTION))
+//									: String.format(DEFAULT_LONG_FORMAT, DEFAULT_POTION_NAMES[d]))
+//									: (splash == 1 ? DEFAULT_POTION_NAMES[d].replace(DEFAULT_POTION, DEFAULT_SPLASH_POTION)
+//									: DEFAULT_POTION_NAMES[d]));
+//						}
+//					}
+//				}
+				for (int d = 0; d < 64; ++d) {
+					addEntry(m.getId(), d, DEFAULT_POTION_NAMES[d]);
+					addEntry(m.getId(), d + (1 << 6), // extra time
+							String.format(DEFAULT_LONG_FORMAT, DEFAULT_POTION_NAMES[d]));
+					addEntry(m.getId(), d + (1 << 14), // splash
+							DEFAULT_POTION_NAMES[d].replace(DEFAULT_POTION, DEFAULT_SPLASH_POTION));
+					addEntry(m.getId(), d + (1 << 6) + (1 << 14), // extra time, splash
+							String.format(DEFAULT_LONG_FORMAT, DEFAULT_POTION_NAMES[d].replace(DEFAULT_POTION, DEFAULT_SPLASH_POTION)));
 				}
 			} else if (m.getId() == ExtendedMaterials.idList[extended_i]) {
 				for (ExtendedMaterials m2 : ExtendedMaterials.values()) {
@@ -238,14 +249,14 @@ public class ItemLookupTable {
 						} else if (items.containsKey(valKey)) {
 							// if this element exists elsewhere, don't add
 							if (id != 373) {
-								// there are alot of conflicting potion names...
-								// some increment with level (bit 4), some don't
-								// and tier 2 starts at bit 5, so not sure where that's going..
+								// don't show notice if is a potion:
+								//   there are alot of conflicting potion names...
+								//   some increment with level (bit 4), some don't
+								//   and tier 2 starts at bit 5, so not sure where that's going..
 								ItemValue val = getItem(v);
 								plugin.getLogger().info(String.format(
 										"Notice: Name \"%s\" for item %d:%d conficts with an existing entry: %d:%d (ignoring)",
 										v, id, data, val == null ? -1 : val.id, val == null ? -1 : val.data));
-
 							}
 							continue;
 						} else {
@@ -257,7 +268,7 @@ public class ItemLookupTable {
 								names.add(v);
 							}
 							// as well to the global index
-							items.put(valKey, id);
+							items.put(valKey, (id << 16) + data);
 						}
 					}
 				}
@@ -342,7 +353,6 @@ public class ItemLookupTable {
 			return;
 		}
 		MemorySection itemNameSection = (MemorySection) conf.get("Items");
-		System.out.println(Str.concatStr(itemNameSection.getKeys(false), ", "));
 		int ignore_i = 0, extended_i = 0;
 		for (Material m : Material.values()) {
 			if (m.getId() == invalidItems[ignore_i]) {

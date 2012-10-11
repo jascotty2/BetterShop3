@@ -48,7 +48,6 @@ public class BetterShop3 extends JavaPlugin {
 		} catch (IOException e) {
 			// Failed to submit the stats :-(
 		}
-		
 	}
 
 	@Override
@@ -58,13 +57,13 @@ public class BetterShop3 extends JavaPlugin {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		if(sender instanceof Player) {
-			System.out.println(((Player)sender).getName());
-			for(ItemStack i : ((Player) sender).getInventory().getContents()) {
+		if (sender instanceof Player) {
+			System.out.println(((Player) sender).getName());
+			for (ItemStack i : ((Player) sender).getInventory().getContents()) {
 				System.out.println(i == null ? "null" : i.toString() + " - " + i.getDurability());
-				//sender.sendMessage(i == null ? "null" : i.toString());
 			}
 		}
 		return true;
 	}
-	}
+	
+}
