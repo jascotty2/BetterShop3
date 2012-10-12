@@ -45,7 +45,6 @@ public class SettingsManager {
 
 		try {
 			FileConfiguration config = plugin.getConfig();
-			config.load(FileManager.configFile);
 			// if any important setting found missing, what they were
 			//	(will be more lenient than last BetterShop.. 
 			//		only check those that have large influence on plugin operation)

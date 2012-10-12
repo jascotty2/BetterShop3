@@ -526,6 +526,10 @@ public class ItemLookupTable {
 	public ArrayList<String> getItemNames(ItemValue id) {
 		return id != null && itemNames.containsKey((id.id << 16) + id.data) ? (ArrayList<String>) itemNames.get((id.id << 16) + id.data).clone() : null;
 	}
+	
+	public Integer[] getFullIdList() {
+		return itemNames.keySet().toArray(new Integer[0]);
+	}
 
 	public List<String> getItemNameMatches(String search) {
 		/**

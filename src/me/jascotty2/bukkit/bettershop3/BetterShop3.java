@@ -20,6 +20,7 @@ package me.jascotty2.bukkit.bettershop3;
 
 import java.io.IOException;
 import java.util.List;
+import me.jascotty2.bukkit.bettershop3.database.YAML_Database;
 import me.jascotty2.libv2.util.Str;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -50,7 +51,6 @@ public class BetterShop3 extends JavaPlugin {
 		} catch (IOException e) {
 			// Failed to submit the stats :-(
 		}
-		
 	}
 
 	@Override

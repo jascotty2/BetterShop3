@@ -67,3 +67,13 @@ ShopList.Pricecheck:  pricecheck is what shows up when a player asks for a item 
 	<buycur> - formatted buy cost (like "1,800 Coins" instead of "1800 Coin")
 	<sellcur> - formatted sell value
 	<avail> - current avaliable stock (if enabled)
+Items: Default Item Names for each item id, with acceptable aliases (comma-delimited)
+	item id keys are in the following format: ID [-DATA] [_sub]
+	the _sub key is to allow for data items to be accessed using "main value":"sub value" (eg. "wool:black")
+	item names may be colored, but only one color per item is accepted
+Potions: how potions are named
+  Extra-Time: the name an extended duration potion is given
+	<name> is to specify where in the name the rest of the potion name is put (defaults to end of the string)
+  Splash-Potion: name of a splash potion
+	this is used instead of 'Potion-Name' when a potion is a splash potion
+  Potion-Name: the name to look for in the potion name to replace with the splash potion string
