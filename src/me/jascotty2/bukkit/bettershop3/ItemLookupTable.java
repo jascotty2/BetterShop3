@@ -21,6 +21,8 @@ package me.jascotty2.bukkit.bettershop3;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import me.jascotty2.bukkit.bettershop3.enums.ExtendedMaterials;
 import me.jascotty2.libv2.io.CheckInput;
 import me.jascotty2.libv2.util.Str;
@@ -161,20 +163,6 @@ public class ItemLookupTable {
 				++ignore_i;
 			} else if (m == Material.POTION) {
 				addEntry(m.getId(), 0, DEFAULT_WATER_BOTTLE);
-				// saving this routine in case i later decide to make the index ordered..
-				// for now, though, the alternative is easier to read
-//				for (int splash = 0; splash <= 1; ++splash) {
-//					for (int extra = 0; extra <= 1; ++extra) {
-//						for (int d = 0; d < 64; ++d) {
-//							addEntry(m.getId(), d + (extra << 6) + (splash << 14),
-//									extra == 1
-//									? (splash == 1 ? String.format(DEFAULT_LONG_FORMAT, DEFAULT_POTION_NAMES[d].replace(DEFAULT_POTION, DEFAULT_SPLASH_POTION))
-//									: String.format(DEFAULT_LONG_FORMAT, DEFAULT_POTION_NAMES[d]))
-//									: (splash == 1 ? DEFAULT_POTION_NAMES[d].replace(DEFAULT_POTION, DEFAULT_SPLASH_POTION)
-//									: DEFAULT_POTION_NAMES[d]));
-//						}
-//					}
-//				}
 				for (int d = 0; d < 64; ++d) {
 					addEntry(m.getId(), d, DEFAULT_POTION_NAMES[d]);
 					addEntry(m.getId(), d + (1 << 6), // extra time
@@ -321,12 +309,12 @@ public class ItemLookupTable {
 			if ((v = v.trim()).length() > 0) {
 				//addSubEntry(id, data, v);
 				// only slightly more efficient than calling the funtion
-				if (map.containsKey(v)) {
+				if (map.containsKey(v.toLowerCase())) {
 					plugin.getLogger().info(String.format(
-							"Notice: Sub-Name \"%s\" for item %d:%d conficts with an existing entry (" + map.get(v) + ") : ignoring",
+							"Notice: Sub-Name \"%s\" for item %d:%d conficts with an existing entry (" + map.get(v.toLowerCase()) + ") : ignoring",
 							v, id, data));
 				} else {
-					map.put(v, data);
+					map.put(v.toLowerCase(), data);
 				}
 			}
 		}
@@ -337,13 +325,13 @@ public class ItemLookupTable {
 			itemSubdata.put(id, new HashMap<String, Integer>());
 		}
 		HashMap<String, Integer> map = itemSubdata.get(id);
-		if (map.containsKey(value)) {
+		if (map.containsKey(value.toLowerCase())) {
 			plugin.getLogger().info(String.format(
-					"Notice: Sub-Name \"%s\" for item %d:%d conficts with an existing entry: ignoring",
+					"Notice: Sub-Name \"%s\" for item %d:%d conficts with an existing entry (" + map.get(value.toLowerCase()) + ") : ignoring",
 					value, id, data));
 			return;
 		}
-		map.put(value, data);
+		map.put(value.toLowerCase(), data);
 	}
 
 	public void load(YamlConfiguration conf) {
@@ -499,6 +487,10 @@ public class ItemLookupTable {
 		return itemNames.containsKey((id << 16) + data) ? itemNames.get((id << 16) + data).get(0) : null;
 	}
 
+	public String getItemName(ItemValue id) {
+		return id != null && itemNames.containsKey((id.id << 16) + id.data) ? itemNames.get((id.id << 16) + id.data).get(0) : null;
+	}
+
 	public String getColoredItemName(int id) {
 		if (itemNames.containsKey(id << 16)) {
 			if (itemColors.containsKey(id << 16)) {
@@ -519,12 +511,93 @@ public class ItemLookupTable {
 		return null;
 	}
 
+	public String getColoredItemName(ItemValue id) {
+		return id == null ? null : getColoredItemName(id.id, id.data);
+	}
+
 	public ArrayList<String> getItemNames(int id) {
 		return itemNames.containsKey(id << 16) ? (ArrayList<String>) itemNames.get(id << 16).clone() : null;
 	}
 
 	public ArrayList<String> getItemNames(int id, int data) {
 		return itemNames.containsKey((id << 16) + data) ? (ArrayList<String>) itemNames.get((id << 16) + data).clone() : null;
+	}
+
+	public ArrayList<String> getItemNames(ItemValue id) {
+		return id != null && itemNames.containsKey((id.id << 16) + id.data) ? (ArrayList<String>) itemNames.get((id.id << 16) + id.data).clone() : null;
+	}
+
+	public List<String> getItemNameMatches(String search) {
+		/**
+		 * min length of string for spelling and inStr checks
+		 */
+		final int MIN_STR_LEN = 3;
+		ArrayList<String> partialMatches = new ArrayList<String>(),
+				spellingMatches = new ArrayList<String>(),
+				stringMatches = new ArrayList<String>();
+		search = search.replace(" ", "").toLowerCase();
+		boolean requireDataItem = search.contains(":");
+		String dataValue = "";
+		if (requireDataItem) {
+			dataValue = search.substring(search.indexOf(':') + 1);
+			search = search.substring(0, search.indexOf(':'));
+		}
+		boolean start, instr, spell;
+		for (Map.Entry<Integer, ArrayList<String>> e : itemNames.entrySet()) {
+			if (!requireDataItem || ExtendedMaterials.usesData(e.getKey() >> 16)) {
+				for (String item : e.getValue()) {
+					String check = item.replace(" ", "").toLowerCase();
+					start = instr = spell = false;
+					if (check.startsWith(search)) {
+						start = true;
+					} else if (search.length() > MIN_STR_LEN && Str.getLevenshteinDistance(check, search) <= MAX_LEVENSHTEIN_DIST) {
+						spell = true;
+					} else if (search.length() > MIN_STR_LEN && check.contains(search)) {
+						instr = true;
+					}
+					// partial matches
+					if (start || instr || spell) {
+						if (requireDataItem) {
+							if ((e.getKey() & 65535) == 0 && itemSubdata.containsKey(e.getKey() >> 16)) {
+								// look up using sub table (eg. wool:black)
+								HashMap<String, Integer> subs = itemSubdata.get(e.getKey() >> 16);
+								if (subs.containsKey(dataValue)) {
+									partialMatches.add(item + ":" + dataValue);
+								} else {
+									ArrayList<Integer> used = new ArrayList<Integer>();
+									// now do string-compare for matches
+									for (Map.Entry<String, Integer> de : subs.entrySet()) {
+										if (!used.contains(de.getValue())) {
+											if (de.getKey().startsWith(dataValue)) { // partial matches
+												partialMatches.add(item + ":" + de.getKey());
+												used.add(de.getValue());
+											} else if (dataValue.length() > MIN_STR_LEN && Str.getLevenshteinDistance(de.getKey(), dataValue) <= MAX_LEVENSHTEIN_DIST) {// spelling
+												spellingMatches.add(item + ":" + de.getKey());
+												used.add(de.getValue());
+											} else if (dataValue.length() > MIN_STR_LEN && de.getKey().contains(dataValue)) { // string
+												stringMatches.add(item + ":" + de.getKey());
+												used.add(de.getValue());
+											}
+										}
+									}
+									used.clear();
+								}
+							}
+						} else if (start) {
+							partialMatches.add(item);
+						} else if (spell) {
+							spellingMatches.add(item);
+						} else if (instr) {
+							stringMatches.add(item);
+						}
+						break;
+					}
+				}
+			}
+		}
+		partialMatches.addAll(spellingMatches);
+		partialMatches.addAll(stringMatches);
+		return partialMatches;
 	}
 
 	public static class ItemValue {
