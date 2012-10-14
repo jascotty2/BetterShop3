@@ -34,14 +34,18 @@ also, colors can use shorthand '&' tags or full tags as such:
 	&& is used if you want an '&' symbol, and don't want it to turn the next character into a color code
 ========= Extended Node Tags: =========
 
-Shop.Prefix:		what comes before each and EVERY BetterShop message. (Putting default colors here makes things easy)
-Shop.Unknown_Item:	if someone tries to check an item that has no definition
+Commands.Prefix:		what comes before each and EVERY BetterShop message. (Putting default colors here makes things easy)
+Commands.Unknown_Item:	if someone tries to check an item that has no definition
 	<item> - what was looked up
-Shop.Bad_Parameter:	something went wrong parsing the command (missing arguments, or in wrong order?)
+Commands.Bad_Parameter:	something went wrong parsing the command (missing arguments, or in wrong order?)
 	<error>	- hopefully useful informatino on what caused the error
 
-Permission.Denied: permission denied message. 
-	<perm> can be used to show the permission node that was checked.
+Shop.No_Last_Sale: if a player runs '/sellagain' and has not sold anything since reload
+Shop.No_Last_Buy: if a player runs '/buyagain' and has not bought anything since reload
+Shop.Sell_Again: message shown to player when repeating sale
+	<action> - the arguments that are being run again (items being sold)
+Shop.Buy_Again:  message shown to player when repeating purchase
+	<action> - the arguments that are being run again (items being bought)
 
 ShopList.Head:  top of a shop listing page (blank for none (not recommended))
 	<page> - current list page
@@ -67,6 +71,10 @@ ShopList.Pricecheck:  pricecheck is what shows up when a player asks for a item 
 	<buycur> - formatted buy cost (like "1,800 Coins" instead of "1800 Coin")
 	<sellcur> - formatted sell value
 	<avail> - current avaliable stock (if enabled)
+
+Permission.Denied: permission denied message. 
+	<perm> can be used to show the permission node that was checked.
+
 Items: Default Item Names for each item id, with acceptable aliases (comma-delimited)
 	item id keys are in the following format: ID [-DATA] [_sub]
 	the _sub key is to allow for data items to be accessed using "main value":"sub value" (eg. "wool:black")

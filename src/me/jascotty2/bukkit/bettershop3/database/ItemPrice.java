@@ -25,7 +25,7 @@ public class ItemPrice {
 		buyPrice = sellPrice = -1;
 	}
 
-	public ItemPrice(float buyPrice, float sellPrice) {
+	public ItemPrice(double buyPrice, double sellPrice) {
 		this.buyPrice = buyPrice;
 		this.sellPrice = sellPrice;
 	}

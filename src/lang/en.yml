@@ -1,17 +1,27 @@
 # default english
+Commands:
+  Prefix: "<darkgreen>SHOP: <white>"
+  Unknown_Item: "<red>What is <white>\"<item>\"</>?"
+  Bad_Parameter: "<red>... Not Quite Right for that Command ..<br> -- <error>"
+  Player_Required: "Must use this command as a Player"
 Shop:
-  Prefix: "<white>SHOP: <darkgreen>"
-  Unknown_Item: "What is <white>\"<item>\"</>?"
-  Bad_Parameter: "... Not Quite Right for that Command ..<br> -- <error>"
+  No_Last_Sale: You have no sell history since server reload
+  No_Last_Buy: You have no purchase history since server reload
+  Sell_Again: "Repeating Last Sale: <action>"
+  Buy_Again: "Repeating Last Purchase: <action>"
+Shop_List:
+  Header: "&2-------- Price-List Page: &f<page> &2of &f<pages> &2--------"
+  Listing: "<left>[<green><item></>]&2 <right>Buy: &f<buyprice>&2  Sell: &f<sellprice>"
+  #Listing: "<left>[<green><item></>]&2 <center>Buy: &f<buyprice>&2 <right>Sell: &f<sellprice>"
+  # worst-case
+  #Listing: "<left>[<green><item></>]&2 <right>Buy: &f<buyprice>&2 <center>Sell: &f<sellprice>"
+  #Listing: "<right>[<green><item></>]&2 <left>Buy: &f<buyprice>&2 <center>Sell: &f<sellprice>"
+  Footer: 
+  Alias: "&f[</><item>&f]&2 is also known as: &b<alias>"
+  Nolist: "&f[</><item>&f] &2cannot be bought or sold."
+  Pricecheck: "Price check! &f[</><item>&f]&2 Buy: &f<buyprice> &2Sell: &f<sellprice>"
 Permission:
   Denied: You don't Have Permission to do that!
-Shop_List:
-  Header: "-------- Price-List Page: &f<page> &2of &f<pages> &2--------"
-  Listing: "&f[<item>&f]&2 <l> Buy: &f<buyprice>&2  Sell: &f<sellprice>"
-  Footer: 
-  Alias: "&f[<item>&f]&2 is also known as: &b<alias>"
-  Nolist: "&f[<item>&f] &2cannot be bought or sold."
-  Pricecheck: "Price check! &f[<item>&f]&2 Buy: &f<buyprice> &2Sell: &f<sellprice>"
 Items:
   0: Air
   1: Stone, Smooth Stone

@@ -20,6 +20,7 @@ package me.jascotty2.bukkit.bettershop3;
 
 import java.util.HashMap;
 import java.util.logging.Level;
+import me.jascotty2.bukkit.bettershop3.enums.PricelistType;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -36,7 +37,8 @@ public class SettingsManager {
 			econ_currency_minor_s = "Cent",
 			econ_currency_minor_m = "Cents";
 	public boolean econ_currency_multi = false; // if internal currency formatting should be seperated (eg. 2 Dollars 25 Cents)
-
+	public PricelistType pricelist_type = PricelistType.CSV;
+	
 	protected SettingsManager(BetterShop3 plugin) {
 		this.plugin = plugin;
 	}

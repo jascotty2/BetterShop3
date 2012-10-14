@@ -21,7 +21,10 @@ package me.jascotty2.bukkit.bettershop3;
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
+import me.jascotty2.libv2.bukkit.util.MinecraftChatStr;
 import me.jascotty2.libv2.util.ArrayManip;
 import me.jascotty2.libv2.util.Str;
 import org.bukkit.ChatColor;
@@ -32,22 +35,23 @@ import org.bukkit.configuration.file.YamlConfiguration;
 public class Messages {
 
 	final BetterShop3 plugin;
-	private final static String MISSING_STRING = "&d---&cMissing Message&d---";
+	private final static String MISSING_STRING = "&d---&cMissing Message \"<m>\"&d---";
 	protected final static Class messageTypes[] = new Class[]{
-		SHOP.class, PERMISSION.class, SHOP_LIST.class};
+		COMMANDS.class, SHOP.class, SHOP_LIST.class, PERMISSION.class};
 	protected final String messages[][] = new String[messageTypes.length][];
-	protected final Enum[] ALLOW_NULL = new Enum[]{SHOP.PREFIX,
+	protected final Enum[] ALLOW_NULL = new Enum[]{COMMANDS.PREFIX,
 		SHOP_LIST.HEADER, SHOP_LIST.FOOTER};
 
 	// <editor-fold defaultstate="collapsed" desc="Message Templates">
-	public static enum SHOP implements MessageType {
+	public static enum COMMANDS implements MessageType {
 
 		PREFIX,
 		UNKNOWN_ITEM("<item>"),
-		BAD_PARAMETER("<error>");
+		BAD_PARAMETER("<error>"),
+		PLAYER_REQUIRED;
 		private final String[] tags;
 
-		private SHOP(String... tags) {
+		private COMMANDS(String... tags) {
 			this.tags = tags;
 		}
 
@@ -92,10 +96,38 @@ public class Messages {
 		}
 	}
 
+	public static enum SHOP implements MessageType {
+
+		NO_LAST_SALE,
+		NO_LAST_BUY,
+		SELL_AGAIN("<action>"),
+		BUY_AGAIN("<action>");
+		private final String[] tags;
+
+		private SHOP(String... tags) {
+			this.tags = tags;
+		}
+
+		@Override
+		public int getNumberOfTags() {
+			return tags.length;
+		}
+
+		@Override
+		public String[] getTags() {
+			return tags;
+		}
+
+		@Override
+		public String getTag(int i) {
+			return i >= 0 && i < tags.length ? tags[i] : null;
+		}
+	}
+
 	public static enum SHOP_LIST implements MessageType {
 
 		HEADER("<page>", "<pages>"),
-		LISTING("item>", "<buyprice>", "<sellprice>", "<curr>", "<avail>"),
+		LISTING("<item>", "<buyprice>", "<sellprice>", "<curr>", "<buycur>", "<sellcur>", "<avail>"),
 		FOOTER,
 		ALIAS("<item>", "<alias>"),
 		NOLIST("<item>"),
@@ -163,7 +195,7 @@ public class Messages {
 						if (!s.contains(k2)) {
 							if (ArrayManip.indexOf(ALLOW_NULL, o[j]) == -1) {
 								plugin.getLogger().warning(k + "." + k2 + " missing from " + lang.getName());
-								s.set(k2, MISSING_STRING);
+								s.set(k2, MISSING_STRING.replace("<m>", k + "." + k2));
 								needSave = true;
 							}
 						}
@@ -175,29 +207,30 @@ public class Messages {
 					ConfigurationSection s = conf.getConfigurationSection(k);
 					int j = 0;
 					for (Object o : c.getEnumConstants()) {
-						s.set(Str.titleCase(o.toString()), MISSING_STRING);
-						messages[i][j++] = convertColorChars(MISSING_STRING);
+						String k2 = Str.titleCase(o.toString().replace('_', ' ')).replace(' ', '_');
+						s.set(k2, MISSING_STRING);
+						messages[i][j++] = convertColorChars(MISSING_STRING.replace("<m>", k + "." + k2));
 					}
 					needSave = true;
 				}
 			}
 		}
 		// apply prefix and format reset tags
-		String pre = getMessage(SHOP.PREFIX);
+		String pre = getMessage(COMMANDS.PREFIX);
 		if (pre.length() > 0) {
 			for (int i = 0; i < messageTypes.length; ++i) {
 				Class c = messageTypes[i];
 				if (c.isEnum()) {
 					Object[] o = c.getEnumConstants();
 					for (int j = 0; j < o.length; ++j) {
-						if ((Enum) o[j] != SHOP.PREFIX) {
+						if ((Enum) o[j] != COMMANDS.PREFIX && !messages[i][j].isEmpty()) {
 							messages[i][j] = lastFormatTag(pre + messages[i][j]);
 						}
 					}
 				}
 			}
 		}
-		if(itemDB != null) {
+		if (itemDB != null) {
 			itemDB.load(conf);
 		}
 		if (needSave) {
@@ -348,7 +381,7 @@ public class Messages {
 			throw new IllegalArgumentException("Message cannot be null");
 		}
 		String msg = getMessage(message);
-		if (msg != null) {
+		if (msg != null && !msg.isEmpty()) {
 			try {
 				msg = MessageFormat.format(msg, params);
 			} catch (Exception e) {
@@ -356,11 +389,43 @@ public class Messages {
 						+ message.getDeclaringClass().getSimpleName() + "." + message.getClass().getSimpleName()
 						+ ": " + e.getMessage());
 			}
-			//System.out.println(msg);
+			// todo: extra line formatting here
+			
 			if (player == null) {
 				plugin.getServer().getConsoleSender().sendMessage(msg);
 			} else {
 				player.sendMessage(msg);
+			}
+		} else {
+			System.out.println("message type not found");
+		}
+	}
+
+	public void SendMessages(CommandSender player, Enum message, List<Object[]> paramList) {
+		if (message == null) {
+			throw new IllegalArgumentException("Message cannot be null");
+		}
+		String msg = getMessage(message);
+		if (msg != null && !msg.isEmpty()) {
+			List<String> lines = new ArrayList<String>();
+			try {
+				for (Object[] params : paramList) {
+					lines.add(MessageFormat.format(msg, params));
+				}
+			} catch (Exception e) {
+				plugin.getLogger().severe("Error fomatting message for "
+						+ message.getDeclaringClass().getSimpleName() + "." + message.getClass().getSimpleName()
+						+ ": " + e.getMessage());
+				lines.add(msg);
+			}
+			// todo: extra line formatting here
+			lines = MinecraftChatStr.alignTags(lines);
+			for (String line : lines) {
+				if (player == null) {
+					plugin.getServer().getConsoleSender().sendMessage(line);
+				} else {
+					player.sendMessage(line);
+				}
 			}
 		} else {
 			System.out.println("message type not found");

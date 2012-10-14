@@ -131,6 +131,10 @@ public class ArrayManip {
 		System.arraycopy(arr2, 0, ret, arr1.length, arr2.length);
 		return ret;
 	}
+	
+	public static <T> T[] arraySub(T arr[], int startIndex) {
+		return arraySub(arr, startIndex, arr.length);
+	}
 
 	@SuppressWarnings("unchecked")
 	public static <T> T[] arraySub(T arr[], int startIndex, int endIndex) {

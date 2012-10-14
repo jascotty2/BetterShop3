@@ -44,14 +44,14 @@ public class YAML_Database extends PricelistDatabaseHandler {
 			try {
 				// attempt to load
 				db = YamlConfiguration.loadConfiguration(saveFile);
-				load();
+				loadFromConfiguration();
 			} catch (Exception e) {
 				plugin.getLogger().log(Level.SEVERE, "Failed to load the pricelist config", e);
 			}
 		}
 	}
 
-	protected void load() {
+	protected void loadFromConfiguration() {
 		for (Map.Entry<String, Object> val : db.getValues(false).entrySet()) {
 			if (val.getValue() instanceof MemorySection) {
 				MemorySection m = (MemorySection) val.getValue();
@@ -86,7 +86,7 @@ public class YAML_Database extends PricelistDatabaseHandler {
 			prices.clear();
 			// reload
 			db.load(saveFile);
-			load();
+			loadFromConfiguration();
 		} catch (Exception e) {
 			plugin.getLogger().log(Level.SEVERE, "Failed to reload the pricelist config", e);
 		}
@@ -130,8 +130,14 @@ public class YAML_Database extends PricelistDatabaseHandler {
 	}
 
 	@Override
-	public void save() {
+	protected void saveFull() {
 		try {
+			if(db == null) {
+				if (!saveFile.exists()) {
+					saveFile.createNewFile();
+				}
+				db = YamlConfiguration.loadConfiguration(saveFile);
+			}
 			for (Map.Entry<String, HashMap<Integer, ItemPrice>> e : prices.entrySet()) {
 				for (Map.Entry<Integer, ItemPrice> p : e.getValue().entrySet()) {
 					String itemN = String.valueOf(p.getKey() >> 16);
