@@ -31,23 +31,23 @@ public class Str extends OutputStream {
 	public void write(int b) throws IOException {
 		text.append((char) b);
 	}
-
 	// Static Methods
 	static NumberFormat nf = NumberFormat.getInstance(),
 			cnf = NumberFormat.getCurrencyInstance();
-	public static String numFormat(long num){
+
+	public static String numFormat(long num) {
 		return nf.format(num);
 	}
 
-	public static String numFormat(double num){
+	public static String numFormat(double num) {
 		return nf.format(num);
 	}
 
-	public static String currencyFormat(long num){
+	public static String currencyFormat(long num) {
 		return cnf.format(num);
 	}
 
-	public static String currencyFormat(double num){
+	public static String currencyFormat(double num) {
 		return cnf.format(num);
 	}
 
@@ -114,35 +114,39 @@ public class Str extends OutputStream {
 			return "";
 		}
 		StringBuilder ret = new StringBuilder();
-		int i = 0;
-		//for(int i=0; i<strSet.size(); ++i){
-		for (Object o : strSet) {
-			if (++i > start) {
-				//ret.append(o.toString());
-				//ret.append(String.valueOf(o));
-				ret.append(o == null ? "null" : o.toString());
-				if (i < strSet.size()) {
-					ret.append(sep);
+		if (strSet != null) {
+			int i = 0;
+			//for(int i=0; i<strSet.size(); ++i){
+			for (Object o : strSet) {
+				if (++i > start) {
+					//ret.append(o.toString());
+					//ret.append(String.valueOf(o));
+					ret.append(o == null ? "null" : o.toString());
+					if (i < strSet.size()) {
+						ret.append(sep);
+					}
 				}
 			}
 		}
 		return ret.toString();
 	}
 
-	public static String concatStr(Collection<?> strSet, int start, String sep, int length) {
-		if (strSet == null || strSet.isEmpty() || start >= strSet.size() || length <= 0) {
+	public static String concatStr(Collection<?> strSet, int start, String sep, int count) {
+		if (strSet == null || strSet.isEmpty() || start >= strSet.size() || count <= 0) {
 			return "";
 		}
 		StringBuilder ret = new StringBuilder();
-		int i = 0, l = 0;
-		//for(int i=0; i<strSet.size(); ++i){
-		for (Object o : strSet) {
-			if (++i > start) {
-				ret.append(o == null ? "null" : o.toString());
-				if (++l > length) {
-					break;
-				} else if (i < strSet.size()) {
-					ret.append(sep);
+		if (strSet != null) {
+			int i = 0, l = 0;
+			//for(int i=0; i<strSet.size(); ++i){
+			for (Object o : strSet) {
+				if (++i > start) {
+					ret.append(o == null ? "null" : o.toString());
+					if (++l > count) {
+						break;
+					} else if (i < strSet.size()) {
+						ret.append(sep);
+					}
 				}
 			}
 		}
@@ -181,8 +185,8 @@ public class Str extends OutputStream {
 		return ret.toString();
 	}
 
-	public static String concatStr(Object[] strSet, int start, String sep, int length) {
-		if (strSet == null || start >= strSet.length || length <= 0) {
+	public static String concatStr(Object[] strSet, int start, String sep, int count) {
+		if (strSet == null || start >= strSet.length || count <= 0) {
 			return "";
 		}
 		StringBuilder ret = new StringBuilder();
@@ -191,7 +195,7 @@ public class Str extends OutputStream {
 		for (Object o : strSet) {
 			if (++i > start) {
 				ret.append(o == null ? "null" : o.toString());
-				if (++l > length) {
+				if (++l > count) {
 					break;
 				} else if (i < strSet.length) {
 					ret.append(sep);
@@ -201,21 +205,97 @@ public class Str extends OutputStream {
 		return ret.toString();
 	}
 
+	public static boolean contains(String haystack, String needle) {
+		if (haystack == null || needle == null) {
+			return haystack == null && needle == null;
+		}
+		for(int i = 0; i + needle.length() <= haystack.length(); ++i) {
+			if(needle.equals(haystack.substring(i, i + needle.length()))) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static boolean containsIgnoreCase(String haystack, String needle) {
+		if (haystack == null || needle == null) {
+			return haystack == null && needle == null;
+		}
+		for(int i = 0; i + needle.length() <= haystack.length(); ++i) {
+			if(needle.equalsIgnoreCase(haystack.substring(i, i + needle.length()))) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static boolean contains(String[] haystack, String needle) {
+		if (haystack == null || needle == null) {
+			return haystack == null && needle == null;
+		}
+		for (String c : haystack) {
+			if (needle.equals(c)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static boolean containsIgnoreCase(String[] haystack, String needle) {
+		if (haystack == null || needle == null) {
+			return haystack == null && needle == null;
+		}
+		for (String c : haystack) {
+			if (needle.equalsIgnoreCase(c)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static boolean containsIgnoreCase(Collection<String> haystack, String needle) {
+		if (haystack == null || needle == null) {
+			return haystack == null && needle == null;
+		}
+		for (String c : haystack) {
+			if (needle.equalsIgnoreCase(c)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public static boolean isIn(String input, String... check) {
-		input = input.trim();
+		if (input == null) {
+			return false;
+		}
 		for (String c : check) {
-			if (input.equalsIgnoreCase(c.trim())) {
+			if (input.equals(c)) {
 				return true;
 			}
 		}
 		return false;
 	}
 
+	public static boolean isInIgnoreCase(String input, String... check) {
+		if (input == null) {
+			return false;
+		}
+		for (String c : check) {
+			if (input.equalsIgnoreCase(c)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public static boolean isIn(String input, String[]... check) {
-		input = input.trim();
+		if (input == null) {
+			return false;
+		}
 		for (String[] c : check) {
 			for (String c2 : c) {
-				if (input.equalsIgnoreCase(c2.trim())) {
+				if (input.equals(c2)) {
 					return true;
 				}
 			}
@@ -223,28 +303,38 @@ public class Str extends OutputStream {
 		return false;
 	}
 
-	public static boolean isIn(String input, String check) {
-		input = input.trim();
-		for (String c : check.split(",")) {
-			if (input.equalsIgnoreCase(c.trim())) {
-				return true;
-			}
+	public static boolean isInIgnoreCase(String input, String[]... check) {
+		if (input == null) {
+			return false;
 		}
-		return false;
-	}
-
-	public static boolean startIsIn(String input, String check) {
-		for (String c : check.split(",")) {
-			if (input.length() >= c.length()) {
-				if (input.substring(0, c.length()).equalsIgnoreCase(c)) {
+		for (String[] c : check) {
+			for (String c2 : c) {
+				if (input.equalsIgnoreCase(c2)) {
 					return true;
 				}
 			}
 		}
 		return false;
 	}
-
+	
 	public static boolean startIsIn(String input, String[] check) {
+		if (input == null) {
+			return false;
+		}
+		for (String c : check) {
+			if (input.length() >= c.length()) {
+				if (input.substring(0, c.length()).equals(c)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	public static boolean startIsInIgnoreCase(String input, String[] check) {
+		if (input == null) {
+			return false;
+		}
 		for (String c : check) {
 			if (input.length() >= c.length()) {
 				if (input.substring(0, c.length()).equalsIgnoreCase(c)) {
@@ -254,8 +344,11 @@ public class Str extends OutputStream {
 		}
 		return false;
 	}
-
+	
 	public static int count(String str, String find) {
+		if (str == null) {
+			return 0;
+		}
 		int c = 0;
 		for (int i = 0; i < str.length() - find.length(); ++i) {
 			if (str.substring(i, i + find.length()).equals(find)) {
@@ -266,6 +359,9 @@ public class Str extends OutputStream {
 	}
 
 	public static int count(String str, char find) {
+		if (str == null) {
+			return 0;
+		}
 		int c = 0;
 		for (int i = 0; i < str.length(); ++i) {
 			if (str.charAt(i) == find) {
@@ -276,6 +372,9 @@ public class Str extends OutputStream {
 	}
 
 	public static int countIgnoreCase(String str, String find) {
+		if (str == null) {
+			return 0;
+		}
 		int c = 0;
 		for (int i = 0; i < str.length() - find.length(); ++i) {
 			if (str.substring(i, i + find.length()).equalsIgnoreCase(find)) {
@@ -297,9 +396,11 @@ public class Str extends OutputStream {
 	}
 
 	public static int indexOfIgnoreCase(String array[], String search) {
-		for (int i = array.length - 1; i >= 0; --i) {
-			if (array[i].equalsIgnoreCase(search)) {
-				return i;
+		if (array != null && array.length > 0) {
+			for (int i = array.length - 1; i >= 0; --i) {
+				if (array[i].equalsIgnoreCase(search)) {
+					return i;
+				}
 			}
 		}
 		return -1;
@@ -331,22 +432,30 @@ public class Str extends OutputStream {
 
 	/**
 	 * pads str on the right (space-padded) (left-align)
+	 *
 	 * @param str
 	 * @param len
 	 * @return
 	 */
 	public static String padRight(String str, int len) {
+		if (str == null) {
+			throw new IllegalArgumentException("Error: String cannot be null");
+		}
 		return padRight(str, len, ' ');
 	}
 
 	/**
 	 * pads str on the right with pad (left-align)
+	 *
 	 * @param str
 	 * @param len
 	 * @param pad
 	 * @return
 	 */
 	public static String padRight(String str, int len, char pad) {
+		if (str == null) {
+			throw new IllegalArgumentException("Error: String cannot be null");
+		}
 		StringBuilder ret = new StringBuilder(str);
 		for (int i = str.length(); i < len; ++i) {
 			ret.append(pad);
@@ -356,32 +465,44 @@ public class Str extends OutputStream {
 
 	/**
 	 * pads str on the left (space-padded) (right-align)
+	 *
 	 * @param str
 	 * @param len
 	 * @return
 	 */
 	public static String padLeft(String str, int len) {
+		if (str == null) {
+			throw new IllegalArgumentException("Error: String cannot be null");
+		}
 		return repeat(' ', len - str.length()) + str;
 	}
 
 	/**
 	 * pads str on the left with pad (right-align)
+	 *
 	 * @param str
 	 * @param len
 	 * @param pad
 	 * @return
 	 */
 	public static String padLeft(String str, int len, char pad) {
+		if (str == null) {
+			throw new IllegalArgumentException("Error: String cannot be null");
+		}
 		return repeat(pad, len - str.length()) + str;
 	}
 
 	/**
 	 * pads str on the left & right (space-padded) (center-align)
+	 *
 	 * @param str
 	 * @param len
 	 * @return
 	 */
 	public static String padCenter(String str, int len) {
+		if (str == null) {
+			throw new IllegalArgumentException("Error: String cannot be null");
+		}
 		len -= str.length();
 		int prepad = len / 2;
 		return repeat(' ', prepad) + str + repeat(' ', len - prepad);
@@ -389,12 +510,16 @@ public class Str extends OutputStream {
 
 	/**
 	 * pads str on the left & right with pad (center-align)
+	 *
 	 * @param str
 	 * @param len
 	 * @param pad
 	 * @return
 	 */
 	public static String padCenter(String str, int len, char pad) {
+		if (str == null) {
+			throw new IllegalArgumentException("Error: String cannot be null");
+		}
 		len -= str.length();
 		int prepad = len / 2;
 		return repeat(pad, prepad) + str + repeat(pad, len - prepad);
@@ -409,6 +534,9 @@ public class Str extends OutputStream {
 	}
 
 	public static String strWordWrap(String str, int width, int tab, char tabChar) {
+		if (str == null) {
+			throw new IllegalArgumentException("Error: String cannot be null");
+		}
 		StringBuilder ret = new StringBuilder();
 		while (str.length() > 0) {
 			// find last char of first line
@@ -432,6 +560,7 @@ public class Str extends OutputStream {
 
 	/**
 	 * right-aligns paragraphs
+	 *
 	 * @param str
 	 * @param width
 	 * @param tab
@@ -439,6 +568,9 @@ public class Str extends OutputStream {
 	 * @return
 	 */
 	public static String strWordWrapRight(String str, int width, int tab, char tabChar) {
+		if (str == null) {
+			throw new IllegalArgumentException("Error: String cannot be null");
+		}
 		StringBuilder ret = new StringBuilder();
 		while (str.length() > 0) {
 			// find last char of first line
@@ -474,11 +606,15 @@ public class Str extends OutputStream {
 
 	/**
 	 * Returns a sequence str of the provided str count # of times
+	 *
 	 * @param str
 	 * @param count
 	 * @return
 	 */
 	public static String repeat(String str, int count) {
+		if (str == null) {
+			throw new IllegalArgumentException("Error: String cannot be null");
+		}
 		StringBuilder ret = new StringBuilder();
 		for (int i = 0; i < count; ++i) {
 			ret.append(str);
@@ -487,6 +623,9 @@ public class Str extends OutputStream {
 	}
 
 	public static String strTrim(String str, int length) {
+		if (str == null) {
+			throw new IllegalArgumentException("Error: String cannot be null");
+		}
 		if (str.length() > length) {
 			int width = length;
 			String ret = "";
@@ -514,6 +653,9 @@ public class Str extends OutputStream {
 	}
 
 	public static String titleCase(String str) {
+		if (str == null) {
+			throw new IllegalArgumentException("Error: String cannot be null");
+		}
 		StringBuilder ret = new StringBuilder();
 		boolean st = true;
 		for (char c : str.toLowerCase().toCharArray()) {
@@ -526,7 +668,15 @@ public class Str extends OutputStream {
 		}
 		return ret.toString();
 	}
+	
+	public static boolean equal(String s1, String s2) {
+		return s1 == null && s2 == null || (s1 != null && s2 != null && s1.equals(s2));
+	}
 
+	public static boolean equalNonNull(String s1, String s2) {
+		return s1 != null && s2 != null && s1.equals(s2);
+	}
+	
 	/**
 	 * <p>Find the Levenshtein distance between two Strings.</p>
 	 *
@@ -623,5 +773,5 @@ public class Str extends OutputStream {
 		// actually has the most recent cost counts
 		return p[n];
 	}
+	
 } // end class Str
-

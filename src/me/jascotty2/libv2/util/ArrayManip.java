@@ -79,13 +79,30 @@ public class ArrayManip {
 			reverse(array);
 		}
 	}
-
+	
 	public static void reverse(int array[]) {
-		for (int i = array.length / 2; i >= 0; --i) {
+		for (int i = (array.length & 1) == 0 ? (array.length - 1) / 2 : array.length / 2; i >= 0; --i) {
 			int t = array[i];
 			array[i] = array[array.length - i - 1];
 			array[array.length - i - 1] = t;
 		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static <T> T[] reverse(T[] array) {
+		if (array == null) {
+			return null;
+		}
+		T[] ret = (T[]) Array.newInstance(array.getClass().getComponentType(), array.length);
+		//System.arraycopy(array, 0, ret, 0, array.length);
+		
+		for (int i = (array.length & 1) == 0 ? (array.length - 1) / 2 : array.length / 2; i >= 0; --i) {
+			T temp = array[i];
+			array[i] = array[array.length - i - 1];
+			array[array.length - i - 1] = temp;
+		}
+		
+		return ret;
 	}
 
 	public static void swapElem(int array[], int a, int b) {
