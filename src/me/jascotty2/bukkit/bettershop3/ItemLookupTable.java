@@ -159,7 +159,7 @@ public class ItemLookupTable {
 		// initialize item list
 		int ignore_i = 0, extended_i = 0;
 		for (Material m : Material.values()) {
-			if (m.getId() == invalidItems[ignore_i]) {
+			if (ignore_i < invalidItems.length &&  m.getId() == invalidItems[ignore_i]) {
 				++ignore_i;
 			} else if (m == Material.POTION) {
 				addEntry(m.getId(), 0, DEFAULT_WATER_BOTTLE);
@@ -190,6 +190,9 @@ public class ItemLookupTable {
 						break;
 					case 82:
 						name = "Clay Block";
+						break;
+					case 127:
+						name = "Cocoa Plant";
 						break;
 					default:
 						name = Str.titleCase(m.name().replace('_', ' '));
@@ -343,14 +346,14 @@ public class ItemLookupTable {
 		MemorySection itemNameSection = (MemorySection) conf.get("Items");
 		int ignore_i = 0, extended_i = 0;
 		for (Material m : Material.values()) {
-			if (m.getId() == invalidItems[ignore_i]) {
+			if (ignore_i < invalidItems.length && m.getId() == invalidItems[ignore_i]) {
 				++ignore_i;
 			} else {
 				String idStr = String.valueOf(m.getId());
 				if (itemNameSection.contains(idStr)) {
 					setItem(m.getId(), 0, itemNameSection.getString(idStr));
 				}
-				if (m.getId() == ExtendedMaterials.idList[extended_i]) {
+				if (extended_i < ExtendedMaterials.idList.length && m.getId() == ExtendedMaterials.idList[extended_i]) {
 					++extended_i;
 					for (ExtendedMaterials m2 : ExtendedMaterials.values()) {
 						if (m2.getId() == m.getId()) {

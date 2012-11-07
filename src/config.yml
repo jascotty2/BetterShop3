@@ -1,5 +1,16 @@
 Language: en
 
+Database:
+  # valid types:
+  # MySQL, CSV, YAML
+  Type: MySQL
+  SQL_Username: "root"
+  SQL_Password: "root"
+  SQL_Database: "minecraft"
+  SQL_PriceTable: "pricelist"
+  SQL_HostName: "localhost"
+  SQL_PortNum: "3306"
+
 Economy:
   Bank Name: 
   # these values are used for formatting if there is no ecomony plugin installed

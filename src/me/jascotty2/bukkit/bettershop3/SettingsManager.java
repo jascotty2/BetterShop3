@@ -21,6 +21,7 @@ package me.jascotty2.bukkit.bettershop3;
 import java.util.HashMap;
 import java.util.logging.Level;
 import me.jascotty2.bukkit.bettershop3.enums.PricelistType;
+import me.jascotty2.libv2.util.Str;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -37,7 +38,14 @@ public class SettingsManager {
 			econ_currency_minor_s = "Cent",
 			econ_currency_minor_m = "Cents";
 	public boolean econ_currency_multi = false; // if internal currency formatting should be seperated (eg. 2 Dollars 25 Cents)
-	public PricelistType pricelist_type = PricelistType.CSV;
+	public String sql_username = "root",
+			sql_password = "root",
+			sql_database = "minecraft",
+			sql_pricetable = "pricelist",
+			sql_hostName = "localhost",
+			sql_portNum = "3306";
+	public PricelistType pricelist_type = PricelistType.CSV,
+			pricelist_type_default = PricelistType.CSV;
 	
 	protected SettingsManager(BetterShop3 plugin) {
 		this.plugin = plugin;
@@ -55,7 +63,44 @@ public class SettingsManager {
 			// non-categorial settings
 			locale = config.getString("Language", locale);
 			// sub-settings
-			Object node = config.get("Economy");
+			Object node = config.get("Database");
+			if (node instanceof MemorySection) {
+				MemorySection n = (MemorySection) node;
+				String type = n.getString("Type");
+				if(type != null) {
+					if(Str.isInIgnoreCase(type, "MySQL", "SQL")) {
+						pricelist_type = PricelistType.MYSQL;
+					} else if(Str.isInIgnoreCase(type, "YAML", "YML")) {
+						pricelist_type = PricelistType.YAML;
+					} else if(type.equalsIgnoreCase("CSV")) {
+						pricelist_type = PricelistType.CSV;
+					} else {
+						plugin.getLogger().warning(String.format("Unknown type '%s' (Defaulting to %s)", type, pricelist_type_default.name()));
+						pricelist_type = pricelist_type_default;
+					}
+				} else {
+					missing += (missing.isEmpty() ? "" : ", ") + "Database.Type";
+				}
+				sql_database = n.getString("SQL_Database", sql_database);
+				if(pricelist_type == PricelistType.MYSQL && !n.contains("SQL_Database")) {
+					missing += (missing.isEmpty() ? "" : ", ") + "Database.SQL_Database";
+				}
+				sql_username = n.getString("SQL_Username", sql_username);
+				if(pricelist_type == PricelistType.MYSQL && !n.contains("SQL_Username")) {
+					missing += (missing.isEmpty() ? "" : ", ") + "Database.SQL_Username";
+				}
+				sql_password = n.getString("SQL_Password", sql_password);
+				if(pricelist_type == PricelistType.MYSQL && !n.contains("SQL_Password")) {
+					missing += (missing.isEmpty() ? "" : ", ") + "Database.SQL_Password";
+				}
+				sql_pricetable = n.getString("SQL_PriceTable", sql_pricetable);
+				sql_hostName = n.getString("SQL_HostName", sql_hostName);
+				sql_portNum = n.getString("SQL_PortNum", sql_portNum);
+			} else {
+				missing += (missing.isEmpty() ? "" : ", ") + "Database.*";
+			}
+			
+			node = config.get("Economy");
 			if (node instanceof MemorySection) {
 				MemorySection n = (MemorySection) node;
 				econ_bankName = n.getString("Bank Name", econ_bankName);
@@ -66,7 +111,7 @@ public class SettingsManager {
 			}
 
 			if (missing.length() > 0) {
-				plugin.getLogger().warning("Missing Configuration Nodes: \n" + missing);
+				plugin.getLogger().warning(String.format("Missing Configuration Nodes: \n%s", missing));
 			}
 		} catch (Exception e) {
 			plugin.getLogger().log(Level.SEVERE, "Error Loading Config", e);

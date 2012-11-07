@@ -49,7 +49,7 @@ public class CSV_Database extends PricelistDatabaseHandler {
 	protected void fullReload() {
 		if (saveFile.exists()) {
 			try {
-				for (Map.Entry<String, HashMap<Integer, ItemPrice>> e : prices.entrySet()) {
+				for (Map.Entry<String, Map<Integer, ItemPrice>> e : prices.entrySet()) {
 					e.getValue().clear();
 				}
 				prices.clear();
@@ -74,9 +74,9 @@ public class CSV_Database extends PricelistDatabaseHandler {
 							continue;
 						}
 						int data = dataLine[1].length() == 0 ? 0 : CheckInput.GetInt(dataLine[1], 0);
-						if (ArrayManip.indexOf(validIDs, (Integer) ((id << 16) + data)) != -1) {
-							pricelist.put((id << 16) + data,
-									new ItemPrice(CheckInput.GetInt(dataLine[2], -1), CheckInput.GetInt(dataLine[3], -1)));
+						if (ArrayManip.indexOf(validIDs, (Integer) ((id << DATA_BYTE_LEN) + data)) != -1) {
+							pricelist.put((id << DATA_BYTE_LEN) + data,
+									new ItemPrice(CheckInput.GetDouble(dataLine[2], -1), CheckInput.GetDouble(dataLine[3], -1)));
 						}
 					}
 				}
@@ -104,12 +104,12 @@ public class CSV_Database extends PricelistDatabaseHandler {
 			}
 			FileWriter fstream = new FileWriter(saveFile.getAbsolutePath());
 			BufferedWriter out = new BufferedWriter(fstream);
-			for (Map.Entry<String, HashMap<Integer, ItemPrice>> e : prices.entrySet()) {
+			for (Map.Entry<String, Map<Integer, ItemPrice>> e : prices.entrySet()) {
 				out.write(e.getKey());
 				out.newLine();
 				for (Map.Entry<Integer, ItemPrice> p : e.getValue().entrySet()) {
-					out.write(String.valueOf(p.getKey() >> 16) + "," 
-							+ String.valueOf(p.getKey() & 65535) + "," 
+					out.write(String.valueOf(p.getKey() >> DATA_BYTE_LEN) + "," 
+							+ String.valueOf(p.getKey() & DATA_BYTES) + "," 
 							+ p.getValue().buyPrice + ","
 							+ p.getValue().sellPrice + "\n");
 				}

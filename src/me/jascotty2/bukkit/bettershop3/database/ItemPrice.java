@@ -26,12 +26,26 @@ public class ItemPrice {
 	}
 
 	public ItemPrice(double buyPrice, double sellPrice) {
+		set(buyPrice, sellPrice);
+	}
+	
+	public void set(ItemPrice copy) {
+		this.buyPrice = copy.buyPrice;
+		this.sellPrice = copy.sellPrice;
+	}
+
+	public final void set(double buyPrice, double sellPrice) {
 		this.buyPrice = buyPrice;
 		this.sellPrice = sellPrice;
 	}
-
+	
 	@Override
 	public String toString() {
 		return "ItemPrice{" + "buyPrice=" + buyPrice + ", sellPrice=" + sellPrice + '}';
+	}
+	
+	@Override
+	public ItemPrice clone() {
+		return new ItemPrice(buyPrice, sellPrice);
 	}
 }

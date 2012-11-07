@@ -58,9 +58,9 @@ public class YAML_Database extends PricelistDatabaseHandler {
 				HashMap<Integer, ItemPrice> pricelist = new HashMap<Integer, ItemPrice>();
 				String itemN, itemN_s;
 				for (int item : plugin.itemDB.getFullIdList()) {
-					itemN = itemN_s = String.valueOf(item >> 16);
-					itemN_s += "-" + String.valueOf(item & 65535);
-					if ((item & 65535) == 0 && (m.contains(itemN + "_buy") || m.contains(itemN + "_sell"))) {
+					itemN = itemN_s = String.valueOf(item >> DATA_BYTE_LEN);
+					itemN_s += "-" + String.valueOf(item & DATA_BYTES);
+					if ((item & DATA_BYTES) == 0 && (m.contains(itemN + "_buy") || m.contains(itemN + "_sell"))) {
 						ItemPrice p = new ItemPrice();
 						p.buyPrice = m.getDouble(itemN + "_buy", -1);
 						p.sellPrice = m.getDouble(itemN + "_sell", -1);
@@ -80,7 +80,7 @@ public class YAML_Database extends PricelistDatabaseHandler {
 	@Override
 	protected void fullReload() {
 		try {
-			for (Map.Entry<String, HashMap<Integer, ItemPrice>> e : prices.entrySet()) {
+			for (Map.Entry<String, Map<Integer, ItemPrice>> e : prices.entrySet()) {
 				e.getValue().clear();
 			}
 			prices.clear();
@@ -95,9 +95,7 @@ public class YAML_Database extends PricelistDatabaseHandler {
 	@Override
 	protected void reloadItemPrice(String shop, int id, int data) {
 		if (saveFile.exists()) {
-			if (shop == null) {
-				shop = GLOBAL_IDENTIFIER;
-			}
+			shop = safeShopName(shop);
 			try {
 				// reload
 				db.load(saveFile);
@@ -110,7 +108,7 @@ public class YAML_Database extends PricelistDatabaseHandler {
 					String itemN, itemN_s;
 					itemN = itemN_s = String.valueOf(id);
 					itemN_s += "-" + String.valueOf(data);
-					ItemPrice p = prices.get(shop).get(id << 16 + data);
+					ItemPrice p = prices.get(shop).get(id << DATA_BYTE_LEN + data);
 					if (p == null) {
 						p = new ItemPrice();
 					}
@@ -121,7 +119,7 @@ public class YAML_Database extends PricelistDatabaseHandler {
 						p.buyPrice = m.getDouble(itemN_s + "_buy", -1);
 						p.sellPrice = m.getDouble(itemN_s + "_sell", -1);
 					}
-					prices.get(shop).put(id << 16 + data, p);
+					prices.get(shop).put(id << DATA_BYTE_LEN + data, p);
 				}
 			} catch (Exception e) {
 				plugin.getLogger().log(Level.SEVERE, "Failed to reload the pricelist config", e);
@@ -138,23 +136,27 @@ public class YAML_Database extends PricelistDatabaseHandler {
 				}
 				db = YamlConfiguration.loadConfiguration(saveFile);
 			}
-			for (Map.Entry<String, HashMap<Integer, ItemPrice>> e : prices.entrySet()) {
+			// only way to sort the list it to delete and re-create..
+			for(String s : db.getKeys(false)) {
+				db.set(s, null);
+			}
+			for (Map.Entry<String, Map<Integer, ItemPrice>> e : prices.entrySet()) {
+				String shop = safeShopName(e.getKey());
 				for (Map.Entry<Integer, ItemPrice> p : e.getValue().entrySet()) {
-					String itemN = String.valueOf(p.getKey() >> 16);
-					if ((p.getKey() & 65535) != 0) {
-						itemN += String.valueOf(p.getKey() & 65535);
+					String itemN = String.valueOf(p.getKey() >> DATA_BYTE_LEN);
+					if ((p.getKey() & DATA_BYTES) != 0) {
+						itemN += String.valueOf(p.getKey() & DATA_BYTES);
 					}
 					if (p.getValue().buyPrice >= 0) {
-						db.set(e.getKey() + "." + itemN + "_buy", p.getValue().buyPrice);
+						db.set(shop + "." + itemN + "_buy", p.getValue().buyPrice);
 					} else if (db.contains(e.getKey() + "." + itemN + "_buy")) {
-						db.set(e.getKey() + "." + itemN + "_buy", -1);
+						db.set(shop + "." + itemN + "_buy", -1);
 					}
 					if (p.getValue().sellPrice >= 0) {
-						db.set(e.getKey() + "." + itemN + "_sell", p.getValue().sellPrice);
+						db.set(shop + "." + itemN + "_sell", p.getValue().sellPrice);
 					} else if (db.contains(e.getKey() + "." + itemN + "_sell")) {
-						db.set(e.getKey() + "." + itemN + "_sell", -1);
+						db.set(shop + "." + itemN + "_sell", -1);
 					}
-
 				}
 			}
 			db.save(saveFile);

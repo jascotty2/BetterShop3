@@ -1,26 +1,28 @@
 /**
- * Copyright (C) 2011 Jacob Scott <jascottytechie@gmail.com>
- * Description: methods for working with & formatting strings in minecraft chat
+ * Copyright (C) 2011 Jacob Scott <jascottytechie@gmail.com> Description:
+ * methods for working with & formatting strings in minecraft chat
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package me.jascotty2.libv2.bukkit.util;
 
 import java.util.ArrayList;
-import me.jascotty2.libv2.util.Str;
 import java.util.LinkedList;
 import java.util.List;
+import me.jascotty2.libv2.util.ArrayManip;
+import me.jascotty2.libv2.util.Rand;
+import me.jascotty2.libv2.util.Str;
 import org.bukkit.ChatColor;
 
 public class MinecraftChatStr {
@@ -54,6 +56,14 @@ public class MinecraftChatStr {
 		7, 7, 7, 7, 9, 6, 7, 8, 7, 6, 6, 9, 7, 6, 7, 1};
 	// chat limmitation: repetitions of characters is limmited to 119 per line
 	//      so: repeating !'s will not fill a line
+	public static final ChatColor[] RainbowColors = new ChatColor[]{
+		ChatColor.RED, ChatColor.DARK_RED, ChatColor.GOLD, ChatColor.YELLOW,
+		ChatColor.GREEN, ChatColor.DARK_GREEN, ChatColor.AQUA, ChatColor.DARK_AQUA,
+		ChatColor.BLUE, ChatColor.DARK_BLUE, ChatColor.DARK_PURPLE, ChatColor.LIGHT_PURPLE};
+	public static final ChatColor[] BrightRainbowColors = new ChatColor[]{
+		ChatColor.RED, ChatColor.YELLOW,
+		ChatColor.GREEN, ChatColor.AQUA,
+		ChatColor.BLUE, ChatColor.LIGHT_PURPLE};
 
 	public static int getStringWidth(String s) {
 		int len = 0;
@@ -129,8 +139,68 @@ public class MinecraftChatStr {
 		return str;
 	}
 
+	public static String rainbow(String str) {
+		return rainbow(str, null, false, true, RainbowColors);
+	}
+
+	public static String rainbow(String str, ChatColor... useColors) {
+		return rainbow(str, null, false, true, useColors);
+	}
+
+	public static String rainbow(String str, boolean random) {
+		return rainbow(str, null, random, true, RainbowColors);
+	}
+
+	public static String rainbow(String str, boolean random, ChatColor... useColors) {
+		return rainbow(str, null, random, true, useColors);
+	}
+
+	public static String rainbow(String str, ChatColor start, boolean random, ChatColor... useColors) {
+		return rainbow(str, start, random, true, useColors);
+	}
+
+	public static String rainbow(String str, boolean random, boolean allowRepeat, ChatColor... useColors) {
+		return rainbow(str, null, random, allowRepeat, useColors);
+	}
+
+	public static String rainbow(String str, ChatColor start, boolean random, boolean allowRepeat, ChatColor... useColors) {
+		int i = start == null
+				? (random ? Rand.RandomInt(0, useColors.length - 1) : 0)
+				: ArrayManip.indexOf(useColors, start);
+		if (i == -1) {
+			i = 0;
+		}
+		if (!allowRepeat && useColors.length <= 2) {
+			random = false;
+		}
+		StringBuilder ret = new StringBuilder();
+		boolean firstChar = false;
+		for (char c : ChatColor.stripColor(str).toCharArray()) {
+			if (!Character.isSpaceChar(c)) {
+				if (!firstChar) {
+					firstChar = true;
+				} else if (random) {
+					if (allowRepeat) {
+						i = Rand.RandomInt(0, useColors.length - 1);
+					} else {
+						int last = i;
+						while (last == i) {
+							i = Rand.RandomInt(0, useColors.length - 1);
+						}
+					}
+				} else if (++i >= useColors.length) {
+					i = 0;
+				}
+				ret.append(useColors[i]);
+			}
+			ret.append(c);
+		}
+		return ret.toString();
+	}
+
 	/**
 	 * pads str on the right with spaces (left-align)
+	 *
 	 * @param str string to format
 	 * @param len spaces to pad
 	 * @return str with padding appended
@@ -141,6 +211,7 @@ public class MinecraftChatStr {
 
 	/**
 	 * pads str on the right with pad (left-align)
+	 *
 	 * @param str string to format
 	 * @param len spaces to pad
 	 * @param pad character to use when padding
@@ -155,6 +226,7 @@ public class MinecraftChatStr {
 
 	/**
 	 * pads str on the right to # of pixels
+	 *
 	 * @param str string to format
 	 * @param pad character to use when padding
 	 * @param abslen pixels to space out
@@ -177,6 +249,7 @@ public class MinecraftChatStr {
 
 	/**
 	 * pads str on the left with pad (right-align)
+	 *
 	 * @param str string to format
 	 * @param len spaces to pad
 	 * @param pad character to use when padding
@@ -191,6 +264,7 @@ public class MinecraftChatStr {
 
 	/**
 	 * pads str on the left to # of pixels
+	 *
 	 * @param str string to format
 	 * @param pad character to use when padding
 	 * @param abslen pixels to space out
@@ -213,6 +287,7 @@ public class MinecraftChatStr {
 
 	/**
 	 * pads str on the left & right with pad (center-align)
+	 *
 	 * @param str string to format
 	 * @param len spaces to pad
 	 * @param pad character to use when padding
@@ -230,6 +305,7 @@ public class MinecraftChatStr {
 
 	/**
 	 * pads str on the left & right to # of pixels with pad (center-align)
+	 *
 	 * @param str string to format
 	 * @param pad character to use when padding
 	 * @param abslen pixels to make the result string
@@ -291,6 +367,7 @@ public class MinecraftChatStr {
 
 	/**
 	 * right-aligns paragraphs
+	 *
 	 * @param str
 	 * @param tab
 	 * @param tabChar
@@ -319,7 +396,9 @@ public class MinecraftChatStr {
 	}
 
 	/**
-	 * will left-align the start of the string until sepChar, then right-align the remaining paragraph
+	 * will left-align the start of the string until sepChar, then right-align
+	 * the remaining paragraph
+	 *
 	 * @param str
 	 * @param tab
 	 * @param tabChar
@@ -366,7 +445,9 @@ public class MinecraftChatStr {
 	}
 
 	/**
-	 * will left-align the start of the string until sepChar, then right-align the remaining paragraph
+	 * will left-align the start of the string until sepChar, then right-align
+	 * the remaining paragraph
+	 *
 	 * @param str
 	 * @param width
 	 * @param tab
@@ -530,7 +611,7 @@ public class MinecraftChatStr {
 	public static List<String> alignTags(List<String> input) {
 		if (input != null && !input.isEmpty()) {
 			ArrayList<String> alignedLines = new ArrayList<String>();
-			
+
 			// first check if all of the strings contain the same align tags
 			//	- if not, each string is independent
 			if (input.size() == 1 || !allSameFormat(input)) {
@@ -542,7 +623,7 @@ public class MinecraftChatStr {
 			// all strings are in the same block format
 			SECTION_ALIGN align = SECTION_ALIGN.LEFT;
 			int section_start = 0;
-			
+
 		}
 		return input;
 	}

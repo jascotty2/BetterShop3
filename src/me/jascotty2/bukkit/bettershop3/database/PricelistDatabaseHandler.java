@@ -20,24 +20,29 @@ package me.jascotty2.bukkit.bettershop3.database;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import me.jascotty2.bukkit.bettershop3.BetterShop3;
+import me.jascotty2.libv2.util.Str;
 
 public abstract class PricelistDatabaseHandler {
 
 	protected final BetterShop3 plugin;
 	/**
-	 * internal save of the shop database
+	 * internal save of the shop database <br />
+	 * Shop Name => Item ID => Price <br />
+	 * Item ID is divided into two sections: first 15 bits are for the id number, last 16 bits are for the data for the item
 	 */
-	protected final HashMap<String, HashMap<Integer, ItemPrice>> prices = new HashMap<String, HashMap<Integer, ItemPrice>>();
+	protected final HashMap<String, Map<Integer, ItemPrice>> prices = new HashMap<String, Map<Integer, ItemPrice>>();
 	/**
 	 * what the global shop is identified in the database as
 	 */
-	protected final String GLOBAL_IDENTIFIER = "__global__";
+	protected static final String GLOBAL_IDENTIFIER = "__global__";
 	/**
-	 * time (in milliseconds) before the cached database is considered out of date
+	 * time (in milliseconds) before the cached database is considered out of
+	 * date
 	 */
 	protected long cacheTimeout = -1;
 	/**
@@ -47,12 +52,27 @@ public abstract class PricelistDatabaseHandler {
 	/**
 	 * for individual data reads, when they were last reloaded
 	 */
-	protected final HashMap<String, HashMap<Integer, Long>> lastRead = new HashMap<String, HashMap<Integer, Long>>();
+	protected final HashMap<String, Map<Integer, Long>> lastRead = new HashMap<String, Map<Integer, Long>>();
 	/**
 	 * db is frozen when an active reload is processing
 	 */
 	private boolean frozen = false;
-
+	/**
+	 * number of bytes in ID reserved for data
+	 */
+	public final static int DATA_BYTE_LEN = 16;
+	/**
+	 * for convenience: ID & DATA_BYTES == item data value <br />
+	 * (65535)
+	 */
+	public final static int DATA_BYTES = Math.abs(Integer.MAX_VALUE << DATA_BYTE_LEN) - 1;
+	/**
+	 * for convenience: ID & ID_BYTES == item id byte value
+	 */
+	public final static int ID_BYTES = Integer.MAX_VALUE ^ DATA_BYTES;
+	
+	public final static int MAX_SHOPLEN = 30;
+	
 	public PricelistDatabaseHandler(BetterShop3 plugin) {
 		this.plugin = plugin;
 	}
@@ -69,8 +89,9 @@ public abstract class PricelistDatabaseHandler {
 
 	/**
 	 * for a dynamic pricelist, reload the price of this item
+	 *
 	 * @param id
-	 * @param data 
+	 * @param data
 	 */
 	protected abstract void reloadItemPrice(String shop, int id, int data);
 
@@ -99,13 +120,14 @@ public abstract class PricelistDatabaseHandler {
 	}
 
 	protected final void _reloadItemPrice(String shop, int id, int data) {
+		shop = safeShopName(shop);
 		if (prices.containsKey(shop) && id > 0 && data > 0) {
 			try {
 				frozen = true;
 				if (!lastRead.containsKey(shop)) {
 					lastRead.put(shop, new HashMap<Integer, Long>());
 				}
-				lastRead.get(shop).put((id << 16) + data, System.currentTimeMillis());
+				lastRead.get(shop).put((id << DATA_BYTE_LEN) + data, System.currentTimeMillis());
 				reloadItemPrice(shop, id, data);
 			} catch (Throwable t) {
 				plugin.getLogger().log(Level.SEVERE, "Error while reloading Pricelist Database", t);
@@ -127,6 +149,8 @@ public abstract class PricelistDatabaseHandler {
 					// global shop
 					shop = GLOBAL_IDENTIFIER;
 				}
+			} else {
+				shop = safeShopName(shop);
 			}
 			if (!lastRead.containsKey(shop)) {
 				if (!prices.containsKey(shop)) {
@@ -136,7 +160,7 @@ public abstract class PricelistDatabaseHandler {
 					lastRead.put(shop, new HashMap<Integer, Long>());
 				}
 			} else {
-				Long last = lastRead.get(shop).get((id << 16) + data);
+				Long last = lastRead.get(shop).get((id << DATA_BYTE_LEN) + data);
 				if (last != null && lastReload > last) {
 					return System.currentTimeMillis() - last > cacheTimeout;
 				}
@@ -150,7 +174,7 @@ public abstract class PricelistDatabaseHandler {
 		if (frozen) {
 			try {
 				while (frozen) {
-					this.wait(10);
+					this.wait(50);
 				}
 			} catch (InterruptedException ex) {
 				plugin.getLogger().log(Level.SEVERE, null, ex);
@@ -160,12 +184,16 @@ public abstract class PricelistDatabaseHandler {
 
 	public final Map<Integer, ItemPrice> getPricelist(String shop) {
 		syncReload();
+		shop = safeShopName(shop);
 		if (needReload(shop, 0, 0)) {
 			_fullReload();
 		}
-		return prices.get(shop == null ? GLOBAL_IDENTIFIER : shop);
+		return prices.get(shop);
 	}
 
+	public final Set<String> getShops() {
+		return prices.keySet();
+	}
 	/**
 	 * @param shop
 	 * @param id
@@ -174,50 +202,71 @@ public abstract class PricelistDatabaseHandler {
 	 */
 	public ItemPrice getPrice(String shop, int id, int data) {
 		syncReload();
-		if (prices.containsKey(shop == null ? GLOBAL_IDENTIFIER : shop)) {
+		shop = safeShopName(shop);
+		if (prices.containsKey(shop)) {
 			if (needReload(shop, id, data)) {
 				_reloadItemPrice(shop, id, data);
 			}
-			return prices.get(shop == null ? GLOBAL_IDENTIFIER : shop).get((id << 16) + data);
+			return prices.get(shop).get((id << DATA_BYTE_LEN) + data);
 		}
 		return null;
 	}
 
 	public void setBuyPrice(String shop, int id, int data, double price) {
 		syncReload();
-		if (shop == null) {
-			shop = GLOBAL_IDENTIFIER;
-		}
+		shop = safeShopName(shop);
 		if (!prices.containsKey(shop)) {
 			prices.put(shop, new HashMap<Integer, ItemPrice>());
 		}
-		if (!prices.get(shop).containsKey((id << 16) + data)) {
-			prices.get(shop).put((id << 16) + data, new ItemPrice(price, -1));
+		if (!prices.get(shop).containsKey((id << DATA_BYTE_LEN) + data)) {
+			prices.get(shop).put((id << DATA_BYTE_LEN) + data, new ItemPrice(price, -1));
 		} else {
-			prices.get(shop).get((id << 16) + data).buyPrice = price;
+			prices.get(shop).get((id << DATA_BYTE_LEN) + data).buyPrice = price;
 		}
 		save();
 	}
 
 	public void setSellPrice(String shop, int id, int data, double price) {
 		syncReload();
-		if (shop == null) {
-			shop = GLOBAL_IDENTIFIER;
-		}
+		shop = safeShopName(shop);
 		if (!prices.containsKey(shop)) {
 			prices.put(shop, new HashMap<Integer, ItemPrice>());
 		}
-		if (!prices.get(shop).containsKey((id << 16) + data)) {
-			prices.get(shop).put((id << 16) + data, new ItemPrice(-1, price));
+		if (!prices.get(shop).containsKey((id << DATA_BYTE_LEN) + data)) {
+			prices.get(shop).put((id << DATA_BYTE_LEN) + data, new ItemPrice(-1, price));
 		} else {
-			prices.get(shop).get((id << 16) + data).sellPrice = price;
+			prices.get(shop).get((id << DATA_BYTE_LEN) + data).sellPrice = price;
 		}
 		save();
 	}
 	
+	public void setPrice(String shop, int id, int data, double buy, double sell) {
+		syncReload();
+		shop = safeShopName(shop);
+		if (!prices.containsKey(shop)) {
+			prices.put(shop, new HashMap<Integer, ItemPrice>());
+		}
+		if (!prices.get(shop).containsKey((id << DATA_BYTE_LEN) + data)) {
+			prices.get(shop).put((id << DATA_BYTE_LEN) + data, new ItemPrice(buy, sell));
+		} else {
+			prices.get(shop).get((id << DATA_BYTE_LEN) + data).set(buy, sell);
+		}
+		save();
+	}
+	
+	public static String safeShopName(String shop) {
+		return shop == null ? GLOBAL_IDENTIFIER : Str.strTrim(shop, MAX_SHOPLEN);
+	}
+	
+	protected void clearPrices() {
+		for(String shop : prices.keySet()) {
+			prices.get(shop).clear();
+		}
+		prices.clear();
+	}
 	/// threaded saving ///
 	private Saver saveTask = null;
-	
+
 	public final void save() {
 		if (saveTask != null) {
 			saveTask.cancel();
@@ -225,7 +274,7 @@ public abstract class PricelistDatabaseHandler {
 		saveTask = new Saver();
 		saveTask.start(30000);
 	}
-	
+
 	public void flushSave() {
 		if (saveTask != null) {
 			saveTask.cancel();
@@ -242,6 +291,7 @@ public abstract class PricelistDatabaseHandler {
 
 		@Override
 		public void run() {
+			System.out.println("calling save now..");
 			saveFull();
 		}
 	}

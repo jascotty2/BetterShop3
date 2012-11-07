@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
 import me.jascotty2.bukkit.bettershop3.commands.*;
 import me.jascotty2.bukkit.bettershop3.database.*;
 import me.jascotty2.bukkit.bettershop3.enums.PricelistType;
@@ -55,9 +57,18 @@ public class BetterShop3 extends JavaPlugin {
 		// initialize handlers
 		economy.enable();
 		permissions.enable();
+		if (config.pricelist_type == PricelistType.MYSQL) {
+			try {
+				pricelist = new MySQL_Database(this);
+			} catch (Throwable t) {
+				getLogger().log(Level.SEVERE, "Failed to connect to MySQL Server", t);
+				getLogger().info(String.format("Reverting to %s Database..", config.pricelist_type_default.name()));
+				config.pricelist_type = config.pricelist_type_default;
+			}
+		}
 		if (config.pricelist_type == PricelistType.CSV) {
 			pricelist = new CSV_Database(this);
-		} else { // if(config.pricelist_type == PricelistType.YAML) {
+		} else if(config.pricelist_type == PricelistType.YAML) {
 			pricelist = new YAML_Database(this);
 		}
 		pricelist.load();
@@ -69,7 +80,7 @@ public class BetterShop3 extends JavaPlugin {
 		setCommand("sellagain", com_sell);
 		setCommand("price", com_price);
 		setCommand("pricelist", com_price);
-		
+
 		try {
 			Metrics metrics = new Metrics(this);
 			metrics.start();
@@ -90,7 +101,7 @@ public class BetterShop3 extends JavaPlugin {
 //		System.out.println(MinecraftChatStr.alignTags(test2, false));
 //		System.out.println(strs.get(1));
 		System.out.println(strs2.get(1));
-		
+
 		messages.SendMessage(null, Messages.SHOP_LIST.HEADER, 1, 1);
 		ArrayList<Object[]> paramList = new ArrayList<Object[]>();
 		paramList.add(new Object[]{"Stone", 2, 1, "Dollar", "2 Dollars", "1 Dollar", 300});
@@ -105,6 +116,8 @@ public class BetterShop3 extends JavaPlugin {
 		PluginCommand c = getCommand(command);
 		if (c != null) {
 			c.setExecutor(exec);
+		} else {
+			getLogger().warning(String.format("Could not register command \"%s\"", command));
 		}
 	}
 

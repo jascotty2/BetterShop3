@@ -19,5 +19,5 @@
 package me.jascotty2.bukkit.bettershop3.enums;
 
 public enum PricelistType {
-	YAML, CSV
+	YAML, CSV, MYSQL
 }

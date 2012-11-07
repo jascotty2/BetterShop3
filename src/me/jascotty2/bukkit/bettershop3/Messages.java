@@ -175,7 +175,7 @@ public class Messages {
 				plugin.getLogger().severe((locale.equals("en") ? "Error: 'en.yml' cannot be found" : "Error: Cannot load locale '" + locale + "', and 'en.yml' cannot be found"));
 				return;
 			} else {
-				plugin.getLogger().severe("Error: Cannot load locale '" + locale + "'. Defaulting to en");
+				plugin.getLogger().severe(String.format("Error: Cannot load locale '%s'. Defaulting to en", locale));
 			}
 		}
 
@@ -194,7 +194,7 @@ public class Messages {
 						String k2 = Str.titleCase(o[j].toString().replace('_', ' ')).replace(' ', '_');
 						if (!s.contains(k2)) {
 							if (ArrayManip.indexOf(ALLOW_NULL, o[j]) == -1) {
-								plugin.getLogger().warning(k + "." + k2 + " missing from " + lang.getName());
+								plugin.getLogger().warning(String.format("%s.%s missing from %s", k, k2, lang.getName()));
 								s.set(k2, MISSING_STRING.replace("<m>", k + "." + k2));
 								needSave = true;
 							}
@@ -202,7 +202,7 @@ public class Messages {
 						messages[i][j] = convertColorChars(convertTags(s.getString(k2, ""), (MessageType) o[j]));
 					}
 				} else {
-					plugin.getLogger().warning("Error: Section '" + k + "' is missing from " + lang.getName());
+					plugin.getLogger().warning(String.format("Error: Section '%s' is missing from %s", k, lang.getName()));
 					conf.createSection(k);
 					ConfigurationSection s = conf.getConfigurationSection(k);
 					int j = 0;
@@ -385,19 +385,19 @@ public class Messages {
 			try {
 				msg = MessageFormat.format(msg, params);
 			} catch (Exception e) {
-				plugin.getLogger().severe("Error fomatting message for "
-						+ message.getDeclaringClass().getSimpleName() + "." + message.getClass().getSimpleName()
-						+ ": " + e.getMessage());
+				plugin.getLogger().severe(String.format("Error fomatting message for %s.%s: %s", 
+						message.getClass().getSimpleName(), message.name(), e.getMessage()));
 			}
 			// todo: extra line formatting here
-			
+			// (line wrapping, align, etc)
 			if (player == null) {
 				plugin.getServer().getConsoleSender().sendMessage(msg);
 			} else {
 				player.sendMessage(msg);
 			}
-		} else {
-			System.out.println("message type not found");
+		} else if (msg == null) {
+			plugin.getLogger().warning(String.format("Message type '%s.%s' not found", 
+					message.getDeclaringClass().getSimpleName(), message.name()));
 		}
 	}
 
@@ -413,9 +413,8 @@ public class Messages {
 					lines.add(MessageFormat.format(msg, params));
 				}
 			} catch (Exception e) {
-				plugin.getLogger().severe("Error fomatting message for "
-						+ message.getDeclaringClass().getSimpleName() + "." + message.getClass().getSimpleName()
-						+ ": " + e.getMessage());
+				plugin.getLogger().severe(String.format("Error fomatting message for %s.%s: %s", 
+						message.getDeclaringClass().getSimpleName(), message.getClass().getSimpleName(), e.getMessage()));
 				lines.add(msg);
 			}
 			// todo: extra line formatting here
