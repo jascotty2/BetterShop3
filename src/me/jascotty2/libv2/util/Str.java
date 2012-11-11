@@ -96,7 +96,75 @@ public class Str extends OutputStream {
 		}
 		return ret.toString();
 	}
+	
+	public static String concatStr(long[] s, String sep) {
+		return concatStr(s, 0, sep);
+	}
 
+	public static String concatStr(long[] s, int start) {
+		return concatStr(s, start, "");
+	}
+
+	public static String concatStr(long[] s, int start, String sep) {
+		StringBuilder ret = new StringBuilder();
+		if (s != null) {
+			for (int i = start; i < s.length; ++i) {
+				ret.append(s[i]);
+				if (i + 1 < s.length) {
+					ret.append(sep);
+				}
+			}
+		}
+		return ret.toString();
+	}
+
+	public static String concatStr(long[] s, int start, String sep, int length) {
+		StringBuilder ret = new StringBuilder();
+		if (s != null) {
+			for (int i = start, j = 0; i < s.length && j < length; ++i, ++j) {
+				ret.append(s[i]);
+				if (i + 1 < s.length) {
+					ret.append(sep);
+				}
+			}
+		}
+		return ret.toString();
+	}
+	
+	public static String concatStr(int[] s, String sep) {
+		return concatStr(s, 0, sep);
+	}
+
+	public static String concatStr(int[] s, int start) {
+		return concatStr(s, start, "");
+	}
+
+	public static String concatStr(int[] s, int start, String sep) {
+		StringBuilder ret = new StringBuilder();
+		if (s != null) {
+			for (int i = start; i < s.length; ++i) {
+				ret.append(s[i]);
+				if (i + 1 < s.length) {
+					ret.append(sep);
+				}
+			}
+		}
+		return ret.toString();
+	}
+
+	public static String concatStr(int[] s, int start, String sep, int length) {
+		StringBuilder ret = new StringBuilder();
+		if (s != null) {
+			for (int i = start, j = 0; i < s.length && j < length; ++i, ++j) {
+				ret.append(s[i]);
+				if (i + 1 < s.length) {
+					ret.append(sep);
+				}
+			}
+		}
+		return ret.toString();
+	}
+	
 	public static String concatStr(Collection<?> strSet) {
 		return concatStr(strSet, 0, "");
 	}

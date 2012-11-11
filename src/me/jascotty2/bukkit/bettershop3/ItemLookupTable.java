@@ -19,10 +19,13 @@
 package me.jascotty2.bukkit.bettershop3;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import me.jascotty2.bukkit.bettershop3.database.PricelistDatabaseHandler;
 import me.jascotty2.bukkit.bettershop3.enums.ExtendedMaterials;
 import me.jascotty2.libv2.io.CheckInput;
 import me.jascotty2.libv2.util.Str;
@@ -41,23 +44,15 @@ public class ItemLookupTable {
 		92, 93, 94, 104, 105, 115, 117, 118, 119,
 		132, 140, 141, 142, 144
 	};
-	// what item ids' data resemble max damage value
-	// (must be in ascending order)
-	final static int[] tools = new int[]{
-		256, 257, 258, 259, 261, 267, 268, 269, 270, 271,
-		272, 273, 274, 275, 276, 277, 278, 278, 279,
-		283, 284, 285, 286, 290, 291, 292, 293, 294,
-		298, 299, 300, 301, 302, 303, 304, 305,
-		306, 307, 308, 309, 310, 311, 312, 313,
-		314, 315, 316, 317, 346, 359};
 	// items (other than tools) that aren't good to stack
 	final static int[] unsafeStack = new int[]{
-		282, 325, 326, 327, 335};
+		282, 325, 326, 327, 335, 387};
 	// first 15 bits == id, last 16 bits == data
 	final protected HashMap<Integer, ArrayList<String>> itemNames = new HashMap<Integer, ArrayList<String>>();
 	final protected HashMap<Integer, ChatColor> itemColors = new HashMap<Integer, ChatColor>();
 	final protected HashMap<String, Integer> items = new HashMap<String, Integer>();
 	final protected HashMap<Integer, HashMap<String, Integer>> itemSubdata = new HashMap<Integer, HashMap<String, Integer>>();
+	final protected ArrayList<Integer> sortedItemList = new ArrayList<Integer>();
 	//final protected ArrayList<String>[] potions = new ArrayList[64];
 	final protected static String DEFAULT_WATER_BOTTLE = "Water Bottle"; // 373:0
 	final protected static String DEFAULT_LONG_FORMAT = "Extended %s";
@@ -70,7 +65,7 @@ public class ItemLookupTable {
 		/*  3 */ "Potion of Fire Resistance",
 		/*  4 */ "Potion of Poison",
 		/*  5 */ "Potion of Healing",
-		/*  6 */ "Clear Potion",
+		/*  6 */ "Potion of Night Vision",
 		/*  7 */ "Clear Potion",
 		/*  8 */ "Potion of Weakness",
 		/*  9 */ "Potion of Strength",
@@ -78,7 +73,7 @@ public class ItemLookupTable {
 		/* 11 */ "Diffuse Potion",
 		/* 12 */ "Potion of Harming",
 		/* 13 */ "Artless Potion",
-		/* 14 */ "Thin Potion",
+		/* 14 */ "Potion of Invisibility",
 		/* 15 */ "Thin Potion",
 		/* 16 */ "Awkward Potion",
 		/* 17 */ "Potion of Regeneration",
@@ -86,15 +81,15 @@ public class ItemLookupTable {
 		/* 19 */ "Potion of Fire Resistance",
 		/* 20 */ "Potion of Poison",
 		/* 21 */ "Potion of Healing",
-		/* 22 */ "Bungling Potion",
-		/* 23 */ "Bungling Potion 2",
+		/* 22 */ "Potion of Night Vision",
+		/* 23 */ "Bungling Potion",
 		/* 24 */ "Potion of Weakness",
 		/* 25 */ "Potion of Strength",
 		/* 26 */ "Potion of Slowness",
 		/* 27 */ "Smooth Potion",
 		/* 28 */ "Potion of Harming",
 		/* 29 */ "Suave Potion",
-		/* 30 */ "Debonair Potion",
+		/* 30 */ "Potion of Invisibility",
 		/* 31 */ "Debonair Potion",
 		/* 32 */ "Thick Potion",
 		/* 33 */ "Potion of Regeneration II",
@@ -102,7 +97,7 @@ public class ItemLookupTable {
 		/* 35 */ "Potion of Fire Resistance",
 		/* 36 */ "Potion of Poison II",
 		/* 37 */ "Potion of Healing II",
-		/* 38 */ "Charming Potion",
+		/* 38 */ "Potion of Night Vision II",
 		/* 39 */ "Charming Potion",
 		/* 40 */ "Potion of Weakness",
 		/* 41 */ "Potion of Strength II",
@@ -110,15 +105,15 @@ public class ItemLookupTable {
 		/* 43 */ "Refined Potion",
 		/* 44 */ "Potion of Harming II",
 		/* 45 */ "Cordial Potion",
-		/* 46 */ "Sparkling Potion",
-		/* 47 */ "Sparkling Potion 2",
+		/* 46 */ "Potion of Invisibility II",
+		/* 47 */ "Sparkling Potion",
 		/* 48 */ "Potent Potion",
 		/* 49 */ "Potion of Regeneration II",
 		/* 50 */ "Potion of Swiftness II",
 		/* 51 */ "Potion of Fire Resistance",
 		/* 52 */ "Potion of Poison II",
 		/* 53 */ "Potion of Healing II",
-		/* 54 */ "Rank Potion",
+		/* 54 */ "Potion of Night Vision II",
 		/* 55 */ "Rank Potion",
 		/* 56 */ "Potion of Weakness",
 		/* 57 */ "Potion of Strength II",
@@ -126,7 +121,7 @@ public class ItemLookupTable {
 		/* 59 */ "Acrid Potion",
 		/* 60 */ "Potion of Harming II",
 		/* 61 */ "Gross Potion",
-		/* 62 */ "Stinky Potion",
+		/* 62 */ "Potion of Invisibility II",
 		/* 63 */ "Stinky Potion"
 	};
 	protected static String potion_longFormat = DEFAULT_LONG_FORMAT;
@@ -159,7 +154,7 @@ public class ItemLookupTable {
 		// initialize item list
 		int ignore_i = 0, extended_i = 0;
 		for (Material m : Material.values()) {
-			if (ignore_i < invalidItems.length &&  m.getId() == invalidItems[ignore_i]) {
+			if (ignore_i < invalidItems.length && m.getId() == invalidItems[ignore_i]) {
 				++ignore_i;
 			} else if (m == Material.POTION) {
 				addEntry(m.getId(), 0, DEFAULT_WATER_BOTTLE);
@@ -203,10 +198,10 @@ public class ItemLookupTable {
 	}
 
 	protected final void setItem(int id, int data, String value) {
-		ArrayList<String> orig = itemNames.get((id << 16) + data);
+		ArrayList<String> orig = itemNames.get(idVal(id, data));
 		String colored = Messages.convertColorChars(value);
 		if (colored.contains(String.valueOf(ChatColor.COLOR_CHAR))) {
-			itemColors.put((id << 16) + data,
+			itemColors.put(idVal(id, data),
 					ChatColor.getByChar(colored.charAt(colored.indexOf(ChatColor.COLOR_CHAR) + 1)));
 			value = ChatColor.stripColor(colored);
 		}
@@ -295,7 +290,7 @@ public class ItemLookupTable {
 			}
 			return;
 		}
-		id = (id << 16) + data;
+		id = idVal(id, data);
 		if (!itemNames.containsKey(id)) {
 			itemNames.put(id, new ArrayList<String>());
 		}
@@ -339,6 +334,9 @@ public class ItemLookupTable {
 
 	public void load(YamlConfiguration conf) {
 		loadDefaults();
+		sortedItemList.clear();
+		sortedItemList.addAll(itemNames.keySet());
+		reorderSortedIds(null);
 		// sanity check
 		if (conf == null || !(conf.get("Items") instanceof MemorySection)) {
 			return;
@@ -414,7 +412,7 @@ public class ItemLookupTable {
 		search = search.replace(" ", "").toLowerCase();
 		if (CheckInput.IsInt(search)) {
 			int id = CheckInput.GetInt(search, -1);
-			if ((id & 2147418112) == 0 && id > 0 && itemNames.containsKey(id << 16)) {
+			if ((id & PricelistDatabaseHandler.ID_BYTES) == 0 && id > 0 && itemNames.containsKey(id << PricelistDatabaseHandler.DATA_BYTE_LEN)) {
 				return new ItemValue(id, 0);
 			}
 		} else if (search.contains(":")) {
@@ -461,7 +459,8 @@ public class ItemLookupTable {
 			}
 		} else if (items.containsKey(search)) {
 			// direct match to name or alias
-			return new ItemValue(items.get(search) >> 16, items.get(search) & 65535);
+			return new ItemValue(items.get(search) >> PricelistDatabaseHandler.DATA_BYTE_LEN, 
+					items.get(search) & PricelistDatabaseHandler.DATA_BYTES);
 		} else {
 			// now do string-compare for the closest match
 			String close = null;
@@ -476,40 +475,46 @@ public class ItemLookupTable {
 				}
 			}
 			if (close != null) {
-				return new ItemValue(items.get(close) >> 16, items.get(close) & 65535);
+				return new ItemValue(items.get(close) >> PricelistDatabaseHandler.DATA_BYTE_LEN, 
+						items.get(close) & PricelistDatabaseHandler.DATA_BYTES);
 			}
 		}
 		return null;
 	}
 
 	public String getItemName(int id) {
-		return itemNames.containsKey(id << 16) ? itemNames.get(id << 16).get(0) : null;
+		if((id & PricelistDatabaseHandler.ID_BYTES) == 0 && id > 0) {
+			return itemNames.containsKey(id << PricelistDatabaseHandler.DATA_BYTE_LEN) ? itemNames.get(id << PricelistDatabaseHandler.DATA_BYTE_LEN).get(0) : null;
+		}
+		return itemNames.containsKey(id) ? itemNames.get(id).get(0) : null;
 	}
 
 	public String getItemName(int id, int data) {
-		return itemNames.containsKey((id << 16) + data) ? itemNames.get((id << 16) + data).get(0) : null;
+		return itemNames.containsKey(idVal(id, data)) ? itemNames.get(idVal(id, data)).get(0) : null;
 	}
 
 	public String getItemName(ItemValue id) {
-		return id != null && itemNames.containsKey((id.id << 16) + id.data) ? itemNames.get((id.id << 16) + id.data).get(0) : null;
+		return id != null && itemNames.containsKey(id.toIDVal()) ? itemNames.get(id.toIDVal()).get(0) : null;
 	}
 
 	public String getColoredItemName(int id) {
-		if (itemNames.containsKey(id << 16)) {
-			if (itemColors.containsKey(id << 16)) {
-				return itemColors.get(id << 16) + itemNames.get(id << 16).get(0);
+		int idv = idVal(id, 0);
+		if (itemNames.containsKey(idv)) {
+			if (itemColors.containsKey(idv)) {
+				return itemColors.get(idv) + itemNames.get(idv).get(0);
 			}
-			return itemNames.get(id << 16).get(0);
+			return itemNames.get(idv).get(0);
 		}
 		return null;
 	}
 
 	public String getColoredItemName(int id, int data) {
-		if (itemNames.containsKey((id << 16) + data)) {
-			if (itemColors.containsKey((id << 16) + data)) {
-				return itemColors.get((id << 16) + data) + itemNames.get((id << 16) + data).get(0);
+		int idv = idVal(id, data);
+		if (itemNames.containsKey(idv)) {
+			if (itemColors.containsKey(idv)) {
+				return itemColors.get(idv) + itemNames.get(idv).get(0);
 			}
-			return itemNames.get((id << 16) + data).get(0);
+			return itemNames.get(idv).get(0);
 		}
 		return null;
 	}
@@ -519,21 +524,47 @@ public class ItemLookupTable {
 	}
 
 	public ArrayList<String> getItemNames(int id) {
-		return itemNames.containsKey(id << 16) ? (ArrayList<String>) itemNames.get(id << 16).clone() : null;
+		return itemNames.containsKey(id << PricelistDatabaseHandler.DATA_BYTE_LEN) ? (ArrayList<String>) itemNames.get(id << PricelistDatabaseHandler.DATA_BYTE_LEN).clone() : null;
 	}
 
 	public ArrayList<String> getItemNames(int id, int data) {
-		return itemNames.containsKey((id << 16) + data) ? (ArrayList<String>) itemNames.get((id << 16) + data).clone() : null;
+		return itemNames.containsKey(idVal(id, data)) ? (ArrayList<String>) itemNames.get(idVal(id, data)).clone() : null;
 	}
 
 	public ArrayList<String> getItemNames(ItemValue id) {
-		return id != null && itemNames.containsKey((id.id << 16) + id.data) ? (ArrayList<String>) itemNames.get((id.id << 16) + id.data).clone() : null;
+		return id != null && itemNames.containsKey(id.toIDVal()) ? (ArrayList<String>) itemNames.get(id.toIDVal()).clone() : null;
 	}
 	
-	public Integer[] getFullIdList() {
-		return itemNames.keySet().toArray(new Integer[0]);
+	private int idVal(int id, int data) {
+		return (id << PricelistDatabaseHandler.DATA_BYTE_LEN) + data;
 	}
 
+	public Integer[] getFullIdList() {
+		//return itemNames.keySet().toArray(new Integer[0]);
+		return sortedItemList.toArray(new Integer[0]);
+	}
+	
+	public void reorderSortedIds(final ArrayList<Integer> sortFirst) {
+		Collections.sort(sortedItemList, new Comparator<Integer>(){
+
+			@Override
+			public int compare(Integer o1, Integer o2) {
+				if(sortFirst != null && !sortFirst.isEmpty()) {
+					int o1i = sortFirst.indexOf(o1);
+					int o2i = sortFirst.indexOf(o2);
+					if (o1i != -1 && o2i != -1) {
+						return o1i - o2i;
+					} else if (o1i != -1) {
+						return -1;
+					} else if (o2i != -1) {
+						return 1;
+					}
+				}
+				return o1 - o2;
+			}
+		});
+	}
+	
 	public List<String> getItemNameMatches(String search) {
 		/**
 		 * min length of string for spelling and inStr checks
@@ -621,6 +652,15 @@ public class ItemLookupTable {
 		public ItemValue(int id, int data) {
 			this.id = id;
 			this.data = data;
+		}
+		
+		public boolean isTool() {
+			Material m = Material.getMaterial(id);
+			return m != null && m.getMaxDurability() > 0;
+		}
+		
+		public int toIDVal() {
+			return (id << PricelistDatabaseHandler.DATA_BYTE_LEN) + data;
 		}
 
 		@Override

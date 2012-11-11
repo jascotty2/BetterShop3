@@ -51,27 +51,33 @@ public class MySQL_Database extends PricelistDatabaseHandler {
 			ResultSet table = sqlConnection.getColumns(sql_tableName);
 			boolean hasShopKey = false;
 			for (; table.next();) {
-				if(table.getString("COLUMN_NAME").equalsIgnoreCase("Shop")) {
+				if (table.getString("COLUMN_NAME").equalsIgnoreCase("Shop")) {
 					hasShopKey = true;
-				} else if(table.getString("COLUMN_NAME").equalsIgnoreCase("Sub")
+				} else if (table.getString("COLUMN_NAME").equalsIgnoreCase("Sub")
 						&& table.getString("TYPE_NAME").equalsIgnoreCase("TINYINT")) {
 					// new ver. uses int for both
 					sqlConnection.runUpdate("ALTER TABLE `" + sql_tableName + "` "
 							+ "MODIFY COLUMN `Sub` INT(11) UNSIGNED NOT NULL;");
-				} else if(table.getString("COLUMN_NAME").equalsIgnoreCase("NAME")
+				} else if (table.getString("COLUMN_NAME").equalsIgnoreCase("NAME")
 						&& !table.getBoolean("IS_NULLABLE") && table.getString("COLUMN_DEF") == null) {
 					// modify to allow null default for deprecated entry 'name'
 					sqlConnection.runUpdate("ALTER TABLE `" + sql_tableName + "` "
 							+ " MODIFY COLUMN `NAME` VARCHAR(" + table.getString("COLUMN_SIZE") + ")");
 				}
 			}
-			if(!hasShopKey)  {
+			if (!hasShopKey) {
 				sqlConnection.runUpdate(
-						"ALTER TABLE `" +sql_tableName + "` ADD COLUMN `Shop` VARCHAR(" + MAX_SHOPLEN + ") NOT NULL FIRST, "
+						"ALTER TABLE `" + sql_tableName + "` ADD COLUMN `Shop` VARCHAR(" + MAX_SHOPLEN + ") NOT NULL FIRST, "
 						+ "DROP PRIMARY KEY, "
 						+ "ADD PRIMARY KEY  USING BTREE(`Shop`, `ID`, `SUB`);");
 			}
 		}
+	}
+	
+	public void disconnect() {
+		flushSave();
+		sqlConnection.disconnect();
+		sqlConnection = null;
 	}
 
 	private void verifyConnection() {
@@ -208,28 +214,52 @@ public class MySQL_Database extends PricelistDatabaseHandler {
 					}
 				}
 			}
+			// now check for shops that were completely removed
+			for (String shop : DBprices.keySet()) {
+				if (!prices.containsKey(shop)) {
+					removeShop(shop);
+				}
+			}
 		} catch (Exception e) {
 			plugin.getLogger().log(Level.SEVERE, "Error Saving Database", e);
 		}
 	}
 
 	protected void addValue(String shop, int idValue, ItemPrice price) throws SQLException {
-		System.out.println("adding " + plugin.itemDB.getItemName(idValue) + ": " + price);
 		sqlConnection.runUpdate("INSERT INTO `" + sql_tableName + "`(Shop, ID, Sub, Buy, Sell) "
 				+ "VALUES('" + safeShopName(shop) + "'," + (idValue >> DATA_BYTE_LEN) + "," + (idValue & DATA_BYTES)
 				+ "," + price.buyPrice + "," + price.sellPrice + ");");
 	}
 
+	protected void addValue(String shop, int id, int data, ItemPrice price) throws SQLException {
+		sqlConnection.runUpdate("INSERT INTO `" + sql_tableName + "`(Shop, ID, Sub, Buy, Sell) "
+				+ "VALUES('" + safeShopName(shop) + "'," + id + "," + data
+				+ "," + price.buyPrice + "," + price.sellPrice + ");");
+	}
+
+	protected void updateValue(String shop, int idValue, ItemPrice price) throws SQLException {
+		sqlConnection.runUpdate("UPDATE `" + sql_tableName + "` SET Buy=" + price.buyPrice + " AND Sell=" + price.sellPrice
+				+ " WHERE Shop='" + safeShopName(shop) + "' AND ID=" + (idValue >> DATA_BYTE_LEN) + " AND Sub=" + (idValue & DATA_BYTES) + ";");
+	}
+
+	protected void updateValue(String shop, int id, int data, ItemPrice price) throws SQLException {
+		sqlConnection.runUpdate("UPDATE `" + sql_tableName + "` SET Buy=" + price.buyPrice + " AND Sell=" + price.sellPrice
+				+ " WHERE Shop='" + safeShopName(shop) + "' AND ID=" + id + " AND Sub=" + data + ";");
+	}
+
 	protected void removeValue(String shop, int idValue) throws SQLException {
-		System.out.println("deleting " + plugin.itemDB.getItemName(idValue));
 		sqlConnection.runUpdate("DELETE FROM `" + sql_tableName + "` "
 				+ "WHERE Shop='" + safeShopName(shop) + "' AND ID=" + (idValue >> DATA_BYTE_LEN) + " AND Sub=" + (idValue & DATA_BYTES) + ";");
 	}
 
-	protected void updateValue(String shop, int idValue, ItemPrice price) throws SQLException {
-		System.out.println("updating " + plugin.itemDB.getItemName(idValue) + ": " + price);
-		sqlConnection.runUpdate("UPDATE `" + sql_tableName + "` SET Buy=" + price.buyPrice + " AND Sell=" + price.sellPrice
-				+ " WHERE Shop='" + safeShopName(shop) + "' AND ID=" + (idValue >> DATA_BYTE_LEN) + " AND Sub=" + (idValue & DATA_BYTES) + ";");
+	protected void removeValue(String shop, int id, int data) throws SQLException {
+		sqlConnection.runUpdate("DELETE FROM `" + sql_tableName + "` "
+				+ "WHERE Shop='" + safeShopName(shop) + "' AND ID=" + id + " AND Sub=" + data + ";");
+	}
+
+	protected void removeShop(String shop) throws SQLException {
+		sqlConnection.runUpdate("DELETE FROM `" + sql_tableName + "` "
+				+ "WHERE Shop='" + safeShopName(shop) + "';");
 	}
 
 	private boolean createPricelistTable(String tableName) throws SQLException {

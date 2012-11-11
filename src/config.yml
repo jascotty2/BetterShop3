@@ -1,5 +1,24 @@
 Language: en
 
+Shop: 
+  # number of lines outputted in shop list
+  Items Per Page: 9
+  # broadcast all transactions publicly?
+  Public Market: false
+  # Should maxstack be honored? (if false, all items can be purchased stacked to 64)
+  Use Max Stack: true
+  # Can used tools be sold back to the shop?
+  Buy Back Tools: true
+  #items listed here will be sorted before everything else, in this order
+  # can be listed with id:data or names in a string or list
+  # ex:  4, 35, 35:1, 35:2, 35:3, 35:4, 35:5, 8, 2, Sand, Gravel
+  # or
+  #  - Chainmail Helmet
+  #  - Chainmail Chestplate
+  #  - Chainmail Leggings
+  #  - Chainmail Boots
+  Custom Sort:
+ 
 Database:
   # valid types:
   # MySQL, CSV, YAML
@@ -18,3 +37,15 @@ Economy:
   Currency Plural: "Dollars"
   Currency Minor: "Cent"
   Currency Minor Plural: "Cents"
+
+DiscountGroups:
+    # groups are defined using permissions
+    # BetterShop.discount.(NAME)
+    # ex: BetterShop.discount.VIP
+    # note: "BetterShop.discount.none" negates discounts
+    # Discounts are defined in whole-number percentages
+    # note: values greater than 100% are truncated to 100%
+    #		(so that users aren't given money to buy items)
+    # Also, negative values can be used to force users to pay more
+    # (buy & sell prices are changed by the same amount)
+    VIP: 10

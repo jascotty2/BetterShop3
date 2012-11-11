@@ -167,6 +167,20 @@ public class EconomyHandler {
 		}
 		return false;
 	}
+	
+	public String getCurrencyName() {
+		if (vaultEcon != null) {
+			return vaultEcon.currencyNamePlural();
+		}
+		return plugin.config.econ_currency_m;
+	}
+	
+	public String numFormat(double amt) {
+		if (vaultEcon != null) {
+			return String.format("%." + (vaultEcon.fractionalDigits() < 0 ? 2 : vaultEcon.fractionalDigits()) + "f", amt);
+		}
+		return String.format("%.2f", amt);
+	}
 
 	public String format(double amt) {
 //		try {

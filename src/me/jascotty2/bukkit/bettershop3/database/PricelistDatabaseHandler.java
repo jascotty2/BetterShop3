@@ -291,7 +291,6 @@ public abstract class PricelistDatabaseHandler {
 
 		@Override
 		public void run() {
-			System.out.println("calling save now..");
 			saveFull();
 		}
 	}

@@ -10,12 +10,10 @@ Shop:
   Sell_Again: "Repeating Last Sale: <action>"
   Buy_Again: "Repeating Last Purchase: <action>"
 Shop_List:
-  Header: "&2-------- Price-List Page: &f<page> &2of &f<pages> &2--------"
-  Listing: "<left>[<green><item></>]&2 <right>Buy: &f<buyprice>&2  Sell: &f<sellprice>"
+  Header: "&2----------<center> Price-List Page: &f<page> &2of &f<pages> <right>&2----------"
+  Listing: "[<green><item></>]&2 <right>Buy: &f<buyprice>&2 <right>Sell: &f<sellprice>"
   #Listing: "<left>[<green><item></>]&2 <center>Buy: &f<buyprice>&2 <right>Sell: &f<sellprice>"
-  # worst-case
-  #Listing: "<left>[<green><item></>]&2 <right>Buy: &f<buyprice>&2 <center>Sell: &f<sellprice>"
-  #Listing: "<right>[<green><item></>]&2 <left>Buy: &f<buyprice>&2 <center>Sell: &f<sellprice>"
+  #Listing: "<left>[<green><item></>]&2 <center>Buy: &f<buyprice>&2 <left>(&f<buycur>&/) <right>Sell: &f<sellprice> &/<left>(&f<sellcur>&/)"
   Footer: 
   Alias: "&f[</><item>&f]&2 is also known as: &b<alias>"
   Nolist: "&f[</><item>&f] &2cannot be bought or sold."
@@ -435,17 +433,18 @@ Items:
   383-120: Villager Egg
   384: Bottle o' Enchanting, Bottle of Enchanting, Experience Bottle, Experience, Exp Bottle
   385: Fire Charge, Fireball
-  2256: <gold>13 Disk, Gold Record, Gold Disk
+  2256: <gold>13 Disc, Gold Record, Gold Disk
   2257: <darkgreen>Cat Disc, Green Record, Green Disk
   2258: <red>Blocks Disc, Orange Record, Orange Disk
   2259: <red>Chirp Disc, Red Record, Red Disk
   2260: Far Disc, Lime Record, Lime Disk
-  2261: <blue>Mall Disc, Blue Record, Blue Disk
-  2262: <darkpurple>Mellohi Disc, Purple Record, Purple Disk, pRecord, pDisk
+  2261: <darkpurple>Mall Disc, Purple Record, Purple Disk
+  2262: <purple>Mellohi Disc, Violet Record, Violet Disk
   2263: <black>Stal Disc, Black Record, Black Disk
   2264: <white>Strad Disc, White Record, White Disk
   2265: <green>Ward Disc
   2266: <black>11 Disc, Broken Record, Broken Disk
+  2267: <blue>Wait Disc, Blue Record, Blue Disk
 Potions: 
   Extra-Time: Extended <name>
   Splash-Potion: Splash Potion
@@ -456,7 +455,7 @@ Potions:
   3: Potion of Fire Resistance
   4: Potion of Poison
   5: Potion of Healing
-  6: Clear Potion
+  6: Potion of Night Vision
   7: Clear Potion
   8: Potion of Weakness
   9: Potion of Strength
@@ -464,7 +463,7 @@ Potions:
   11: Diffuse Potion
   12: Potion of Harming
   13: Artless Potion
-  14: Thin Potion
+  14: Potion of Invisibility
   15: Thin Potion
   # tier 1.5 ..
   16: Awkward Potion
@@ -473,7 +472,7 @@ Potions:
   19: Potion of Fire Resistance
   20: Potion of Poison
   21: Potion of Healing
-  22: Bungling Potion
+  22: Potion of Night Vision
   23: Bungling Potion
   24: Potion of Weakness
   25: Potion of Strength
@@ -481,7 +480,7 @@ Potions:
   27: Smooth Potion
   28: Potion of Harming
   29: Suave Potion
-  30: Debonair Potion
+  30: Potion of Invisibility
   31: Debonair Potion
   # tier 2 names
   32: Thick Potion
@@ -490,7 +489,7 @@ Potions:
   35: Potion of Fire Resistance
   36: Potion of Poison II
   37: Potion of Healing II
-  38: Charming Potion
+  38: Potion of Night Vision II
   39: Charming Potion
   40: Potion of Weakness
   41: Potion of Strength II
@@ -498,7 +497,7 @@ Potions:
   43: Refined Potion
   44: Potion of Harming II
   45: Cordial Potion
-  46: Sparkling Potion
+  46: Potion of Invisibility II
   47: Sparkling Potion
   # tier 2.5..
   48: Potent Potion
@@ -507,7 +506,7 @@ Potions:
   51: Potion of Fire Resistance
   52: Potion of Poison II
   53: Potion of Healing II
-  54: Rank Potion
+  54: Potion of Night Vision II
   55: Rank Potion
   56: Potion of Weakness
   57: Potion of Strength II
@@ -515,7 +514,7 @@ Potions:
   59: Acrid Potion
   60: Potion of Harming II
   61: Gross Potion
-  62: Stinky Potion
+  62: Potion of Invisibility II
   63: Stinky Potion
 # possible future use?
 Entities:

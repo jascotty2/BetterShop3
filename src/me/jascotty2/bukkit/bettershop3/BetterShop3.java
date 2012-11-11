@@ -19,15 +19,10 @@
 package me.jascotty2.bukkit.bettershop3;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import me.jascotty2.bukkit.bettershop3.commands.*;
 import me.jascotty2.bukkit.bettershop3.database.*;
 import me.jascotty2.bukkit.bettershop3.enums.PricelistType;
-import me.jascotty2.libv2.bukkit.util.MinecraftChatStr;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -46,7 +41,7 @@ public class BetterShop3 extends JavaPlugin {
 	public final SellCommands com_sell = new SellCommands(this);
 	public final BuyCommands com_buy = new BuyCommands(this);
 	public final PriceCheckCommands com_price = new PriceCheckCommands(this);
-
+	
 	@Override
 	public void onEnable() {
 		// housekeeping
@@ -54,6 +49,7 @@ public class BetterShop3 extends JavaPlugin {
 		// settings
 		config.load();
 		messages.load(config.locale, itemDB);
+		config.updateSortIDs(itemDB);
 		// initialize handlers
 		economy.enable();
 		permissions.enable();
@@ -68,7 +64,7 @@ public class BetterShop3 extends JavaPlugin {
 		}
 		if (config.pricelist_type == PricelistType.CSV) {
 			pricelist = new CSV_Database(this);
-		} else if(config.pricelist_type == PricelistType.YAML) {
+		} else if (config.pricelist_type == PricelistType.YAML) {
 			pricelist = new YAML_Database(this);
 		}
 		pricelist.load();
@@ -88,28 +84,6 @@ public class BetterShop3 extends JavaPlugin {
 			// Failed to submit the stats :-(
 		}
 		
-		System.out.println("testing alignment:");
-//		String test1 = "<r.>1. number <l> 2.value ";
-//		String test2 = "[<item>] <l> Buy: <buyprice>  Sell: <sellprice>";
-		String test1 = "<left>1. number <right> 2.value ";
-		String test2 = "<left[<item>] <right> Buy: <buyprice>  Sell: <sellprice>";
-//		List<String> strs = MinecraftChatStr.alignTags(Arrays.asList(test1, test2), false);
-		List<String> strs2 = MinecraftChatStr.alignTags(Arrays.asList(test1, test2));
-//		System.out.println(MinecraftChatStr.alignTags(test1, false));
-//		System.out.println(strs.get(0));
-		System.out.println(strs2.get(0));
-//		System.out.println(MinecraftChatStr.alignTags(test2, false));
-//		System.out.println(strs.get(1));
-		System.out.println(strs2.get(1));
-
-		messages.SendMessage(null, Messages.SHOP_LIST.HEADER, 1, 1);
-		ArrayList<Object[]> paramList = new ArrayList<Object[]>();
-		paramList.add(new Object[]{"Stone", 2, 1, "Dollar", "2 Dollars", "1 Dollar", 300});
-		paramList.add(new Object[]{"Grass", 3, 4, "Dollar", "3 Dollars", "4 Dollars", 400});
-		paramList.add(new Object[]{"CobbleStone", 4, 5, "Dollar", "4 Dollars", "5 Dollars", 500});
-		paramList.add(new Object[]{"Oak Wood", 5, 6, "Dollar", " 5 Dollars", "6 Dollars", -1});
-		messages.SendMessages(null, Messages.SHOP_LIST.LISTING, paramList);
-		messages.SendMessage(null, Messages.SHOP_LIST.FOOTER);
 	}
 
 	private void setCommand(String command, CommandExecutor exec) {
@@ -125,6 +99,9 @@ public class BetterShop3 extends JavaPlugin {
 	public void onDisable() {
 		economy.flushSave();
 		pricelist.flushSave();
+		if (pricelist instanceof MySQL_Database) {
+			((MySQL_Database) pricelist).disconnect();
+		}
 	}
 
 	public PricelistDatabaseHandler getPricelist() {

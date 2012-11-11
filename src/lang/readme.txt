@@ -31,6 +31,7 @@ also, colors can use shorthand '&' tags or full tags as such:
 	<reset>			<r>		&r	(reset all formatting)
 	<newline>		<br>	&\	(begin a new line of text)
 	<endcolor>		</>		&/	(end tag - returns to last used format or color (can be nested))
+    <rainbow>       &^      &z  (special option - each letter in the text will be a different bright text color (randomizes for each use))
 	&& is used if you want an '&' symbol, and don't want it to turn the next character into a color code
 ========= Extended Node Tags: =========
 

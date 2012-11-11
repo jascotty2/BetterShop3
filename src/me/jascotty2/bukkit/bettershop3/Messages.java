@@ -242,10 +242,10 @@ public class Messages {
 			}
 		}
 	}
-	final static Character shortColors[] = new Character[]{'B', 'N', 'G', 'Q', 'R', 'P', 'U', 'd', 'D', 'b', 'g', 'q', 'r', 'p', 'y', 'w', '~', 'r'};
-	final static Character colors[] = new Character[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'k', 'r'};
+	final static Character shortColors[] = new Character[]{'B', 'N', 'G', 'Q', 'R', 'P', 'U', 'd', 'D', 'b', 'g', 'q', 'r', 'p', 'y', 'w', '~', 'r', '^'};
+	final static Character colors[] = new Character[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'k', 'r', 'z'};
 	final static String colorTags[] = new String[]{"<black>", "<darkblue>", "<darkgreen>", "<darkaqua>", "<darkred>", "<darkpurple>",
-		"<gold>", "<gray>", "<darkgray>", "<blue>", "<green>", "<aqua>", "<red>", "<lightpurple>", "<yellow>", "<white>", "<magic>", "<reset>"};
+		"<gold>", "<gray>", "<darkgray>", "<blue>", "<green>", "<aqua>", "<red>", "<lightpurple>", "<yellow>", "<white>", "<magic>", "<reset>", "<rainbow>"};
 
 	protected static String convertColorChars(String str) {
 		if (str.contains("<")) {
@@ -388,12 +388,12 @@ public class Messages {
 				plugin.getLogger().severe(String.format("Error fomatting message for %s.%s: %s", 
 						message.getClass().getSimpleName(), message.name(), e.getMessage()));
 			}
-			// todo: extra line formatting here
-			// (line wrapping, align, etc)
+			msg = MinecraftChatStr.alignTags(msg, player != null);
 			if (player == null) {
-				plugin.getServer().getConsoleSender().sendMessage(msg);
+				String pre = getMessage(COMMANDS.PREFIX);
+				plugin.getServer().getConsoleSender().sendMessage(MinecraftChatStr.formatRainbow(msg.substring(pre == null ? 0 : pre.length())));
 			} else {
-				player.sendMessage(msg);
+				player.sendMessage(MinecraftChatStr.formatRainbow(msg));
 			}
 		} else if (msg == null) {
 			plugin.getLogger().warning(String.format("Message type '%s.%s' not found", 
@@ -417,13 +417,12 @@ public class Messages {
 						message.getDeclaringClass().getSimpleName(), message.getClass().getSimpleName(), e.getMessage()));
 				lines.add(msg);
 			}
-			// todo: extra line formatting here
-			lines = MinecraftChatStr.alignTags(lines);
+			lines = MinecraftChatStr.alignTags(lines, player != null);
 			for (String line : lines) {
 				if (player == null) {
-					plugin.getServer().getConsoleSender().sendMessage(line);
+					plugin.getServer().getConsoleSender().sendMessage(MinecraftChatStr.formatRainbow(line));
 				} else {
-					player.sendMessage(line);
+					player.sendMessage(MinecraftChatStr.formatRainbow(line));
 				}
 			}
 		} else {

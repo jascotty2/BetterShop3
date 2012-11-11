@@ -18,8 +18,8 @@
 package me.jascotty2.libv2.bukkit.util;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Pattern;
 import me.jascotty2.libv2.util.ArrayManip;
 import me.jascotty2.libv2.util.Rand;
 import me.jascotty2.libv2.util.Str;
@@ -27,7 +27,7 @@ import org.bukkit.ChatColor;
 
 public class MinecraftChatStr {
 
-	public final static int MC_CHAT_WIDTH = 325;
+	public final static int MC_CHAT_WIDTH = 325, CONSOLE_WIDTH = 70;
 	public final static String MC_CHAT_WIDTH_CHARS =
 			" !\"#$%&'()*+,-./"
 			+ "0123456789:;<=>?"
@@ -56,7 +56,7 @@ public class MinecraftChatStr {
 		7, 7, 7, 7, 9, 6, 7, 8, 7, 6, 6, 9, 7, 6, 7, 1};
 	// chat limmitation: repetitions of characters is limmited to 119 per line
 	//      so: repeating !'s will not fill a line
-	public static final ChatColor[] RainbowColors = new ChatColor[]{
+	public static final ChatColor[] AllRainbowColors = new ChatColor[]{
 		ChatColor.RED, ChatColor.DARK_RED, ChatColor.GOLD, ChatColor.YELLOW,
 		ChatColor.GREEN, ChatColor.DARK_GREEN, ChatColor.AQUA, ChatColor.DARK_AQUA,
 		ChatColor.BLUE, ChatColor.DARK_BLUE, ChatColor.DARK_PURPLE, ChatColor.LIGHT_PURPLE};
@@ -64,7 +64,10 @@ public class MinecraftChatStr {
 		ChatColor.RED, ChatColor.YELLOW,
 		ChatColor.GREEN, ChatColor.AQUA,
 		ChatColor.BLUE, ChatColor.LIGHT_PURPLE};
-
+	public static String CHATCOLOR_RAINBOW = new String(new char[]{ChatColor.COLOR_CHAR, 'z'});
+	// adding rainbow custom char to ChatColor.STRIP_COLOR_PATTERN
+    private static final Pattern STRIP_COLOR_PATTERN = Pattern.compile("(?i)" + String.valueOf(ChatColor.COLOR_CHAR) + "[0-9A-FK-ORZ]");
+	
 	public static int getStringWidth(String s) {
 		int len = 0;
 		if (s != null) {
@@ -90,6 +93,17 @@ public class MinecraftChatStr {
 		}
 		return defaultReturn;
 	}
+	
+	
+    /**
+     * Strips the given message of all color codes
+     *
+     * @param input String to strip of color
+     * @return A copy of the input string, without any coloring
+     */
+    public static String stripColor(final String input) {
+        return input == null ? null : STRIP_COLOR_PATTERN.matcher(input).replaceAll("");
+    }
 
 	public static String trim(String str, int length) {
 		if (ChatColor.stripColor(str).length() > length) {
@@ -140,7 +154,7 @@ public class MinecraftChatStr {
 	}
 
 	public static String rainbow(String str) {
-		return rainbow(str, null, false, true, RainbowColors);
+		return rainbow(str, null, false, true, BrightRainbowColors);
 	}
 
 	public static String rainbow(String str, ChatColor... useColors) {
@@ -148,7 +162,7 @@ public class MinecraftChatStr {
 	}
 
 	public static String rainbow(String str, boolean random) {
-		return rainbow(str, null, random, true, RainbowColors);
+		return rainbow(str, null, random, true, BrightRainbowColors);
 	}
 
 	public static String rainbow(String str, boolean random, ChatColor... useColors) {
@@ -196,6 +210,22 @@ public class MinecraftChatStr {
 			ret.append(c);
 		}
 		return ret.toString();
+	}
+
+	public static String formatRainbow(String str) {
+		return formatRainbow(str, true);
+	}
+
+	public static String formatRainbow(String str, boolean random) {
+		if (str.contains(CHATCOLOR_RAINBOW)) {
+			int st = str.indexOf(CHATCOLOR_RAINBOW),
+					en = str.indexOf(ChatColor.COLOR_CHAR, st + 1);
+			if (en == -1) {
+				en = str.length();
+			}
+			str = str.substring(0, st) + rainbow(str.substring(st + 2, en), null, random, false, BrightRainbowColors) + str.substring(en);
+		}
+		return str;
 	}
 
 	/**
@@ -494,155 +524,281 @@ public class MinecraftChatStr {
 		return ret;
 	}
 
-	private static boolean containsAlignTag(String str, String tag) {
-		int pos = str.indexOf("<" + tag);
-		if (pos >= 0) {
-			return str.length() > pos + ("<" + tag).length()
-					&& (str.charAt(pos + ("<" + tag).length()) == '>'
-					|| str.charAt(pos + ("<" + tag).length() + 1) == '>');
-		}
-		return false;
-	}
-
-	private static boolean containsAlignTag(List<String> input, String tag) {
-		for (String l : input) {
-			if (containsAlignTag(l, tag)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * UNTESTED: DON'T USE YET
-	 */
-	public static String alignTags(String input, boolean minecraftChatFormat) {
-		for (String fm : new String[]{"l", "r", "c"}) {
-			while (containsAlignTag(input, fm)) {
-				char repl = ' ';
-				if (input.matches("^.*<" + fm + ".>.*$")) {
-					repl = input.substring(input.indexOf("<" + fm) + 2).charAt(0);
-					input = input.replaceFirst("<" + fm + ".>", "<" + fm + ">");
-				}
-
-				if (fm.equals("l")) {
-					if (minecraftChatFormat) {
-						input = padRight(input.substring(0, input.indexOf("<" + fm + ">")), input.indexOf("<" + fm + ">"), repl) + input.substring(input.indexOf("<" + fm + ">") + 3);
-					} else {
-						input = Str.padRight(input.substring(0, input.indexOf("<" + fm + ">")), input.indexOf("<" + fm + ">"), repl) + input.substring(input.indexOf("<" + fm + ">") + 3);
-					}
-				} else if (fm.equals("c")) {
-					if (minecraftChatFormat) {
-						input = padCenter(input.substring(0, input.indexOf("<" + fm + ">")), input.indexOf("<" + fm + ">"), repl) + input.substring(input.indexOf("<" + fm + ">") + 3);
-					} else {
-						input = Str.padCenter(input.substring(0, input.indexOf("<" + fm + ">")), input.indexOf("<" + fm + ">"), repl) + input.substring(input.indexOf("<" + fm + ">") + 3);
-					}
-				} else {
-					if (minecraftChatFormat) {
-						input = padLeft(input.substring(0, input.indexOf("<" + fm + ">")), input.indexOf("<" + fm + ">"), repl) + input.substring(input.indexOf("<" + fm + ">") + 3);
-					} else {
-						input = Str.padLeft(input.substring(0, input.indexOf("<" + fm + ">")), input.indexOf("<" + fm + ">"), repl) + input.substring(input.indexOf("<" + fm + ">") + 3);
-					}
-				}
-			}
-		}
-		return input;
-	}
-
-	public static List<String> alignTags(List<String> input, boolean minecraftChatFormat) {
-		if (input == null || input.isEmpty()) {
-			return input;
-		}
-		char[] repl = new char[input.size()];
-		for (String fm : new String[]{"l", "r", "c"}) {
-			while (containsAlignTag(input, fm)) {
-				for (int i = 0; i < input.size(); ++i) {
-					if (input.get(i).matches("^.*<" + fm + ".>.*$")) {// || input.get(1).matches("^.*<r.>.*$")) {
-						repl[i] = input.get(i).substring(input.get(i).indexOf("<" + fm) + 2).charAt(0); //, input.get(1).indexOf(">")
-						input.set(i, input.get(i).replaceFirst("<" + fm + ".>", "<" + fm + ">"));
-					} else {
-						repl[i] = ' ';
-					}
-				}
-				int maxPos = 0;
-				for (int i = 0; i < input.size(); ++i) {
-					if (input.get(i).indexOf("<" + fm + ">") > maxPos) {
-						maxPos = input.get(i).indexOf("<" + fm + ">");
-					}
-				}
-
-				LinkedList<String> newinput = new LinkedList<String>();
-				for (int i = 0; i < input.size(); ++i) {
-					String line = input.get(i);
-
-					if (line.indexOf("<" + fm + ">") != -1) {
-						if (fm.equals("l")) {
-							if (minecraftChatFormat) {
-								newinput.add(MinecraftChatStr.padRight(line.substring(0, line.indexOf("<" + fm + ">")), maxPos, repl[i]) + line.substring(line.indexOf("<" + fm + ">") + 3));
-							} else {
-								newinput.add(Str.padRight(line.substring(0, line.indexOf("<" + fm + ">")), maxPos, repl[i]) + line.substring(line.indexOf("<" + fm + ">") + 3));
-							}
-						} else if (fm.equals("c")) {
-							if (minecraftChatFormat) {
-								newinput.add(MinecraftChatStr.padCenter(line.substring(0, line.indexOf("<" + fm + ">")), maxPos, repl[i]) + line.substring(line.indexOf("<" + fm + ">") + 3));
-							} else {
-								newinput.add(Str.padCenter(line.substring(0, line.indexOf("<" + fm + ">")), maxPos, repl[i]) + line.substring(line.indexOf("<" + fm + ">") + 3));
-							}
-						} else {
-							if (minecraftChatFormat) {
-								newinput.add(MinecraftChatStr.padLeft(line.substring(0, line.indexOf("<" + fm + ">")), maxPos, repl[i]) + line.substring(line.indexOf("<" + fm + ">") + 3));
-							} else {
-								newinput.add(Str.padLeft(line.substring(0, line.indexOf("<" + fm + ">")), maxPos, repl[i]) + line.substring(line.indexOf("<" + fm + ">") + 3));
-							}
-						}
-					} else {
-						newinput.add(line);
-					}
-				}
-				input = newinput;
-			}
-		}
-		return input;
-	}
+//	private static boolean containsAlignTag(String str, String tag) {
+//		int pos = str.indexOf("<" + tag);
+//		if (pos >= 0) {
+//			int len = ("<" + tag).length();
+//			return str.length() > pos + len + 1
+//					&& (str.charAt(pos + len) == '>'
+//					|| str.charAt(pos + len + 1) == '>');
+//		}
+//		return false;
+//	}
+//
+//	private static boolean containsAlignTag(List<String> input, String tag) {
+//		for (String l : input) {
+//			if (containsAlignTag(l, tag)) {
+//				return true;
+//			}
+//		}
+//		return false;
+//	}
+//	/**
+//	 * UNTESTED: DON'T USE YET
+//	 */
+//	public static String alignTags(String input, boolean minecraftChatFormat) {
+//		for (String fm : new String[]{"l", "r", "c"}) {
+//			while (containsAlignTag(input, fm)) {
+//				char repl = ' ';
+//				if (input.matches("^.*<" + fm + ".>.*$")) {
+//					repl = input.substring(input.indexOf("<" + fm) + 2).charAt(0);
+//					input = input.replaceFirst("<" + fm + ".>", "<" + fm + ">");
+//				}
+//
+//				if (fm.equals("l")) {
+//					if (minecraftChatFormat) {
+//						input = padRight(input.substring(0, input.indexOf("<" + fm + ">")), input.indexOf("<" + fm + ">"), repl) + input.substring(input.indexOf("<" + fm + ">") + 3);
+//					} else {
+//						input = Str.padRight(input.substring(0, input.indexOf("<" + fm + ">")), input.indexOf("<" + fm + ">"), repl) + input.substring(input.indexOf("<" + fm + ">") + 3);
+//					}
+//				} else if (fm.equals("c")) {
+//					if (minecraftChatFormat) {
+//						input = padCenter(input.substring(0, input.indexOf("<" + fm + ">")), input.indexOf("<" + fm + ">"), repl) + input.substring(input.indexOf("<" + fm + ">") + 3);
+//					} else {
+//						input = Str.padCenter(input.substring(0, input.indexOf("<" + fm + ">")), input.indexOf("<" + fm + ">"), repl) + input.substring(input.indexOf("<" + fm + ">") + 3);
+//					}
+//				} else {
+//					if (minecraftChatFormat) {
+//						input = padLeft(input.substring(0, input.indexOf("<" + fm + ">")), input.indexOf("<" + fm + ">"), repl) + input.substring(input.indexOf("<" + fm + ">") + 3);
+//					} else {
+//						input = Str.padLeft(input.substring(0, input.indexOf("<" + fm + ">")), input.indexOf("<" + fm + ">"), repl) + input.substring(input.indexOf("<" + fm + ">") + 3);
+//					}
+//				}
+//			}
+//		}
+//		return input;
+//	}
+//	public static List<String> alignTags(List<String> input, boolean minecraftChatFormat) {
+//		if (input == null || input.isEmpty()) {
+//			return input;
+//		}
+//		char[] repl = new char[input.size()];
+//		for (String fm : new String[]{"l", "r", "c"}) {
+//			while (containsAlignTag(input, fm)) {
+//				for (int i = 0; i < input.size(); ++i) {
+//					if (input.get(i).matches("^.*<" + fm + ".>.*$")) {// || input.get(1).matches("^.*<r.>.*$")) {
+//						repl[i] = input.get(i).substring(input.get(i).indexOf("<" + fm) + 2).charAt(0); //, input.get(1).indexOf(">")
+//						input.set(i, input.get(i).replaceFirst("<" + fm + ".>", "<" + fm + ">"));
+//					} else {
+//						repl[i] = ' ';
+//					}
+//				}
+//				int maxPos = 0;
+//				for (int i = 0; i < input.size(); ++i) {
+//					if (input.get(i).indexOf("<" + fm + ">") > maxPos) {
+//						maxPos = input.get(i).indexOf("<" + fm + ">");
+//					}
+//				}
+//
+//				LinkedList<String> newinput = new LinkedList<String>();
+//				for (int i = 0; i < input.size(); ++i) {
+//					String line = input.get(i);
+//
+//					if (line.indexOf("<" + fm + ">") != -1) {
+//						if (fm.equals("l")) {
+//							if (minecraftChatFormat) {
+//								newinput.add(MinecraftChatStr.padRight(line.substring(0, line.indexOf("<" + fm + ">")), maxPos, repl[i]) + line.substring(line.indexOf("<" + fm + ">") + 3));
+//							} else {
+//								newinput.add(Str.padRight(line.substring(0, line.indexOf("<" + fm + ">")), maxPos, repl[i]) + line.substring(line.indexOf("<" + fm + ">") + 3));
+//							}
+//						} else if (fm.equals("c")) {
+//							if (minecraftChatFormat) {
+//								newinput.add(MinecraftChatStr.padCenter(line.substring(0, line.indexOf("<" + fm + ">")), maxPos, repl[i]) + line.substring(line.indexOf("<" + fm + ">") + 3));
+//							} else {
+//								newinput.add(Str.padCenter(line.substring(0, line.indexOf("<" + fm + ">")), maxPos, repl[i]) + line.substring(line.indexOf("<" + fm + ">") + 3));
+//							}
+//						} else {
+//							if (minecraftChatFormat) {
+//								newinput.add(MinecraftChatStr.padLeft(line.substring(0, line.indexOf("<" + fm + ">")), maxPos, repl[i]) + line.substring(line.indexOf("<" + fm + ">") + 3));
+//							} else {
+//								newinput.add(Str.padLeft(line.substring(0, line.indexOf("<" + fm + ">")), maxPos, repl[i]) + line.substring(line.indexOf("<" + fm + ">") + 3));
+//							}
+//						}
+//					} else {
+//						newinput.add(line);
+//					}
+//				}
+//				input = newinput;
+//			}
+//		}
+//		return input;
+//	}
 	private final static String[] tagStrings = new String[]{"<left>", "<right>", "<center>"};
 	private final static SECTION_ALIGN[] tagAlignments = new SECTION_ALIGN[]{
 		SECTION_ALIGN.LEFT, SECTION_ALIGN.RIGHT, SECTION_ALIGN.CENTER};
 
-	public static List<String> alignTags(List<String> input) {
-		if (input != null && !input.isEmpty()) {
-			ArrayList<String> alignedLines = new ArrayList<String>();
+	public static String alignTags(String input, boolean minecraftChatFormat) {
+		return alignTags(input, minecraftChatFormat, null);
+	}
 
+	private static String alignTags(String input, boolean minecraftChatFormat, ArrayList<SECTION_ALIGN> alignmentOrder) {
+		if (input != null && !input.isEmpty()) {
+			if (alignmentOrder == null) {
+				alignmentOrder = getAlignOrder(input);
+			}
+			int sectionLength[] = new int[alignmentOrder.size() + 1];
+			String block[] = new String[alignmentOrder.size() + 1];
+			int i = 0;
+			for (int oi = 0; oi < alignmentOrder.size(); ++oi) {
+				int ti = ArrayManip.indexOf(tagAlignments, alignmentOrder.get(oi));
+				int st = input.indexOf(tagStrings[ti], i);
+				if (st == -1) {
+					System.out.println("error for " + oi + " from " + i + ": " + alignmentOrder.get(oi) + " - " + tagStrings[ti]);
+					continue;
+				}
+				block[oi] = i == st ? "" : input.substring(i, st);
+				int len = minecraftChatFormat ? getStringWidth(block[oi]) : stripColor(block[oi]).length();//st - i;
+				if (len > sectionLength[oi]) {
+					sectionLength[oi] = len; // st - i;
+				}
+				i = st + tagStrings[ti].length();
+			}
+			block[alignmentOrder.size()] = input.substring(i, input.length());
+			int len = minecraftChatFormat ? getStringWidth(block[alignmentOrder.size()]) : stripColor(block[alignmentOrder.size()]).length();//line.length() - i;
+			if (len > sectionLength[alignmentOrder.size()]) {
+				sectionLength[alignmentOrder.size()] = len;// line.length() - i;
+			}
+
+			int totalWidth = (int) ArrayManip.sum(sectionLength);
+			//System.out.println("block lengths: " + Str.concatStr(sectionLength, ", ") + " total " + totalWidth);
+			if (totalWidth < (minecraftChatFormat ? MC_CHAT_WIDTH : CONSOLE_WIDTH)) {
+				int free = ((minecraftChatFormat ? MC_CHAT_WIDTH : CONSOLE_WIDTH) - totalWidth) / sectionLength.length;
+				for (int oi = 0; oi < sectionLength.length; ++oi) {
+					sectionLength[oi] += free;
+				}
+			}
+			String line = "";
+			line += minecraftChatFormat ? padRight(block[0], ' ', sectionLength[0]) : 
+					Str.padRight(block[0], sectionLength[0] + (block[0].length() - stripColor(block[0]).length()), ' ');
+			for (i = 1; i < block.length; ++i) {
+				switch (alignmentOrder.get(i - 1)) {
+					case LEFT:
+						line += minecraftChatFormat ? padRight(block[i], ' ', sectionLength[i])
+								: Str.padRight(block[i], sectionLength[i] + (block[i].length() - stripColor(block[i]).length()), ' ');
+						break;
+					case RIGHT:
+						line += minecraftChatFormat ? padLeft(block[i], ' ', sectionLength[i])
+								: Str.padLeft(block[i], sectionLength[i] + (block[i].length() - stripColor(block[i]).length()), ' ');
+						break;
+					case CENTER:
+						line += minecraftChatFormat ? padCenter(block[i], ' ', sectionLength[i])
+								: Str.padCenter(block[i], sectionLength[i] + (block[i].length() - stripColor(block[i]).length()), ' ');
+				}
+			}
+			return line;
+		}
+		return input;
+	}
+	
+	public static List<String> alignTags(List<String> input, boolean minecraftChatFormat) {
+		if (input != null && !input.isEmpty()) {
+			// return value
+			ArrayList<String> alignedLines = new ArrayList<String>();
+			ArrayList<SECTION_ALIGN> alignmentOrder = getAlignOrder(input.get(0));
 			// first check if all of the strings contain the same align tags
 			//	- if not, each string is independent
-			if (input.size() == 1 || !allSameFormat(input)) {
+			if (input.size() == 1 || !allSameFormat(input, alignmentOrder)) {
 				for (int i = 0; i < input.size(); ++i) {
-					alignedLines.add(alignTags(input.get(i), true));
+					alignedLines.add(alignTags(input.get(i), true, input.size() == 1 ? alignmentOrder : null));
 				}
 				return alignedLines;
 			}
-			// all strings are in the same block format
-			SECTION_ALIGN align = SECTION_ALIGN.LEFT;
-			int section_start = 0;
 
+			// all strings are in the same block format
+			int sectionLength[] = new int[alignmentOrder.size() + 1];
+			ArrayList<String[]> lineBlocks = new ArrayList<String[]>();
+			for (String line : input) {
+				String block[] = new String[alignmentOrder.size() + 1];
+				int i = 0;
+				for (int oi = 0; oi < alignmentOrder.size(); ++oi) {
+					int ti = ArrayManip.indexOf(tagAlignments, alignmentOrder.get(oi));
+					int st = line.indexOf(tagStrings[ti], i);
+
+					block[oi] = line.substring(i, st);
+					int len = minecraftChatFormat ? getStringWidth(block[oi]) : stripColor(block[oi]).length();//st - i;
+					if (len > sectionLength[oi]) {
+						sectionLength[oi] = len; // st - i;
+					}
+					i = st + tagStrings[ti].length();
+				}
+				block[alignmentOrder.size()] = line.substring(i, line.length());
+				int len = minecraftChatFormat ? getStringWidth(block[alignmentOrder.size()]) : stripColor(block[alignmentOrder.size()]).length();//line.length() - i;
+				if (len > sectionLength[alignmentOrder.size()]) {
+					sectionLength[alignmentOrder.size()] = len;// line.length() - i;
+				}
+				lineBlocks.add(block);
+			}
+			int totalWidth = (int) ArrayManip.sum(sectionLength);
+			//System.out.println("block lengths: " + Str.concatStr(sectionLength, ", ") + " total " + totalWidth);
+			if (totalWidth < (minecraftChatFormat ? MC_CHAT_WIDTH : CONSOLE_WIDTH)) {
+				int free = ((minecraftChatFormat ? MC_CHAT_WIDTH : CONSOLE_WIDTH) - totalWidth) / sectionLength.length;
+				for (int oi = 0; oi < sectionLength.length; ++oi) {
+					sectionLength[oi] += free;
+				}
+			}
+			//totalWidth = (int) ArrayManip.sum(sectionLength);
+			//System.out.println("adj. block lengths: " + Str.concatStr(sectionLength, ", ") + " total " + totalWidth);
+			//System.out.println("block aligns: " + Str.concatStr(alignmentOrder, ", "));
+			//System.out.println("blocks[0]: " + Str.concatStr(lineBlocks.get(0), ", "));
+			for (String[] block : lineBlocks) {
+				String line = "";
+				line += minecraftChatFormat ? padRight(block[0], ' ', sectionLength[0]) : 
+						Str.padRight(block[0], sectionLength[0] + (block[0].length() - stripColor(block[0]).length()), ' ');
+				for (int i = 1; i < block.length; ++i) {
+					switch (alignmentOrder.get(i - 1)) {
+						case LEFT:
+							line += minecraftChatFormat ? padRight(block[i], ' ', sectionLength[i])
+									: Str.padRight(block[i], sectionLength[i] + (block[i].length() - stripColor(block[i]).length()), ' ');
+							break;
+						case RIGHT:
+							line += minecraftChatFormat ? padLeft(block[i], ' ', sectionLength[i])
+									: Str.padLeft(block[i], sectionLength[i] + (block[i].length() - stripColor(block[i]).length()), ' ');
+							break;
+						case CENTER:
+							line += minecraftChatFormat ? padCenter(block[i], ' ', sectionLength[i])
+									: Str.padCenter(block[i], sectionLength[i] + (block[i].length() - stripColor(block[i]).length()), ' ');
+					}
+				}
+				alignedLines.add(line);
+			}
+			return alignedLines;
 		}
 		return input;
 	}
 
-	private static boolean allSameFormat(List<String> input) {
+	private static ArrayList<SECTION_ALIGN> getAlignOrder(String line) {
 		ArrayList<SECTION_ALIGN> order = new ArrayList<SECTION_ALIGN>();
-		String line = input.get(0);
 		for (int i = 0; i < line.length(); ++i) {
 			for (int j = 0; j < tagStrings.length; ++j) {
 				if (strStart(line, i, tagStrings[j])) {
 					order.add(tagAlignments[j]);
 					i += tagStrings[j].length();
 					break;
-				}
+				} // else if (i == 0) { order.add(SECTION_ALIGN.LEFT); }
 			}
 		}
+		return order;
+	}
+
+	private static boolean allSameFormat(List<String> input, ArrayList<SECTION_ALIGN> order) {
+		int n = 0;
+		if (order == null) {
+			order = getAlignOrder(input.get(0));
+			++n;
+		}
 		// now check that remainder follow this order
-		for (int n = 1; n < input.size(); ++n) {
-			line = input.get(n);
+		for (; n < input.size(); ++n) {
+			String line = input.get(n);
 			int formatNum = 0;
 			for (int i = 0; i < line.length(); ++i) {
 				for (int j = 0; j < tagStrings.length; ++j) {
@@ -654,7 +810,7 @@ public class MinecraftChatStr {
 						++formatNum;
 						i += tagStrings[j].length();
 						break;
-					}
+					} // else if (i == 0) { ++formatNum; }
 				}
 			}
 			if (formatNum < order.size()) {
