@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import me.jascotty2.bukkit.bettershop3.BetterShop3;
 import me.jascotty2.bukkit.bettershop3.FileManager;
+import me.jascotty2.bukkit.bettershop3.ItemValue;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -55,20 +56,22 @@ public class YAML_Database extends PricelistDatabaseHandler {
 		for (Map.Entry<String, Object> val : db.getValues(false).entrySet()) {
 			if (val.getValue() instanceof MemorySection) {
 				MemorySection m = (MemorySection) val.getValue();
-				HashMap<Integer, ItemPrice> pricelist = new HashMap<Integer, ItemPrice>();
+				HashMap<ItemValue, ItemPrice> pricelist = new HashMap<ItemValue, ItemPrice>();
 				String itemN, itemN_s;
-				for (int item : plugin.itemDB.getFullIdList()) {
-					itemN = itemN_s = String.valueOf(item >> DATA_BYTE_LEN);
-					itemN_s += "-" + String.valueOf(item & DATA_BYTES);
-					if ((item & DATA_BYTES) == 0 && (m.contains(itemN + "_buy") || m.contains(itemN + "_sell"))) {
-						ItemPrice p = new ItemPrice();
+				for (ItemValue item : plugin.itemDB.getFullIdList()) {
+					itemN = itemN_s = String.valueOf(item.id);
+					itemN_s += "-" + String.valueOf(item.data);
+					if ((item.data) == 0 && (m.contains(itemN + "_buy") || m.contains(itemN + "_sell"))) {
+						ItemPrice p = new ItemPrice(item);
 						p.buyPrice = m.getDouble(itemN + "_buy", -1);
 						p.sellPrice = m.getDouble(itemN + "_sell", -1);
+						p.stockAmount = m.getLong(itemN + "_stock", -1);
 						pricelist.put(item, p);
 					} else if (m.contains(itemN_s + "_buy") || m.contains(itemN_s + "_sell")) {
-						ItemPrice p = new ItemPrice();
+						ItemPrice p = new ItemPrice(item);
 						p.buyPrice = m.getDouble(itemN_s + "_buy", -1);
 						p.sellPrice = m.getDouble(itemN_s + "_sell", -1);
+						p.stockAmount = m.getLong(itemN_s + "_stock", -1);
 						pricelist.put(item, p);
 					}
 				}
@@ -80,7 +83,7 @@ public class YAML_Database extends PricelistDatabaseHandler {
 	@Override
 	protected void fullReload() {
 		try {
-			for (Map.Entry<String, Map<Integer, ItemPrice>> e : prices.entrySet()) {
+			for (Map.Entry<String, Map<ItemValue, ItemPrice>> e : prices.entrySet()) {
 				e.getValue().clear();
 			}
 			prices.clear();
@@ -103,23 +106,26 @@ public class YAML_Database extends PricelistDatabaseHandler {
 				if (section instanceof MemorySection) {
 					MemorySection m = (MemorySection) section;
 					if (!prices.containsKey(shop)) {
-						prices.put(shop, new HashMap<Integer, ItemPrice>());
+						prices.put(shop, new HashMap<ItemValue, ItemPrice>());
 					}
 					String itemN, itemN_s;
 					itemN = itemN_s = String.valueOf(id);
 					itemN_s += "-" + String.valueOf(data);
-					ItemPrice p = prices.get(shop).get(id << DATA_BYTE_LEN + data);
+					ItemValue idv = new ItemValue(id, data);
+					ItemPrice p = prices.get(shop).get(idv);
 					if (p == null) {
-						p = new ItemPrice();
+						p = new ItemPrice(id, (short) data);
 					}
 					if (data == 0 && (m.contains(itemN + "_buy") || m.contains(itemN + "_sell"))) {
 						p.buyPrice = m.getDouble(itemN + "_buy", -1);
 						p.sellPrice = m.getDouble(itemN + "_sell", -1);
+						p.stockAmount = m.getLong(itemN + "_stock", -1);
 					} else if (m.contains(itemN_s + "_buy") || m.contains(itemN_s + "_sell")) {
 						p.buyPrice = m.getDouble(itemN_s + "_buy", -1);
 						p.sellPrice = m.getDouble(itemN_s + "_sell", -1);
+						p.stockAmount = m.getLong(itemN_s + "_stock", -1);
 					}
-					prices.get(shop).put(id << DATA_BYTE_LEN + data, p);
+					prices.get(shop).put(idv, p);
 				}
 			} catch (Exception e) {
 				plugin.getLogger().log(Level.SEVERE, "Failed to reload the pricelist config", e);
@@ -140,12 +146,12 @@ public class YAML_Database extends PricelistDatabaseHandler {
 			for(String s : db.getKeys(false)) {
 				db.set(s, null);
 			}
-			for (Map.Entry<String, Map<Integer, ItemPrice>> e : prices.entrySet()) {
+			for (Map.Entry<String, Map<ItemValue, ItemPrice>> e : prices.entrySet()) {
 				String shop = safeShopName(e.getKey());
-				for (Map.Entry<Integer, ItemPrice> p : e.getValue().entrySet()) {
-					String itemN = String.valueOf(p.getKey() >> DATA_BYTE_LEN);
-					if ((p.getKey() & DATA_BYTES) != 0) {
-						itemN += String.valueOf(p.getKey() & DATA_BYTES);
+				for (Map.Entry<ItemValue, ItemPrice> p : e.getValue().entrySet()) {
+					String itemN = String.valueOf(p.getKey().id);
+					if (p.getKey().data != 0) {
+						itemN += "-" + String.valueOf(p.getKey().data);
 					}
 					if (p.getValue().buyPrice >= 0) {
 						db.set(shop + "." + itemN + "_buy", p.getValue().buyPrice);
@@ -156,6 +162,11 @@ public class YAML_Database extends PricelistDatabaseHandler {
 						db.set(shop + "." + itemN + "_sell", p.getValue().sellPrice);
 					} else if (db.contains(e.getKey() + "." + itemN + "_sell")) {
 						db.set(shop + "." + itemN + "_sell", -1);
+					}
+					if (p.getValue().stockAmount >= 0) {
+						db.set(shop + "." + itemN + "_stock", p.getValue().stockAmount);
+					} else if (db.contains(e.getKey() + "." + itemN + "_stock")) {
+						db.set(shop + "." + itemN + "_stock", -1);
 					}
 				}
 			}

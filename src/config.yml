@@ -17,12 +17,14 @@ Shop:
   #  - Chainmail Chestplate
   #  - Chainmail Leggings
   #  - Chainmail Boots
-  Custom Sort:
+  Custom Sort: 12, 13, food, 1, web
+  # if categories (not listed in cusomsort) should be sorted first (after customsort items)
+  Sort Categories First: false
  
 Database:
   # valid types:
   # MySQL, CSV, YAML
-  Type: MySQL
+  Type: CSV
   SQL_Username: "root"
   SQL_Password: "root"
   SQL_Database: "minecraft"
@@ -32,20 +34,77 @@ Database:
 
 Economy:
   Bank Name: 
-  # these values are used for formatting if there is no ecomony plugin installed
+  # if there is no ecomony plugin installed:
+  Internal Start Amount: 50
+  Internal Uses Decimal: true
+  # formatting (if no ecomony plugin)
   Currency: "Dollar"
   Currency Plural: "Dollars"
   Currency Minor: "Cent"
   Currency Minor Plural: "Cents"
 
+Stock:
+  Enabled: false
+  # restock interval: automatic (on stock check, not timer), and stock will be reset to start value
+  #   positive integer values only, units being m(inutes) h(hours) d(ays) w(eeks) M(onths) (default: h)
+  #   0 == never restock
+  Restock Timeout: 6h
+  # if to lower the amount to starting amount if above
+  Restock Lower: false
+  # max stock to carry (stock is increased with sales)
+  #(cannot exceed  2^63-1, or 9,223,372,036,854,775,807)
+  Max Stock: 500
+  # deny sales if stock is full?
+  #   (if false, additional sales will not increase stock above maxStock)
+  No Overstock: false
+  Start Amount:
+    default: 200
+    # any item can be customized here, using the same key format as in the language file
+    # (eg. 1 for stone, 5-3 for jungle wood)
+    # for potions: 373-(name, 0-63)[s][e]
+    # example: Potion of Healing: 373-5
+    #		Splash Potion of Weakness: 373-8s
+    264: 25
+    265: 75
+    266: 50
+    373-5: 10
+    373-8s: 15
+
 DiscountGroups:
-    # groups are defined using permissions
-    # BetterShop.discount.(NAME)
-    # ex: BetterShop.discount.VIP
-    # note: "BetterShop.discount.none" negates discounts
-    # Discounts are defined in whole-number percentages
-    # note: values greater than 100% are truncated to 100%
-    #		(so that users aren't given money to buy items)
-    # Also, negative values can be used to force users to pay more
-    # (buy & sell prices are changed by the same amount)
-    VIP: 10
+  # groups are defined using permissions
+  # BetterShop.discount.(NAME)
+  # ex: BetterShop.discount.VIP
+  # note: "BetterShop.discount.none" negates discounts
+  # Discounts are defined in whole-number percentages
+  # note: values greater than 100% are truncated to 100%
+  #		(so that users aren't given money to buy items)
+  # Also, negative values can be used to force users to pay more
+  # (buy & sell prices are changed by the same amount)
+  VIP: 10
+
+Spout:
+  # if you have spout, whether to use the spout gui
+  Enabled: true
+   # what key to bring up the display
+  Key: b
+  # if the menu listing should use names for buttons
+  #    (if false, will just be clickable images)
+  Large Menu: true
+  # for the menu listing, if should use whole pages
+  #		(if false, each page scrolls the list over by 1)
+  Use Pages: true
+  # if you want to use categories, how to use them
+  # options:
+  # Tab   : categories use top row of listing on the screen
+  # Cycle : button above the exit button to cycle through categories
+  # None  : no category selection (default)
+  Categories: none
+
+Item Categories:
+  food: apple, goldenapple, bread, pork, cookedpork, rawfish, cookedfish, cake, cookie
+  loot: string, arrow, gunpowder, feather
+  armor: 298, 299, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311, 312, 313, 314, 315, 316, 317
+  tools: 256, 257, 258, 269, 270, 271, 273, 274, 275, 277, 278, 279, 284, 285, 286, 290, 291, 292, 293, 294, 346, 359
+  weapons: 261, 262, 267, 268, 272, 276, 283
+  wool: "35, 35:12, 35:10, 35:2, 35:11, 35:3, 35:9, 35:13, 35:5, 35:4, 35:1, 35:14, 35:6, 35:8, 35:7, 35:15"
+  dye: "351:15, 351:3, 351:5, 351:13, 351:4, 351:12, 351:6, 351:2, 351:11, 351:14, 351:1, 351:9, 351:7, 351:8, 351"

@@ -17,7 +17,6 @@
  */
 package me.jascotty2.libv2.util;
 
-import java.util.Date;
 import java.util.Random;
 
 public class Rand {
@@ -54,7 +53,7 @@ public class Rand {
 		} else if (max < min) {
 			return RandomInt(max, min);
 		} else if (!isRand) {
-			rand.setSeed((new Date()).getTime());
+			rand.setSeed(System.currentTimeMillis());
 			isRand = true;
 		}
 		return min + rand.nextInt(max - min + 1);
@@ -62,7 +61,7 @@ public class Rand {
 	
 	public static double RandomDouble() {
 		if (!isRand) {
-			rand.setSeed((new Date()).getTime());
+			rand.setSeed(System.currentTimeMillis());
 			isRand = true;
 		}
 		return rand.nextDouble();
@@ -70,7 +69,7 @@ public class Rand {
 
 	public static double RandomDouble(double min, double max) {
 		if (!isRand) {
-			rand.setSeed((new Date()).getTime());
+			rand.setSeed(System.currentTimeMillis());
 			isRand = true;
 		}
 		return min + rand.nextDouble() * (max - min);
@@ -78,7 +77,7 @@ public class Rand {
 
 	public static boolean RandomBoolean() {
 		if (!isRand) {
-			rand.setSeed((new Date()).getTime());
+			rand.setSeed(System.currentTimeMillis());
 			isRand = true;
 		}
 		return rand.nextBoolean();
@@ -90,7 +89,7 @@ public class Rand {
 		}else if (chance <= 0) {
 			return false;
 		}else if (!isRand) {
-			rand.setSeed((new Date()).getTime());
+			rand.setSeed(System.currentTimeMillis());
 			isRand = true;
 		}
 		return rand.nextDouble() <= chance;

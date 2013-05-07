@@ -206,7 +206,7 @@ public class CheckInput {
 					// do nothing: is already seconds
 					return ret;
 				} else if (unit == 'm') {
-					// it's annoying that this class doesn't accept a long..
+					// its annoying that this class doesn't accept a long..
 					ret = ret.multiply(new BigInteger("60"));
 				} else if (unit == 'h') {
 					ret = ret.multiply(new BigInteger("3600"));
@@ -225,8 +225,44 @@ public class CheckInput {
 				throw new Exception("Invalid Numerical Value: " + str);
 			}
 		}
-		// will throw it's own exception
+		// will throw its own exception
 		return new BigInteger(str);
+	}
+	public static long GetTimeSpanInSec(String str, char defaultUnit, long onError) throws Exception {
+		try {
+			return GetBigInt_TimeSpanInSec(str, defaultUnit).longValue();
+		} catch(Exception e) {
+			return onError;
+		}
+	}
+	
+	/**
+	 * attempts to extract a number from within a string <br/>
+	 * ex. "$5", "5 Dollars" <br/>
+	 * if there are multiple, will only return the first
+	 * @param input
+	 * @param onError
+	 * @return
+	 */
+	public static int ExtractInteger(String input, int onError) {
+		int numStart = -1, numEnd = input.length() - 1;
+		for (int i = 0; i < input.length(); ++i) {
+			if ((Character.isDigit(input.charAt(i)))) {
+				if (numStart < 0) {
+					numStart = i;
+				}
+			} else if (numStart >= 0) {
+				numEnd = i - 1;
+				break;
+			}
+		}
+		if (numStart > 0 && input.charAt(numStart - 1) == '-') {
+			--numStart;
+		}
+		if (numStart >= 0) {
+			return GetInt(input.substring(numStart, numEnd + 1), onError);
+		}
+		return onError;
 	}
 
 	/**

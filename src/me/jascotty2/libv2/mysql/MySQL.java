@@ -23,7 +23,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import me.jascotty2.libv2.net.InstallDependency;
@@ -31,7 +30,8 @@ import me.jascotty2.libv2.net.InstallDependency;
 public class MySQL {
 
 	// local copy of current connection info
-	protected String sql_username, sql_password, sql_database, sql_hostName = "localhost", sql_portNum = "3306";
+	protected String sql_username, sql_password, sql_database, 
+			sql_hostName = "localhost", sql_portNum = "3306";
 	// DB connection
 	protected Connection DBconnection = null;
 	private static int checkedDep = 0;
@@ -49,23 +49,73 @@ public class MySQL {
 		this.sql_portNum = copy.sql_portNum;
 	}
 
-	public MySQL(String database, String username, String password, String hostName, String portNum) throws Exception {
-		// connect to database (for now, jeaves connection open)
-		connect(database, username, password, hostName, portNum);
+	public MySQL(String database, String username, String password, String hostName, String portNum) {
+		this.sql_database = database;
+		this.sql_username = username;
+		this.sql_password = password;
+		this.sql_hostName = hostName;
+		this.sql_portNum = portNum;
 	}
 
-	public MySQL(String database, String username, String password, String hostName) throws Exception {
-		connect(database, username, password, hostName);
+	public MySQL(String database, String username, String password, String hostName) {
+		this.sql_database = database;
+		this.sql_username = username;
+		this.sql_password = password;
+		this.sql_hostName = hostName;
 	}
 
 	public MySQL(String database, String username, String password) throws Exception {
-		connect(database, username, password);
+		this.sql_database = database;
+		this.sql_username = username;
+		this.sql_password = password;
 	}
 
 	public MySQL(String database, String username) throws Exception {
-		connect(database, username, "");
+		this.sql_database = database;
+		this.sql_username = username;
+		this.sql_password = "";
 	}
 
+	/**
+	 * Checks if mysql-connector-java-bin.jar exists <br />
+	 * If not, will automatically download and save the jar to "lib/"
+	 * @return
+	 */
+	public static boolean checkDependency() {
+		//int checked = 0;
+		if (checkedDep != 0) {
+			return checkedDep > 0;
+		}
+		// file used by iConomy
+		// 4 can try, name shared with iConomy mysql.. i don't check for all possibilities, though)
+		String names[] = new String[]{"lib/mysql.jar",
+			"lib/mysql-connector-java-bin.jar",
+			"lib/mysql-connector-java-5.1.14-bin.jar",
+			"lib/mysql-connector-java-5.1.15-bin.jar"};
+		File f;
+		for (int i = 0; i < names.length; ++i) {
+			f = new File(names[i]);
+			if (f.exists()) {
+				checkedDep = 1;
+				return true;
+			}
+		}
+
+		// file not found: download jar to lib folder
+		if (!InstallDependency.install("lib" + File.separator + "mysql-connector-java-bin.jar",
+				"mysql-connector-java-5.1.15/mysql-connector-java-5.1.15-bin.jar",
+				"http://mirror.services.wisc.edu/mysql/Downloads/Connector-J/mysql-connector-java-5.1.15.zip",
+				"http://mirror.anigaiku.com/Dependencies/mysql-connector-java-bin.jar")) {
+			// failed to download the required lib to use this class
+			checkedDep = -1;
+			return false;
+		}
+		// download successful
+		checkedDep = 1;
+		return true;
+
+	}
+	
 	/**
 	 * Connect to a database
 	 *
@@ -166,46 +216,6 @@ public class MySQL {
 		return false;
 	}
 
-	/**
-	 * Checks if mysql-connector-java-bin.jar exists <br />
-	 * If not, will automatically download and save the jar to "lib/"
-	 * @return
-	 */
-	public static boolean checkDependency() {
-		//int checked = 0;
-		if (checkedDep != 0) {
-			return checkedDep > 0;
-		}
-		// file used by iConomy
-		// 4 can try, name shared with iConomy mysql.. i don't check for all possibilities, though)
-		String names[] = new String[]{"lib/mysql.jar",
-			"lib/mysql-connector-java-bin.jar",
-			"lib/mysql-connector-java-5.1.14-bin.jar",
-			"lib/mysql-connector-java-5.1.15-bin.jar"};
-		File f;
-		for (int i = 0; i < names.length; ++i) {
-			f = new File(names[i]);
-			if (f.exists()) {
-				checkedDep = 1;
-				return true;
-			}
-		}
-		// !f.exists()
-
-		// download jar to lib folder
-		if (!InstallDependency.install("lib" + File.separator + "mysql-connector-java-bin.jar",
-				"mysql-connector-java-5.1.15/mysql-connector-java-5.1.15-bin.jar",
-				"http://mirror.services.wisc.edu/mysql/Downloads/Connector-J/mysql-connector-java-5.1.15.zip",
-				"http://mirror.anigaiku.com/Dependencies/mysql-connector-java-bin.jar")) {
-
-			checkedDep = -1;
-			return false;
-		}
-
-		checkedDep = 1;
-		return true;
-
-	}
 
 	/**
 	 * Connect/Reconnect using current info
@@ -223,25 +233,27 @@ public class MySQL {
 			// connect to database
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
 
-			if (isConnected()) {
-				disconnect();
-			}
-
 			DBconnection = DriverManager.getConnection(
-					String.format("jdbc:mysql://%s:%s/%s?create=true,autoReconnect=true", sql_hostName, sql_portNum, sql_database),
+					String.format("jdbc:mysql://%s:%s/%s?create=true,autoReconnect=true",
+					sql_hostName, sql_portNum, sql_database),
 					sql_username, sql_password);
 
 			// or append "user=%s&password=%s", sql_username, sql_password);
 			// create=true: create database if not already exist
 			// autoReconnect=true: should fix errors that occur if the connection times out
 		} else {
+//			if (isConnected()) {
+//				disconnect();
+//			}
+
 			if (DBconnection.isClosed()) {
 				DBconnection = DriverManager.getConnection(
-						String.format("jdbc:mysql://%s:%s/%s?create=true,autoReconnect=true", sql_hostName, sql_portNum, sql_database),
+						String.format("jdbc:mysql://%s:%s/%s?create=true,autoReconnect=true",
+						sql_hostName, sql_portNum, sql_database),
 						sql_username, sql_password);
 			}
 		}
-		return true;
+		return DBconnection != null && DBconnection.getCatalog() != null; // .getSchema()
 	}
 
 	/**
@@ -256,6 +268,34 @@ public class MySQL {
 			Logger.getLogger(MySQL.class.getName()).log(Level.SEVERE, "Error closing MySQL connection", ex);
 		}
 		DBconnection = null;
+	}
+
+	/**
+	 * check if is currently connected to a server preforms a pre-check, and if
+	 * not & connection info exists, will attempt reconnect
+	 */
+	public boolean isConnected() {
+		return isConnected(true);
+	}
+
+	public boolean isConnected(boolean reconnect) {
+		try {
+			if (reconnect && (DBconnection == null || DBconnection.isClosed())) {
+				try {
+					connect();
+				} catch (Exception ex) {
+					// should not reach here, since is only thrown if creating a new connection
+					// (while connecting to the mysql lib)
+				}
+			}
+			return DBconnection != null && !DBconnection.isClosed() && DBconnection.getCatalog() != null; //.getSchema() != null;
+		} catch (SQLException ex) {
+			Logger.getLogger(MySQL.class.getName()).log(Level.SEVERE, "Error checking MySQL connection status", ex);
+		} catch (AbstractMethodError e) {
+		} catch (Throwable e) {
+		}
+		DBconnection = null;
+		return false;
 	}
 
 	/**
@@ -279,7 +319,7 @@ public class MySQL {
 				return DBconnection.createStatement().executeQuery(qry);
 			} catch (SQLException ex) {
 				// if lost connection & successfully reconnected, try again
-				if (isConnected(false) && isConnected(true)) {
+				if (!isConnected(false) && isConnected(true)) {
 					try {
 						return DBconnection.createStatement().executeQuery(qry);
 					} catch (SQLException ex2) {
@@ -291,6 +331,30 @@ public class MySQL {
 			}
 		} else {
 			return null;
+		}
+	}
+	
+	public int runUpdate(String qry) throws SQLException { //
+		if (isConnected()) {
+			try {
+				if (!qry.trim().endsWith(";")) {
+					qry += ";";
+				}
+				return DBconnection.prepareStatement(qry).executeUpdate();
+			} catch (SQLException ex) {
+				// if lost connection & successfully reconnected, try again
+				if (!isConnected(false) && isConnected(true)) {
+					try {
+						return DBconnection.prepareStatement(qry).executeUpdate();
+					} catch (SQLException ex2) {
+						throw new SQLException("Query Error: " + qry, ex2);
+					}
+				}
+				//disconnect();
+				throw new SQLException("Query Error: " + qry, ex);
+			}
+		} else {
+			return -1;
 		}
 	}
 
@@ -326,83 +390,6 @@ public class MySQL {
 			}
 		} while (++r < row);
 		return res.getObject(field);
-	}
-
-	public int runUpdate(String qry) throws SQLException { //
-		if (isConnected()) {
-			try {
-				if (!qry.trim().endsWith(";")) {
-					qry += ";";
-				}
-				return DBconnection.prepareStatement(qry).executeUpdate();
-			} catch (SQLException ex) {
-				// if lost connection & successfully reconnected, try again
-				if (isConnected(false) && isConnected(true)) {
-					try {
-						return DBconnection.prepareStatement(qry).executeUpdate();
-					} catch (SQLException ex2) {
-						throw new SQLException("Query Error: " + qry, ex2);
-					}
-				}
-				//disconnect();
-				throw new SQLException("Query Error: " + qry, ex);
-			}
-		} else {
-			return -1;
-		}
-	}
-
-	public ResultSet getTable(String tablename) throws SQLException {
-		if (isConnected()) {
-			try {
-				// Statement to use to issue SQL queries
-				//Statement st = DBconnection.createStatement();
-				//ResultSet table = st.executeQuery("SELECT * FROM " + sql_tableName + ";");
-				//PreparedStatement st=
-				//ResultSet table = DBconnection.prepareStatement("SELECT * FROM `" + sql_tableName + "`;").executeQuery();
-				return DBconnection.createStatement().executeQuery("SELECT * FROM `" + tablename + "`;");
-
-			} catch (SQLException ex) {
-				// if lost connection & successfully reconnected, try again
-				if (isConnected(false) && isConnected(true)) {
-					try {
-						return DBconnection.createStatement().executeQuery("SELECT * FROM `" + tablename + "`;");
-					} catch (SQLException ex2) {
-						throw new SQLException("Query Error: " + "SELECT * FROM `" + tablename + "`;", ex2);
-					}
-				}
-				//disconnect();
-				throw new SQLException("Query Error: " + "SELECT * FROM `" + tablename + "`;", ex);
-			}
-		} else {
-			return null;
-		}
-	}
-
-	/**
-	 * check if is currently connected to a server preforms a pre-check, and if
-	 * not & connection info exists, will attempt reconnect
-	 */
-	public boolean isConnected() {
-		return isConnected(true);
-	}
-
-	public boolean isConnected(boolean reconnect) {
-		try {
-			if (DBconnection != null && DBconnection.isClosed()) {
-				try {
-					connect();
-				} catch (Exception ex) {
-					// should not reach here, since is only thrown if creating a new connection
-					// (while connecting to the mysql lib)
-				}
-			}
-			return DBconnection != null && !DBconnection.isClosed();
-		} catch (SQLException ex) {
-			Logger.getLogger(MySQL.class.getName()).log(Level.SEVERE, "Error checking MySQL connection status", ex);
-			DBconnection = null;
-			return false;
-		}
 	}
 
 	/**
@@ -446,16 +433,17 @@ public class MySQL {
 
 	public boolean columnsExist(String tableName, String... columns) throws SQLException {
 		if (isConnected()) {
-			ResultSet t = DBconnection.getMetaData().getColumns(null, null, tableName, null);//.getTables(null, null, tableName, null);//
-			for (; t.next();) {
-				boolean ex = false;
-				for (String c : columns) {
-					if (t.getString(4).equals(c)) {
-						ex = true;
+			String[] tcols = getColumnNames(tableName);
+			// for each column checking, scan if that column name exists
+			for (String c : columns) {
+				boolean exists = false;
+				for(String tc : tcols) {
+					if((tc == null && c == null) || (tc != null && c != null && tc.equalsIgnoreCase(c))) {
+						exists = true;
 						break;
 					}
 				}
-				if (!ex) {
+				if (!exists) {
 					return false;
 				}
 			}
@@ -467,11 +455,18 @@ public class MySQL {
 	public String[] getColumnNames(String tableName) throws SQLException {
 		if (isConnected()) {
 			ResultSet t = DBconnection.getMetaData().getColumns(null, null, tableName, null);//.getTables(null, null, tableName, null);//
-			ArrayList<String> cols = new ArrayList<String>();
-			for (; t.next();) {
-				cols.add(t.getString(4));
+			t.last();
+			String[] cols = new String[t.getRow()];
+			t.beforeFirst();
+			while(t.next()) {
+				cols[t.getRow() - 1] = t.getString(4); // "COLUMN_NAME"
 			}
-			return cols.toArray(new String[0]);
+			return cols;
+//			ArrayList<String> cols = new ArrayList<String>();
+//			for (; t.next();) {
+//				cols.add(t.getString(4));
+//			}
+//			return cols.toArray(new String[0]);
 		}
 		return null;
 	}
@@ -482,7 +477,7 @@ public class MySQL {
 		}
 		return null;
 	}
-	
+
 	public String getUserName() {
 		return sql_username;
 	}

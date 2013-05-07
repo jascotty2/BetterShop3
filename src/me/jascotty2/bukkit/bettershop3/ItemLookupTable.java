@@ -22,9 +22,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import me.jascotty2.bukkit.bettershop3.database.PricelistDatabaseHandler;
 import me.jascotty2.bukkit.bettershop3.enums.ExtendedMaterials;
 import me.jascotty2.libv2.io.CheckInput;
@@ -33,6 +35,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.craftbukkit.v1_5_R3.inventory.CraftFurnaceRecipe;
+import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.inventory.ShapelessRecipe;
 
 public class ItemLookupTable {
 
@@ -48,11 +53,12 @@ public class ItemLookupTable {
 	final static int[] unsafeStack = new int[]{
 		282, 325, 326, 327, 335, 387};
 	// first 15 bits == id, last 16 bits == data
-	final protected HashMap<Integer, ArrayList<String>> itemNames = new HashMap<Integer, ArrayList<String>>();
-	final protected HashMap<Integer, ChatColor> itemColors = new HashMap<Integer, ChatColor>();
-	final protected HashMap<String, Integer> items = new HashMap<String, Integer>();
-	final protected HashMap<Integer, HashMap<String, Integer>> itemSubdata = new HashMap<Integer, HashMap<String, Integer>>();
-	final protected ArrayList<Integer> sortedItemList = new ArrayList<Integer>();
+	final protected HashMap<ItemValue, ArrayList<String>> itemNames = new HashMap<ItemValue, ArrayList<String>>();
+	final protected HashMap<ItemValue, ChatColor> itemColors = new HashMap<ItemValue, ChatColor>();
+	final protected HashMap<String, ItemValue> items = new HashMap<String, ItemValue>();
+	final protected HashMap<Integer, HashMap<String, Short>> itemSubdata = new HashMap<Integer, HashMap<String, Short>>();
+	final protected ArrayList<ItemValue> sortedItemList = new ArrayList<ItemValue>();
+	final protected HashMap<ItemValue, List<CraftRecipe>> recipes = new HashMap<ItemValue, List<CraftRecipe>>();
 	//final protected ArrayList<String>[] potions = new ArrayList[64];
 	final protected static String DEFAULT_WATER_BOTTLE = "Water Bottle"; // 373:0
 	final protected static String DEFAULT_LONG_FORMAT = "Extended %s";
@@ -141,9 +147,13 @@ public class ItemLookupTable {
 		for (ArrayList<String> names : itemNames.values()) {
 			names.clear();
 		}
+		for (List<CraftRecipe> rs : recipes.values()) {
+			rs.clear();
+		}
+		recipes.clear();
 		itemNames.clear();
 		items.clear();
-		for (HashMap<String, Integer> subs : itemSubdata.values()) {
+		for (HashMap<String, Short> subs : itemSubdata.values()) {
 			subs.clear();
 		}
 		itemSubdata.clear();
@@ -195,13 +205,51 @@ public class ItemLookupTable {
 				addEntry(m.getId(), 0, name);
 			}
 		}
+		// now load recipes
+
+		Iterator serverRecipes = plugin.getServer().recipeIterator();
+		String errors = ""; // only show each error once
+		while (serverRecipes.hasNext()) {
+			Object rec = serverRecipes.next();
+			if (rec instanceof ShapedRecipe) {
+				ShapedRecipe r = (ShapedRecipe) rec;
+				addRecipe(new ItemValue(r.getResult().getTypeId(), r.getResult().getData().getData()), new CraftRecipe(r));
+			} else if (rec instanceof ShapelessRecipe) {
+				ShapelessRecipe r = (ShapelessRecipe) rec;
+				addRecipe(new ItemValue(r.getResult().getTypeId(), r.getResult().getData().getData()), new CraftRecipe(r));
+			} else if (!Compatibility.check() && rec instanceof CraftFurnaceRecipe) {
+				CraftFurnaceRecipe r = (CraftFurnaceRecipe) rec;
+				ItemValue idvRes = new ItemValue(r.getResult().getTypeId(), r.getResult().getData().getData());
+				for(CraftRecipe rc : CraftRecipe.getSmeltRecipes(new ItemValue(r.getInput()))) {
+					addRecipe(idvRes, rc);
+				}
+			} else {
+				if(!errors.contains("'" + rec.getClass().getName())) {
+					errors += "'" + rec.getClass().getName();
+					System.out.println("unknown recipe: " + rec.getClass().getName());
+				}
+			}
+		}
+//		int i = 0;
+//		for (List<CraftRecipe> rs : recipes.values()) {
+//			i += rs.size();
+//		}
+//		System.out.println(i + " recipes saved");
+	}
+
+	protected void addRecipe(ItemValue idv, CraftRecipe r) {
+		if (!recipes.containsKey(idv)) {
+			recipes.put(idv, new ArrayList<CraftRecipe>());
+		}
+		recipes.get(idv).add(r);
 	}
 
 	protected final void setItem(int id, int data, String value) {
-		ArrayList<String> orig = itemNames.get(idVal(id, data));
+		ItemValue idv = new ItemValue(id, data);
+		ArrayList<String> orig = itemNames.get(idv);
 		String colored = Messages.convertColorChars(value);
 		if (colored.contains(String.valueOf(ChatColor.COLOR_CHAR))) {
-			itemColors.put(idVal(id, data),
+			itemColors.put(new ItemValue(id, data),
 					ChatColor.getByChar(colored.charAt(colored.indexOf(ChatColor.COLOR_CHAR) + 1)));
 			value = ChatColor.stripColor(colored);
 		}
@@ -243,6 +291,7 @@ public class ItemLookupTable {
 								plugin.getLogger().info(String.format(
 										"Notice: Name \"%s\" for item %d:%d conficts with an existing entry: %d:%d (ignoring)",
 										v, id, data, val == null ? -1 : val.id, val == null ? -1 : val.data));
+								
 							}
 							continue;
 						} else {
@@ -254,7 +303,7 @@ public class ItemLookupTable {
 								names.add(v);
 							}
 							// as well to the global index
-							items.put(valKey, (id << 16) + data);
+							items.put(valKey, new ItemValue(id, data));
 						}
 					}
 				}
@@ -290,19 +339,23 @@ public class ItemLookupTable {
 			}
 			return;
 		}
-		id = idVal(id, data);
-		if (!itemNames.containsKey(id)) {
-			itemNames.put(id, new ArrayList<String>());
+		ItemValue idv = new ItemValue(id, data);
+		if (!itemNames.containsKey(idv)) {
+			itemNames.put(idv, new ArrayList<String>());
 		}
-		itemNames.get(id).add(value);
-		items.put(keyValue, id);
+		itemNames.get(idv).add(value);
+		items.put(keyValue, idv);
 	}
 
 	protected final void addSubEntries(int id, int data, String value) {
-		if (!itemSubdata.containsKey(id)) {
-			itemSubdata.put(id, new HashMap<String, Integer>());
+		addSubEntries(new ItemValue(id, data), value);
+	}
+
+	protected final void addSubEntries(ItemValue idv, String value) {
+		if (!itemSubdata.containsKey(idv.id)) {
+			itemSubdata.put(idv.id, new HashMap<String, Short>());
 		}
-		HashMap<String, Integer> map = itemSubdata.get(id);
+		HashMap<String, Short> map = itemSubdata.get(idv.id);
 		for (String v : value.split(",")) {
 			if ((v = v.trim()).length() > 0) {
 				//addSubEntry(id, data, v);
@@ -310,26 +363,30 @@ public class ItemLookupTable {
 				if (map.containsKey(v.toLowerCase())) {
 					plugin.getLogger().info(String.format(
 							"Notice: Sub-Name \"%s\" for item %d:%d conficts with an existing entry (" + map.get(v.toLowerCase()) + ") : ignoring",
-							v, id, data));
+							v, idv.id, idv.data));
 				} else {
-					map.put(v.toLowerCase(), data);
+					map.put(v.toLowerCase(), (short) idv.data);
 				}
 			}
 		}
 	}
 
 	protected final void addSubEntry(int id, int data, String value) {
-		if (!itemSubdata.containsKey(id)) {
-			itemSubdata.put(id, new HashMap<String, Integer>());
+		addSubEntry(new ItemValue(id, data), value);
+	}
+
+	protected final void addSubEntry(ItemValue idv, String value) {
+		if (!itemSubdata.containsKey(idv.id)) {
+			itemSubdata.put(idv.id, new HashMap<String, Short>());
 		}
-		HashMap<String, Integer> map = itemSubdata.get(id);
+		HashMap<String, Short> map = itemSubdata.get(idv.id);
 		if (map.containsKey(value.toLowerCase())) {
 			plugin.getLogger().info(String.format(
 					"Notice: Sub-Name \"%s\" for item %d:%d conficts with an existing entry (" + map.get(value.toLowerCase()) + ") : ignoring",
-					value, id, data));
+					value, idv.id, idv.data));
 			return;
 		}
-		map.put(value.toLowerCase(), data);
+		map.put(value.toLowerCase(), (short) idv.data);
 	}
 
 	public void load(YamlConfiguration conf) {
@@ -408,30 +465,55 @@ public class ItemLookupTable {
 		}
 	}
 
+	public boolean isValidItem(int id) {
+		if (id > 0) {
+			if ((id & PricelistDatabaseHandler.ID_BYTES) == 0) {
+				return Material.getMaterial(id) != null;
+			} else if (itemNames.containsKey(id)) {
+				return Material.getMaterial(id >> PricelistDatabaseHandler.DATA_BYTE_LEN) != null;
+			}
+		}
+		return false;
+	}
+
+	public boolean isValidItem(int id, int data) {
+		if (id > 0 && data >= 0) {
+			if (Material.getMaterial(id) != null) {
+				return true; //itemNames.containsKey(idVal(id, data));
+			}
+		}
+		return false;
+	}
+
 	public ItemValue getItem(String search) {
 		search = search.replace(" ", "").toLowerCase();
 		if (CheckInput.IsInt(search)) {
-			int id = CheckInput.GetInt(search, -1);
-			if ((id & PricelistDatabaseHandler.ID_BYTES) == 0 && id > 0 && itemNames.containsKey(id << PricelistDatabaseHandler.DATA_BYTE_LEN)) {
-				return new ItemValue(id, 0);
+			ItemValue idv = new ItemValue(CheckInput.GetInt(search, -1));
+			if (idv.id > 0 && itemNames.containsKey(idv)) {
+				return idv;
 			}
-		} else if (search.contains(":")) {
-			if (Str.count(search, ":") == 1) {
-				String idStr = search.substring(0, search.indexOf(':'));
+		} else if (search.contains(":") || search.contains("-")) {
+			char delim;
+			if (search.contains("-")) {
+				delim = '-';
+			} else { // if(search.contains(":")) {
+				delim = ':';
+			}
+			if (Str.count(search, delim) == 1) {
+				String idStr = search.substring(0, search.indexOf(delim));
 				ItemValue find = getItem(idStr);
-
 				if (find != null) {
 					if (ExtendedMaterials.usesData(find.id)) {
-						String datStr = search.substring(search.indexOf(':') + 1);
+						String datStr = search.substring(search.indexOf(delim) + 1);
 						if (CheckInput.IsInt(datStr)) {
-							int dat = CheckInput.GetInt(search, -1);
+							short dat = CheckInput.GetShort(datStr, (short) -1);
 							if ((dat & 2147418112) == 0 && dat > 0 && ExtendedMaterials.validData(find.id, dat)) {
 								find.data = dat;
 								return find;
 							}
 						} else if (itemSubdata.containsKey(find.id)) {
 							// look up using sub table (eg. wool:black)
-							HashMap<String, Integer> subs = itemSubdata.get(find.id);
+							HashMap<String, Short> subs = itemSubdata.get(find.id);
 							if (subs.containsKey(datStr)) {
 								find.data = subs.get(datStr);
 								return find;
@@ -459,8 +541,7 @@ public class ItemLookupTable {
 			}
 		} else if (items.containsKey(search)) {
 			// direct match to name or alias
-			return new ItemValue(items.get(search) >> PricelistDatabaseHandler.DATA_BYTE_LEN, 
-					items.get(search) & PricelistDatabaseHandler.DATA_BYTES);
+			return items.get(search);
 		} else {
 			// now do string-compare for the closest match
 			String close = null;
@@ -475,30 +556,28 @@ public class ItemLookupTable {
 				}
 			}
 			if (close != null) {
-				return new ItemValue(items.get(close) >> PricelistDatabaseHandler.DATA_BYTE_LEN, 
-						items.get(close) & PricelistDatabaseHandler.DATA_BYTES);
+				return items.get(close);
 			}
 		}
 		return null;
 	}
 
 	public String getItemName(int id) {
-		if((id & PricelistDatabaseHandler.ID_BYTES) == 0 && id > 0) {
-			return itemNames.containsKey(id << PricelistDatabaseHandler.DATA_BYTE_LEN) ? itemNames.get(id << PricelistDatabaseHandler.DATA_BYTE_LEN).get(0) : null;
-		}
-		return itemNames.containsKey(id) ? itemNames.get(id).get(0) : null;
+		ItemValue idv = new ItemValue(id);
+		return itemNames.containsKey(idv) ? itemNames.get(idv).get(0) : null;
 	}
 
 	public String getItemName(int id, int data) {
-		return itemNames.containsKey(idVal(id, data)) ? itemNames.get(idVal(id, data)).get(0) : null;
+		ItemValue idv = new ItemValue(id, data);
+		return itemNames.containsKey(idv) ? itemNames.get(idv).get(0) : null;
 	}
 
-	public String getItemName(ItemValue id) {
-		return id != null && itemNames.containsKey(id.toIDVal()) ? itemNames.get(id.toIDVal()).get(0) : null;
+	public String getItemName(ItemValue idv) {
+		return idv != null && itemNames.containsKey(idv) ? itemNames.get(idv).get(0) : null;
 	}
 
 	public String getColoredItemName(int id) {
-		int idv = idVal(id, 0);
+		ItemValue idv = new ItemValue(id);
 		if (itemNames.containsKey(idv)) {
 			if (itemColors.containsKey(idv)) {
 				return itemColors.get(idv) + itemNames.get(idv).get(0);
@@ -508,8 +587,8 @@ public class ItemLookupTable {
 		return null;
 	}
 
-	public String getColoredItemName(int id, int data) {
-		int idv = idVal(id, data);
+	public String getColoredItemName(int id, short data) {
+		ItemValue idv = new ItemValue(id, data);
 		if (itemNames.containsKey(idv)) {
 			if (itemColors.containsKey(idv)) {
 				return itemColors.get(idv) + itemNames.get(idv).get(0);
@@ -519,37 +598,44 @@ public class ItemLookupTable {
 		return null;
 	}
 
-	public String getColoredItemName(ItemValue id) {
-		return id == null ? null : getColoredItemName(id.id, id.data);
+	public String getColoredItemName(ItemValue idv) {
+		if (itemNames.containsKey(idv)) {
+			if (itemColors.containsKey(idv)) {
+				return itemColors.get(idv) + itemNames.get(idv).get(0);
+			}
+			return itemNames.get(idv).get(0);
+		}
+		return null;
 	}
 
 	public ArrayList<String> getItemNames(int id) {
-		return itemNames.containsKey(id << PricelistDatabaseHandler.DATA_BYTE_LEN) ? (ArrayList<String>) itemNames.get(id << PricelistDatabaseHandler.DATA_BYTE_LEN).clone() : null;
+		ItemValue idv = new ItemValue(id);
+		return itemNames.containsKey(idv) ? (ArrayList<String>) itemNames.get(idv).clone() : null;
 	}
 
 	public ArrayList<String> getItemNames(int id, int data) {
-		return itemNames.containsKey(idVal(id, data)) ? (ArrayList<String>) itemNames.get(idVal(id, data)).clone() : null;
+		ItemValue idv = new ItemValue(id, data);
+		return itemNames.containsKey(idv) ? (ArrayList<String>) itemNames.get(idv).clone() : null;
 	}
 
-	public ArrayList<String> getItemNames(ItemValue id) {
-		return id != null && itemNames.containsKey(id.toIDVal()) ? (ArrayList<String>) itemNames.get(id.toIDVal()).clone() : null;
-	}
-	
-	private int idVal(int id, int data) {
-		return (id << PricelistDatabaseHandler.DATA_BYTE_LEN) + data;
+	public ArrayList<String> getItemNames(ItemValue idv) {
+		return idv != null && itemNames.containsKey(idv) ? (ArrayList<String>) itemNames.get(idv).clone() : null;
 	}
 
-	public Integer[] getFullIdList() {
+//	public static int idVal(int id, int data) {
+//		return id >= 0 && data >= 0 ? (id << PricelistDatabaseHandler.DATA_BYTE_LEN) + data : -1;
+//	}
+
+	public ItemValue[] getFullIdList() {
 		//return itemNames.keySet().toArray(new Integer[0]);
-		return sortedItemList.toArray(new Integer[0]);
+		return sortedItemList.toArray(new ItemValue[0]);
 	}
-	
-	public void reorderSortedIds(final ArrayList<Integer> sortFirst) {
-		Collections.sort(sortedItemList, new Comparator<Integer>(){
 
+	public void reorderSortedIds(final ArrayList<Integer> sortFirst) {
+		Collections.sort(sortedItemList, new Comparator<ItemValue>() {
 			@Override
-			public int compare(Integer o1, Integer o2) {
-				if(sortFirst != null && !sortFirst.isEmpty()) {
+			public int compare(ItemValue o1, ItemValue o2) {
+				if (sortFirst != null && !sortFirst.isEmpty()) {
 					int o1i = sortFirst.indexOf(o1);
 					int o2i = sortFirst.indexOf(o2);
 					if (o1i != -1 && o2i != -1) {
@@ -560,11 +646,11 @@ public class ItemLookupTable {
 						return 1;
 					}
 				}
-				return o1 - o2;
+				return o1.toIDVal() - o2.toIDVal();
 			}
 		});
 	}
-	
+
 	public List<String> getItemNameMatches(String search) {
 		/**
 		 * min length of string for spelling and inStr checks
@@ -581,8 +667,8 @@ public class ItemLookupTable {
 			search = search.substring(0, search.indexOf(':'));
 		}
 		boolean start, instr, spell;
-		for (Map.Entry<Integer, ArrayList<String>> e : itemNames.entrySet()) {
-			if (!requireDataItem || ExtendedMaterials.usesData(e.getKey() >> 16)) {
+		for (Map.Entry<ItemValue, ArrayList<String>> e : itemNames.entrySet()) {
+			if (!requireDataItem || ExtendedMaterials.usesData(e.getKey().id)) {
 				for (String item : e.getValue()) {
 					String check = item.replace(" ", "").toLowerCase();
 					start = instr = spell = false;
@@ -596,15 +682,15 @@ public class ItemLookupTable {
 					// partial matches
 					if (start || instr || spell) {
 						if (requireDataItem) {
-							if ((e.getKey() & 65535) == 0 && itemSubdata.containsKey(e.getKey() >> 16)) {
+							if ((e.getKey().data) == 0 && itemSubdata.containsKey(e.getKey().id)) {
 								// look up using sub table (eg. wool:black)
-								HashMap<String, Integer> subs = itemSubdata.get(e.getKey() >> 16);
+								HashMap<String, Short> subs = itemSubdata.get(e.getKey().id);
 								if (subs.containsKey(dataValue)) {
 									partialMatches.add(item + ":" + dataValue);
 								} else {
-									ArrayList<Integer> used = new ArrayList<Integer>();
+									ArrayList<Short> used = new ArrayList<Short>();
 									// now do string-compare for matches
-									for (Map.Entry<String, Integer> de : subs.entrySet()) {
+									for (Map.Entry<String, Short> de : subs.entrySet()) {
 										if (!used.contains(de.getValue())) {
 											if (de.getKey().startsWith(dataValue)) { // partial matches
 												partialMatches.add(item + ":" + de.getKey());
@@ -636,36 +722,5 @@ public class ItemLookupTable {
 		partialMatches.addAll(spellingMatches);
 		partialMatches.addAll(stringMatches);
 		return partialMatches;
-	}
-
-	public static class ItemValue {
-
-		public int id, data;
-
-		ItemValue() {
-		}
-
-		public ItemValue(int id) {
-			this.id = id;
-		}
-
-		public ItemValue(int id, int data) {
-			this.id = id;
-			this.data = data;
-		}
-		
-		public boolean isTool() {
-			Material m = Material.getMaterial(id);
-			return m != null && m.getMaxDurability() > 0;
-		}
-		
-		public int toIDVal() {
-			return (id << PricelistDatabaseHandler.DATA_BYTE_LEN) + data;
-		}
-
-		@Override
-		public String toString() {
-			return "ItemValue{" + "id=" + id + ", data=" + data + '}';
-		}
 	}
 }

@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import me.jascotty2.bukkit.bettershop3.BetterShop3;
 import me.jascotty2.bukkit.bettershop3.FileManager;
+import me.jascotty2.bukkit.bettershop3.ItemValue;
 import me.jascotty2.libv2.io.CheckInput;
 import me.jascotty2.libv2.io.FileIO;
 import me.jascotty2.libv2.util.ArrayManip;
@@ -49,14 +50,14 @@ public class CSV_Database extends PricelistDatabaseHandler {
 	protected void fullReload() {
 		if (saveFile.exists()) {
 			try {
-				for (Map.Entry<String, Map<Integer, ItemPrice>> e : prices.entrySet()) {
+				for (Map.Entry<String, Map<ItemValue, ItemPrice>> e : prices.entrySet()) {
 					e.getValue().clear();
 				}
 				prices.clear();
 				// reload
 				List<String[]> file = FileIO.loadCSVFile(saveFile);
-				Integer validIDs[] = plugin.itemDB.getFullIdList();
-				HashMap<Integer, ItemPrice> pricelist = new HashMap<Integer, ItemPrice>();
+				ItemValue validIDs[] = plugin.itemDB.getFullIdList();
+				HashMap<ItemValue, ItemPrice> pricelist = new HashMap<ItemValue, ItemPrice>();
 				String shopName = GLOBAL_IDENTIFIER;
 				for (String[] dataLine : file) {
 					if (dataLine.length == 0) {
@@ -65,18 +66,16 @@ public class CSV_Database extends PricelistDatabaseHandler {
 					if (!CheckInput.IsInt(dataLine[0])) {
 						if (!pricelist.isEmpty()) {
 							prices.put(shopName, pricelist);
-							pricelist = new HashMap<Integer, ItemPrice>();
+							pricelist = new HashMap<ItemValue, ItemPrice>();
 						}
 						shopName = dataLine[0];
 					} else if (dataLine.length >= 4) {
-						int id = CheckInput.GetInt(dataLine[0], -1);
-						if (id <= 0) { // double-check..
-							continue;
-						}
-						int data = dataLine[1].length() == 0 ? 0 : CheckInput.GetInt(dataLine[1], 0);
-						if (ArrayManip.indexOf(validIDs, (Integer) ((id << DATA_BYTE_LEN) + data)) != -1) {
-							pricelist.put((id << DATA_BYTE_LEN) + data,
-									new ItemPrice(CheckInput.GetDouble(dataLine[2], -1), CheckInput.GetDouble(dataLine[3], -1)));
+						ItemValue idv = new ItemValue(CheckInput.GetInt(dataLine[0], -1), dataLine[1].length() == 0 ? 0 : CheckInput.GetInt(dataLine[1], 0));
+						if (idv.id > 0 && idv.data >= 0 && ArrayManip.indexOf(validIDs, idv) != -1) {
+							pricelist.put(idv,
+									new ItemPrice(idv, 
+											CheckInput.GetDouble(dataLine[2], -1), CheckInput.GetDouble(dataLine[3], -1),
+											dataLine.length > 4 ? CheckInput.GetLong(dataLine[4], -1) : -1));
 						}
 					}
 				}
@@ -104,12 +103,12 @@ public class CSV_Database extends PricelistDatabaseHandler {
 			}
 			FileWriter fstream = new FileWriter(saveFile.getAbsolutePath());
 			BufferedWriter out = new BufferedWriter(fstream);
-			for (Map.Entry<String, Map<Integer, ItemPrice>> e : prices.entrySet()) {
+			for (Map.Entry<String, Map<ItemValue, ItemPrice>> e : prices.entrySet()) {
 				out.write(e.getKey());
 				out.newLine();
-				for (Map.Entry<Integer, ItemPrice> p : e.getValue().entrySet()) {
-					out.write(String.valueOf(p.getKey() >> DATA_BYTE_LEN) + "," 
-							+ String.valueOf(p.getKey() & DATA_BYTES) + "," 
+				for (Map.Entry<ItemValue, ItemPrice> p : e.getValue().entrySet()) {
+					out.write(String.valueOf(p.getKey().id) + "," 
+							+ String.valueOf(p.getKey().data) + "," 
 							+ p.getValue().buyPrice + ","
 							+ p.getValue().sellPrice + "\n");
 				}

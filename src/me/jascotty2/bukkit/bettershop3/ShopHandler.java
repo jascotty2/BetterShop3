@@ -18,6 +18,46 @@
  */
 package me.jascotty2.bukkit.bettershop3;
 
+import me.jascotty2.bukkit.bettershop3.database.PricelistDatabaseHandler;
+import me.jascotty2.bukkit.bettershop3.database.Shop;
+import me.jascotty2.bukkit.bettershop3.enums.GlobalShopMode;
+import org.bukkit.Location;
+
 public class ShopHandler {
+
+	PricelistDatabaseHandler shop;
+	final protected BetterShop3 plugin;
+
+	public ShopHandler(BetterShop3 plugin) {
+		this.plugin = plugin;
+	}
 	
+	public boolean globalEnabled(Location l) {
+		if(!plugin.config.region_useRegions) {
+			return true;
+		} else if (plugin.config.region_globalMode == GlobalShopMode.NONE) {
+			return false;
+		}
+		// todo: 
+		// return plugin.config.region_globalMode == GlobalShopMode.GLOBAL || (location in a global shop region);
+		return plugin.config.region_globalMode == GlobalShopMode.GLOBAL;
+	}
+	
+	public Shop getRegionShop(Location l) {
+		if(!plugin.config.region_useRegions) {
+			return new Shop(null, plugin.getPricelist());
+		}
+		// todo:
+		// if (no region in location) {
+		if (plugin.config.region_globalMode == GlobalShopMode.NONE
+				|| plugin.config.region_globalMode == GlobalShopMode.REGIONS) {
+			return null;
+		} else /*if (plugin.config.region_globalMode == GlobalShopMode.GLOBAL) */ {
+			return new Shop(null, plugin.getPricelist());
+		}
+		// }
+		// else, return the shop associated with this region
+		// if none: return global if (plugin.config.region_globalMode == GlobalShopMode.REGIONS), else null
+		
+	}
 }

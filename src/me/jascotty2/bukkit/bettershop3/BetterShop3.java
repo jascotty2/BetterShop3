@@ -34,8 +34,10 @@ public class BetterShop3 extends JavaPlugin {
 	public final Messages messages = new Messages(this);
 	public final FileManager fileManager = new FileManager(this);
 	public final SettingsManager config = new SettingsManager(this);
+	public final CraftablePriceLookup craftables = new CraftablePriceLookup(this);
 	public final PermissionsHandler permissions = new PermissionsHandler(this);
 	public final ItemLookupTable itemDB = new ItemLookupTable(this);
+	public final ShopHandler shopManager = new ShopHandler(this);
 	protected PricelistDatabaseHandler pricelist;
 	public final ShopCommands com_shop = new ShopCommands(this);
 	public final SellCommands com_sell = new SellCommands(this);
@@ -57,7 +59,12 @@ public class BetterShop3 extends JavaPlugin {
 			try {
 				pricelist = new MySQL_Database(this);
 			} catch (Throwable t) {
-				getLogger().log(Level.SEVERE, "Failed to connect to MySQL Server", t);
+				if(t instanceof AbstractMethodError) {
+					getLogger().log(Level.SEVERE, "Failed to connect to MySQL Server");
+				} else {
+					getLogger().log(Level.SEVERE, String.format("Failed to connect to MySQL Server: %s", 
+							(t == null ? null : t.getClass().getName() + ": " + t.getMessage())));
+				}
 				getLogger().info(String.format("Reverting to %s Database..", config.pricelist_type_default.name()));
 				config.pricelist_type = config.pricelist_type_default;
 			}
@@ -77,6 +84,9 @@ public class BetterShop3 extends JavaPlugin {
 		setCommand("price", com_price);
 		setCommand("pricelist", com_price);
 
+		getLogger().info(String.format("Enabled using %s database: %d Shops with %d total entries", 
+				config.pricelist_type.name(), pricelist.getShops().size(), pricelist.totalEntries()));
+		
 		try {
 			Metrics metrics = new Metrics(this);
 			metrics.start();
@@ -103,7 +113,7 @@ public class BetterShop3 extends JavaPlugin {
 			((MySQL_Database) pricelist).disconnect();
 		}
 	}
-
+	
 	public PricelistDatabaseHandler getPricelist() {
 		return pricelist;
 	}

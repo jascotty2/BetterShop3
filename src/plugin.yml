@@ -49,6 +49,16 @@ commands:
     usage: /<command>
     aliases: [ssellagain, ssa, shopsellagain]
     #permission: BetterShop.user.sell
+  shopadd:
+    description: Add an item to or update an item in the price list
+    usage: /<command> [item] [buy-price] [sell-price]
+    aliases: [sadd]
+    #permission: BetterShop.admin.add
+  shopremove:
+    description: Remove an item from the price list
+    usage: /<command> [item]
+    aliases: [sremove]
+    #permission: BetterShop.admin.remove
 permissions:
   BetterShop.user.*:
     description: all user commands

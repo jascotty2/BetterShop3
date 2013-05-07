@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import me.jascotty2.bukkit.bettershop3.BetterShop3;
+import me.jascotty2.bukkit.bettershop3.ItemValue;
 import me.jascotty2.libv2.mysql.MySQL;
 import me.jascotty2.libv2.util.ArrayManip;
 import me.jascotty2.libv2.util.Numbers;
@@ -35,12 +36,16 @@ public class MySQL_Database extends PricelistDatabaseHandler {
 	/**
 	 * local copy of the database
 	 */
-	protected final HashMap<String, Map<Integer, ItemPrice>> DBprices = new HashMap<String, Map<Integer, ItemPrice>>();
+	protected final HashMap<String, Map<ItemValue, ItemPrice>> DBprices = new HashMap<String, Map<ItemValue, ItemPrice>>();
 
 	public MySQL_Database(BetterShop3 plugin) throws Exception {
 		super(plugin);
 		sqlConnection = new MySQL(plugin.config.sql_database, plugin.config.sql_username,
 				plugin.config.sql_password, plugin.config.sql_hostName, plugin.config.sql_portNum);
+		sqlConnection.connect();
+		if (!sqlConnection.isConnected()) {
+			throw new Exception("Cannot connect to MySQL Server");
+		}
 		sql_tableName = plugin.config.sql_pricetable;
 		conn_pw = plugin.config.sql_password;
 		if (!sqlConnection.tableExists(sql_tableName)) {
@@ -49,10 +54,12 @@ public class MySQL_Database extends PricelistDatabaseHandler {
 		} else {
 			// verify table version
 			ResultSet table = sqlConnection.getColumns(sql_tableName);
-			boolean hasShopKey = false;
+			boolean hasShopKey = false, hasStock = false;
 			for (; table.next();) {
 				if (table.getString("COLUMN_NAME").equalsIgnoreCase("Shop")) {
 					hasShopKey = true;
+				} else if (table.getString("COLUMN_NAME").equalsIgnoreCase("Stock")) {
+					hasStock = true;
 				} else if (table.getString("COLUMN_NAME").equalsIgnoreCase("Sub")
 						&& table.getString("TYPE_NAME").equalsIgnoreCase("TINYINT")) {
 					// new ver. uses int for both
@@ -71,9 +78,13 @@ public class MySQL_Database extends PricelistDatabaseHandler {
 						+ "DROP PRIMARY KEY, "
 						+ "ADD PRIMARY KEY  USING BTREE(`Shop`, `ID`, `SUB`);");
 			}
+			if (!hasStock) {
+				sqlConnection.runUpdate(
+						"ALTER TABLE `" + sql_tableName + "` ADD COLUMN `Stock` INT(19) NOT NULL;");
+			}
 		}
 	}
-	
+
 	public void disconnect() {
 		flushSave();
 		sqlConnection.disconnect();
@@ -113,30 +124,27 @@ public class MySQL_Database extends PricelistDatabaseHandler {
 			return;
 		}
 		try {
-			Integer validIDs[] = plugin.itemDB.getFullIdList();
+			ItemValue validIDs[] = plugin.itemDB.getFullIdList();
 			ResultSet table = sqlConnection.getQuery(
-					"SELECT * FROM `" + sql_tableName + "`  ORDER BY ID, Sub;");
+					"SELECT * FROM `" + sql_tableName + "` ORDER BY ID, Sub;");
 			clearPrices();
 			while (table.next()) {
-				int id = table.getInt("ID"),
-						data = table.getInt("Sub");
-				if (ArrayManip.indexOf(validIDs, (Integer) ((id << DATA_BYTE_LEN) + data)) != -1) {
+				ItemValue idv = new ItemValue(table.getInt("ID"), table.getInt("Sub"));
+				if (ArrayManip.indexOf(validIDs, idv) != -1) {
 					String shopName = table.getString("Shop");
 					if (shopName.isEmpty()) {
 						shopName = GLOBAL_IDENTIFIER;
 					}
-					Map<Integer, ItemPrice> pricelist = prices.get(shopName);
-					Map<Integer, ItemPrice> pricelist2 = DBprices.get(shopName);
+					Map<ItemValue, ItemPrice> pricelist = prices.get(shopName);
+					Map<ItemValue, ItemPrice> pricelist2 = DBprices.get(shopName);
 					if (pricelist == null) {
-						pricelist = new HashMap<Integer, ItemPrice>();
+						pricelist = new HashMap<ItemValue, ItemPrice>();
 						prices.put(shopName, pricelist);
-						pricelist2 = new HashMap<Integer, ItemPrice>();
+						pricelist2 = new HashMap<ItemValue, ItemPrice>();
 						DBprices.put(shopName, pricelist2);
 					}
-					pricelist.put((id << DATA_BYTE_LEN) + data,
-							new ItemPrice(table.getDouble("buy"), table.getDouble("sell")));
-					pricelist2.put((id << DATA_BYTE_LEN) + data,
-							new ItemPrice(table.getDouble("buy"), table.getDouble("sell")));
+					pricelist.put(idv, new ItemPrice(idv, table.getDouble("buy"), table.getDouble("sell")));
+					pricelist2.put(idv, new ItemPrice(idv, table.getDouble("buy"), table.getDouble("sell")));
 				}
 			}
 		} catch (SQLException ex) {
@@ -148,28 +156,32 @@ public class MySQL_Database extends PricelistDatabaseHandler {
 	protected void reloadItemPrice(String shop, int id, int data) {
 		try {
 			shop = safeShopName(shop);
-			int idVal = (id << DATA_BYTE_LEN) + data;
+			ItemValue idv = new ItemValue(id, data);
 			ResultSet value = sqlConnection.getQuery("SELECT * FROM `" + sql_tableName + "` "
 					+ "WHERE Shop='" + shop + "' AND ID=" + id + " AND Sub=" + data + ";");
 			if (value.next()) {
 				if (!prices.containsKey(shop)) {
-					prices.put(shop, new HashMap<Integer, ItemPrice>());
-					DBprices.put(shop, new HashMap<Integer, ItemPrice>());
+					prices.put(shop, new HashMap<ItemValue, ItemPrice>());
+					DBprices.put(shop, new HashMap<ItemValue, ItemPrice>());
 				}
-				if (!prices.get(shop).containsKey(idVal)) {
-					prices.get(shop).put(idVal, new ItemPrice(value.getDouble("buy"), value.getDouble("sell")));
+				if (!prices.get(shop).containsKey(idv)) {
+					prices.get(shop).put(idv, new ItemPrice(id, (short) data, value.getDouble("buy"), value.getDouble("sell"), 
+							value.getLong("Stock")));
 				} else {
-					prices.get(shop).get(idVal).set(value.getDouble("buy"), value.getDouble("sell"));
+					prices.get(shop).get(idv).set(value.getDouble("buy"), value.getDouble("sell"), 
+							value.getLong("Stock"));
 				}
-				if (!DBprices.get(shop).containsKey(idVal)) {
-					DBprices.get(shop).put(idVal, new ItemPrice(value.getDouble("buy"), value.getDouble("sell")));
+				if (!DBprices.get(shop).containsKey(idv)) {
+					DBprices.get(shop).put(idv, new ItemPrice(id, (short) data, value.getDouble("buy"), value.getDouble("sell"), 
+							value.getLong("Stock")));
 				} else {
-					DBprices.get(shop).get(idVal).set(value.getDouble("buy"), value.getDouble("sell"));
+					DBprices.get(shop).get(idv).set(value.getDouble("buy"), value.getDouble("sell"), 
+							value.getLong("Stock"));
 				}
 			} else {
 				if (prices.containsKey(shop)) {
-					prices.get(shop).remove(idVal);
-					DBprices.get(shop).remove(idVal);
+					prices.get(shop).remove(idv);
+					DBprices.get(shop).remove(idv);
 				}
 			}
 		} catch (SQLException ex) {
@@ -181,19 +193,19 @@ public class MySQL_Database extends PricelistDatabaseHandler {
 	public void saveFull() {
 		try {
 			// add new items, remove ones that are missing, update changes
-			for (Map.Entry<String, Map<Integer, ItemPrice>> shop : prices.entrySet()) {
+			for (Map.Entry<String, Map<ItemValue, ItemPrice>> shop : prices.entrySet()) {
 				boolean global = shop.getKey().equalsIgnoreCase(GLOBAL_IDENTIFIER);
 				if (!DBprices.containsKey(shop.getKey())) {
-					Map<Integer, ItemPrice> dbValues = new HashMap<Integer, ItemPrice>();
+					Map<ItemValue, ItemPrice> dbValues = new HashMap<ItemValue, ItemPrice>();
 					DBprices.put(shop.getKey(), dbValues);
 					// all values are new
-					for (Map.Entry<Integer, ItemPrice> e : shop.getValue().entrySet()) {
+					for (Map.Entry<ItemValue, ItemPrice> e : shop.getValue().entrySet()) {
 						addValue(global ? "" : shop.getKey(), e.getKey(), e.getValue());
 						dbValues.put(e.getKey(), e.getValue().clone());
 					}
 				} else {
-					Map<Integer, ItemPrice> oldValues = DBprices.get(shop.getKey());
-					for (int item : plugin.itemDB.getFullIdList()) {
+					Map<ItemValue, ItemPrice> oldValues = DBprices.get(shop.getKey());
+					for (ItemValue item : plugin.itemDB.getFullIdList()) {
 						ItemPrice current = shop.getValue().get(item);
 						ItemPrice dbValue = oldValues.get(item);
 						if (current != null && dbValue == null) {
@@ -225,9 +237,9 @@ public class MySQL_Database extends PricelistDatabaseHandler {
 		}
 	}
 
-	protected void addValue(String shop, int idValue, ItemPrice price) throws SQLException {
+	protected void addValue(String shop, ItemValue idv, ItemPrice price) throws SQLException {
 		sqlConnection.runUpdate("INSERT INTO `" + sql_tableName + "`(Shop, ID, Sub, Buy, Sell) "
-				+ "VALUES('" + safeShopName(shop) + "'," + (idValue >> DATA_BYTE_LEN) + "," + (idValue & DATA_BYTES)
+				+ "VALUES('" + safeShopName(shop) + "'," + idv.id + "," + idv.data
 				+ "," + price.buyPrice + "," + price.sellPrice + ");");
 	}
 
@@ -237,9 +249,9 @@ public class MySQL_Database extends PricelistDatabaseHandler {
 				+ "," + price.buyPrice + "," + price.sellPrice + ");");
 	}
 
-	protected void updateValue(String shop, int idValue, ItemPrice price) throws SQLException {
+	protected void updateValue(String shop, ItemValue idv, ItemPrice price) throws SQLException {
 		sqlConnection.runUpdate("UPDATE `" + sql_tableName + "` SET Buy=" + price.buyPrice + " AND Sell=" + price.sellPrice
-				+ " WHERE Shop='" + safeShopName(shop) + "' AND ID=" + (idValue >> DATA_BYTE_LEN) + " AND Sub=" + (idValue & DATA_BYTES) + ";");
+				+ " WHERE Shop='" + safeShopName(shop) + "' AND ID=" + idv.id + " AND Sub=" + idv.data + ";");
 	}
 
 	protected void updateValue(String shop, int id, int data, ItemPrice price) throws SQLException {
@@ -247,9 +259,9 @@ public class MySQL_Database extends PricelistDatabaseHandler {
 				+ " WHERE Shop='" + safeShopName(shop) + "' AND ID=" + id + " AND Sub=" + data + ";");
 	}
 
-	protected void removeValue(String shop, int idValue) throws SQLException {
+	protected void removeValue(String shop, ItemValue idv) throws SQLException {
 		sqlConnection.runUpdate("DELETE FROM `" + sql_tableName + "` "
-				+ "WHERE Shop='" + safeShopName(shop) + "' AND ID=" + (idValue >> DATA_BYTE_LEN) + " AND Sub=" + (idValue & DATA_BYTES) + ";");
+				+ "WHERE Shop='" + safeShopName(shop) + "' AND ID=" + idv.id + " AND Sub=" + idv.data + ";");
 	}
 
 	protected void removeValue(String shop, int id, int data) throws SQLException {

@@ -9,19 +9,22 @@ Shop:
   No_Last_Buy: You have no purchase history since server reload
   Sell_Again: "Repeating Last Sale: <action>"
   Buy_Again: "Repeating Last Purchase: <action>"
+  Region_Disabled: Sorry, you cannot access the store from here
 Shop_List:
   Header: "&2----------<center> Price-List Page: &f<page> &2of &f<pages> <right>&2----------"
-  Listing: "[<green><item></>]&2 <right>Buy: &f<buyprice>&2 <right>Sell: &f<sellprice>"
+  #Listing: "[<green><item></>]&2 <right>Buy: &f<buyprice>&2 <right>Sell: &f<sellprice>"
   #Listing: "<left>[<green><item></>]&2 <center>Buy: &f<buyprice>&2 <right>Sell: &f<sellprice>"
+  Listing: "[<green><item></>]&2 <right>Buy: &f<buyprice>&2 <right>Sell: &f<sellprice> <right>Avaliable: <avail>"
   #Listing: "<left>[<green><item></>]&2 <center>Buy: &f<buyprice>&2 <left>(&f<buycur>&/) <right>Sell: &f<sellprice> &/<left>(&f<sellcur>&/)"
   Footer: 
   Alias: "&f[</><item>&f]&2 is also known as: &b<alias>"
   Nolist: "&f[</><item>&f] &2cannot be bought or sold."
   Pricecheck: "Price check! &f[</><item>&f]&2 Buy: &f<buyprice> &2Sell: &f<sellprice>"
+  Region_Disabled: "The Global Shop cannot be accessed in this area"
+  Infinite_Stock_Name: Infinite
 Permission:
   Denied: You don't Have Permission to do that!
 Items:
-  0: Air
   1: Stone, Smooth Stone
   2: Grass
   3: Dirt
@@ -242,6 +245,22 @@ Items:
   144-3_sub: Human
   144-4: Creeper Head
   144-4_sub: Creeper
+  145: Anvil
+  146: Trapped Chest, trap chest
+  147: Gold Weighted Pressure Plate, Weighted Pressure Plate, gold pressure plate, light pressure plate
+  148: Iron Weighted Pressure Plate, iron pressure plate, heavy pressure plate
+  151: Daylight Sensor
+  152: Block of Redstone
+  153: Nether Quartz Ore
+  154: Hopper
+  155: Block of Quartz
+  156: Quartz Stairs
+  157: Activator Rail
+  158: Dropper
+  170: Hay Block
+  171: Carpet
+  172: Hardened Clay, hard clay
+  173: Block of Coal
   # items
   256: Iron Shovel, Iron Spade, iShovel, iSpade
   257: Iron Pickaxe, Iron Pick, iPickaxe, iPick
@@ -433,6 +452,43 @@ Items:
   383-120: Villager Egg
   384: Bottle o' Enchanting, Bottle of Enchanting, Experience Bottle, Experience, Exp Bottle
   385: Fire Charge, Fireball
+  386: Book and Quill
+  387: Written Book
+  388: Emerald
+  389: Item Frame
+  390: Flower Pot
+  391: Carrot
+  392: Potato
+  393: Baked Potato
+  394: Poisonous Potato
+  395: Empty Map
+  396: Golden Carrot
+  397: Skeleton Head, Head
+  397-0_sub: Skeleton
+  397-1: Wither Skeleton Head
+  397-1_sub: Wither Skeleton, wSkeleton
+  397-2: Zombie Head
+  397-2_sub: Zombie
+  397-3: Human Head
+  397-3_sub: Human
+  397-4: Creeper Head
+  397-4_sub: Creeper
+  398: Carrot on a Stick
+  399: Nether Star
+  400: Pumpkin Pie
+  # todo - possible to buy fireworks
+  402: Firework Star
+  403: Enchanted Book
+  404: Redstone Comparator
+  405: Nether Brick
+  406: Nether Quartz
+  407: TNT Minecart
+  408: Hopper Minecart
+  417: Iron Horse Armor
+  418: Gold Horse Armor
+  419: Diamond Horse Armor
+  420: Lead
+  421: Name Tag
   2256: <gold>13 Disc, Gold Record, Gold Disk
   2257: <darkgreen>Cat Disc, Green Record, Green Disk
   2258: <red>Blocks Disc, Orange Record, Orange Disk
@@ -546,6 +602,7 @@ Entities:
   97: Snow Golem, Snow Man
   98: Ocelot, Ozelot, Cat
   99: Iron Golem, Villager Golem
+  100: Horse
   
   120: Villager
   

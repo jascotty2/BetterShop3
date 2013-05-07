@@ -19,12 +19,17 @@
 package me.jascotty2.bukkit.bettershop3;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import me.jascotty2.libv2.bukkit.util.MinecraftChatStr;
+import me.jascotty2.libv2.io.FileIO;
 import me.jascotty2.libv2.util.ArrayManip;
 import me.jascotty2.libv2.util.Str;
 import org.bukkit.ChatColor;
@@ -101,7 +106,8 @@ public class Messages {
 		NO_LAST_SALE,
 		NO_LAST_BUY,
 		SELL_AGAIN("<action>"),
-		BUY_AGAIN("<action>");
+		BUY_AGAIN("<action>"),
+		REGION_DISABLED;
 		private final String[] tags;
 
 		private SHOP(String... tags) {
@@ -131,7 +137,8 @@ public class Messages {
 		FOOTER,
 		ALIAS("<item>", "<alias>"),
 		NOLIST("<item>"),
-		PRICECHECK("<item>", "<buyprice>", "<sellprice>", "<curr>", "<max>", "<buycur>", "<sellcur>", "<avail>");
+		PRICECHECK("<item>", "<buyprice>", "<sellprice>", "<curr>", "<max>", "<buycur>", "<sellcur>", "<avail>"),
+		INFINITE_STOCK_NAME;
 		private final String[] tags;
 
 		private SHOP_LIST(String... tags) {
@@ -173,42 +180,105 @@ public class Messages {
 			}
 			if (!lang.exists()) {
 				plugin.getLogger().severe((locale.equals("en") ? "Error: 'en.yml' cannot be found" : "Error: Cannot load locale '" + locale + "', and 'en.yml' cannot be found"));
-				return;
 			} else {
 				plugin.getLogger().severe(String.format("Error: Cannot load locale '%s'. Defaulting to en", locale));
 			}
 		}
 
-		// TODO: load default en from jar, then use those strings if new lang is missing translations
-
-		YamlConfiguration conf = YamlConfiguration.loadConfiguration(lang);
+		YamlConfiguration conf = lang.exists() ? YamlConfiguration.loadConfiguration(lang) : null;
+		// load default en from jar, then use those strings if new lang is missing translations
+		YamlConfiguration defaultConf = null;
+		//String updated = "";
+		try {
+			File jarFile = FileIO.getJarFile(Messages.class);
+			URL res = Messages.class.getResource("/lang/en.yml");
+			if (res == null) {
+				throw new java.io.FileNotFoundException("Could not find '/lang/en.yml' in " + jarFile.getAbsolutePath());
+			}
+			URLConnection resConn = res.openConnection();
+			resConn.setUseCaches(false);
+			InputStream input = resConn.getInputStream();
+			
+			if (input == null) {
+				throw new java.io.IOException("can't get input stream from " + res);
+			} else {
+				defaultConf = YamlConfiguration.loadConfiguration(input);
+			}
+			input.close();
+		} catch (Exception ex) {
+			plugin.getLogger().log(Level.SEVERE, "Failed to load default language", ex);
+			defaultConf = null;
+		}
 		boolean needSave = false;
 		for (int i = 0; i < messageTypes.length; ++i) {
 			Class c = messageTypes[i];
 			if (c.isEnum()) {
 				String k = Str.titleCase(c.getSimpleName().replace('_', ' ')).replace(' ', '_');
-				if (conf.contains(k)) {
+				if (conf != null && conf.contains(k)) {
 					ConfigurationSection s = conf.getConfigurationSection(k);
 					Object[] o = c.getEnumConstants();
 					for (int j = 0; j < o.length; ++j) {
 						String k2 = Str.titleCase(o[j].toString().replace('_', ' ')).replace(' ', '_');
 						if (!s.contains(k2)) {
 							if (ArrayManip.indexOf(ALLOW_NULL, o[j]) == -1) {
-								plugin.getLogger().warning(String.format("%s.%s missing from %s", k, k2, lang.getName()));
-								s.set(k2, MISSING_STRING.replace("<m>", k + "." + k2));
+								boolean upd = false;
+								if(defaultConf != null) {
+									ConfigurationSection s2 = defaultConf.getConfigurationSection(k);
+									if(s2 == null || !s2.contains(k2)) {
+										plugin.getLogger().severe(String.format("Default lang is missing %s.%s", k, k2));
+										s.set(k2, MISSING_STRING.replace("<m>", k + "." + k2));
+									} else {
+										s.set(k2, s2.get(k2));
+										//updated += (updated.isEmpty() ? "" : ", ") + k + "." + k2;
+										upd = true;
+									}
+								} else {
+									s.set(k2, MISSING_STRING.replace("<m>", k + "." + k2));
+								}
+								plugin.getLogger().log(upd ? Level.INFO : Level.WARNING, String.format("%s.%s missing from %s" + (upd ? " (using default value)" : ""), k, k2, lang.getName()));
 								needSave = true;
+							} else if(defaultConf != null) {
+								ConfigurationSection s2 = defaultConf.getConfigurationSection(k);
+								if(s2 != null && s2.contains(k2)) {
+									s.set(k2, s2.get(k2));
+								}
 							}
 						}
 						messages[i][j] = convertColorChars(convertTags(s.getString(k2, ""), (MessageType) o[j]));
 					}
 				} else {
-					plugin.getLogger().warning(String.format("Error: Section '%s' is missing from %s", k, lang.getName()));
-					conf.createSection(k);
-					ConfigurationSection s = conf.getConfigurationSection(k);
+					ConfigurationSection s2 = null;
+					boolean upd = false;
+					if(defaultConf != null) {
+						s2 = defaultConf.getConfigurationSection(k);
+						if(s2 == null) {
+							plugin.getLogger().severe(String.format("Default lang is missing %s.*", k));
+						} else {
+							upd = true;
+						}
+					}
+					plugin.getLogger().log(upd ? Level.INFO: Level.WARNING, String.format("Error: Section '%s' is missing from %s" + (upd ? " (using default value)" : ""), k, lang.getName()));
+					ConfigurationSection s = null;
+					if(conf != null) {
+						conf.createSection(k);
+						s = conf.getConfigurationSection(k);
+					}
 					int j = 0;
 					for (Object o : c.getEnumConstants()) {
 						String k2 = Str.titleCase(o.toString().replace('_', ' ')).replace(' ', '_');
-						s.set(k2, MISSING_STRING);
+						if(s != null) {
+							if(s2 != null) {
+								if(!s2.contains(k2)) {
+									plugin.getLogger().severe(String.format("Default lang is missing %s.%s", k, k2));
+									s.set(k2, MISSING_STRING.replace("<m>", k + "." + k2));
+								} else {
+									s.set(k2, s2.get(k2));
+									//updated += (updated.isEmpty() ? "" : ", ") + k + "." + k2;
+								}
+							} else {
+								s.set(k2, MISSING_STRING.replace("<m>", k + "." + k2));
+							}
+						}
 						messages[i][j++] = convertColorChars(MISSING_STRING.replace("<m>", k + "." + k2));
 					}
 					needSave = true;
@@ -363,7 +433,7 @@ public class Messages {
 		return str;
 	}
 
-	protected String getMessage(Enum message) {
+	public String getMessage(Enum message) {
 		Class c = message.getDeclaringClass();
 		int i = ArrayManip.indexOf(messageTypes, c);
 		if (i != -1) {

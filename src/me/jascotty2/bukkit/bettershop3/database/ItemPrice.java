@@ -17,26 +17,68 @@
  */
 package me.jascotty2.bukkit.bettershop3.database;
 
+import me.jascotty2.bukkit.bettershop3.ItemValue;
+
 public class ItemPrice {
 
+	public final int id;
+	public final short data;
 	public double buyPrice, sellPrice;
+	public long stockAmount = -1;
 
-	public ItemPrice() {
+	public ItemPrice(int id, short data) {
+		this.id = id;
+		this.data = data;
 		buyPrice = sellPrice = -1;
 	}
 
-	public ItemPrice(double buyPrice, double sellPrice) {
+	public ItemPrice(ItemValue idv) {
+		this.id = idv.id;
+		this.data = idv.data;
+		buyPrice = sellPrice = -1;
+	}
+	
+	public ItemPrice(int id, short data, double buyPrice, double sellPrice) {
+		this.id = id;
+		this.data = data;
+		set(buyPrice, sellPrice);
+	}
+
+	public ItemPrice(ItemValue idv, double buyPrice, double sellPrice) {
+		this.id = idv.id;
+		this.data = idv.data;
+		set(buyPrice, sellPrice);
+	}
+	
+	public ItemPrice(int id, short data, double buyPrice, double sellPrice, long stock) {
+		this.id = id;
+		this.data = data;
+		stockAmount = stock;
+		set(buyPrice, sellPrice);
+	}
+	
+	public ItemPrice(ItemValue idv, double buyPrice, double sellPrice, long stock) {
+		this.id = idv.id;
+		this.data = idv.data;
+		stockAmount = stock;
 		set(buyPrice, sellPrice);
 	}
 	
 	public void set(ItemPrice copy) {
 		this.buyPrice = copy.buyPrice;
 		this.sellPrice = copy.sellPrice;
+		this.stockAmount = copy.stockAmount;
 	}
 
 	public final void set(double buyPrice, double sellPrice) {
 		this.buyPrice = buyPrice;
 		this.sellPrice = sellPrice;
+	}
+	
+	public final void set(double buyPrice, double sellPrice, long stockAmount) {
+		this.buyPrice = buyPrice;
+		this.sellPrice = sellPrice;
+		this.stockAmount = stockAmount;
 	}
 	
 	@Override
@@ -46,6 +88,6 @@ public class ItemPrice {
 	
 	@Override
 	public ItemPrice clone() {
-		return new ItemPrice(buyPrice, sellPrice);
+		return new ItemPrice(id, data, buyPrice, sellPrice, stockAmount);
 	}
 }

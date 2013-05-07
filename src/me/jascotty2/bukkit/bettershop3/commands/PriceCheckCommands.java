@@ -21,6 +21,7 @@ package me.jascotty2.bukkit.bettershop3.commands;
 import java.util.ArrayList;
 import java.util.Map;
 import me.jascotty2.bukkit.bettershop3.BetterShop3;
+import me.jascotty2.bukkit.bettershop3.ItemValue;
 import me.jascotty2.bukkit.bettershop3.Messages;
 import me.jascotty2.bukkit.bettershop3.database.ItemPrice;
 import me.jascotty2.libv2.io.CheckInput;
@@ -76,7 +77,7 @@ public class PriceCheckCommands implements CommandExecutor {
 			}
 		} else {
 			String shop = null;
-			Map<Integer, ItemPrice> prices = null;
+			Map<ItemValue, ItemPrice> prices = null;
 			if (sendTo instanceof Player) {
 				// todo: get the name of the shop the player is in, if applicable
 			} else if (args != null && args.length > 0) {
@@ -96,7 +97,7 @@ public class PriceCheckCommands implements CommandExecutor {
 			int pageStart = (pageNum - 1) * plugin.config.itemsPerPage,
 					display = pageNum > 0 ? plugin.config.itemsPerPage : Integer.MAX_VALUE;
 
-			for (int idVal : plugin.itemDB.getFullIdList()) {
+			for (ItemValue idVal : plugin.itemDB.getFullIdList()) {
 				if (prices.containsKey(idVal)) {
 					if (--pageStart < 0) {
 						ItemPrice p = prices.get(idVal);
@@ -105,7 +106,7 @@ public class PriceCheckCommands implements CommandExecutor {
 								p.sellPrice >= 0 ? plugin.economy.numFormat(p.sellPrice) : "--", // "No",
 								plugin.economy.getCurrencyName(), 
 								plugin.economy.format(p.buyPrice), plugin.economy.format(p.sellPrice),
-								-1});
+								p.stockAmount < 0 ? plugin.messages.getMessage(Messages.SHOP_LIST.INFINITE_STOCK_NAME) : p.stockAmount});
 						if (--display <= 0) {
 							break;
 						}

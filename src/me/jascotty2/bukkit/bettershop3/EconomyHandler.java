@@ -141,40 +141,38 @@ public class EconomyHandler {
 	}
 
 	public boolean bankTransaction(String bank, double amount) {
-		if (bank != null || bank.length() == 0) {
+		if (bank != null || bank.length() == 0 || vaultEcon == null) {
+			return false;
+		} else if (vaultEcon != null && !vaultEcon.hasBankSupport()) {
 			return false;
 		}
 		double preAmt = 0;
-		if (vaultEcon != null) {
-			if (vaultEcon.hasBankSupport()) {
-				EconomyResponse balance = vaultEcon.bankBalance(bank);
-				if (balance.transactionSuccess()) {
-					preAmt = balance.balance;
-				}
-			}
+
+		EconomyResponse balance = vaultEcon.bankBalance(bank);
+		if (balance.transactionSuccess()) {
+			preAmt = balance.balance;
 		}
-		if (preAmt <= 0) {
+
+		if (preAmt <= 0 || Math.abs(amount) > preAmt) {
 			return false;
 		}
-		if (vaultEcon != null) {
-			if (amount > 0) {
-				EconomyResponse resp = vaultEcon.bankDeposit(bank, amount);
-				return resp.transactionSuccess();
-			} else {
-				EconomyResponse resp = vaultEcon.bankWithdraw(bank, -amount);
-				return resp.transactionSuccess();
-			}
+
+		if (amount > 0) {
+			EconomyResponse resp = vaultEcon.bankDeposit(bank, amount);
+			return resp.transactionSuccess();
+		} else {
+			EconomyResponse resp = vaultEcon.bankWithdraw(bank, -amount);
+			return resp.transactionSuccess();
 		}
-		return false;
 	}
-	
+
 	public String getCurrencyName() {
 		if (vaultEcon != null) {
 			return vaultEcon.currencyNamePlural();
 		}
 		return plugin.config.econ_currency_m;
 	}
-	
+
 	public String numFormat(double amt) {
 		if (vaultEcon != null) {
 			return String.format("%." + (vaultEcon.fractionalDigits() < 0 ? 2 : vaultEcon.fractionalDigits()) + "f", amt);
